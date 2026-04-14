@@ -6,4 +6,6 @@ var app = builder.Build();
 
 app.MapHealthChecks("/health");
 
+app.MapGet("/", () => "Hello from Catalog!");
+
 app.Run();
