@@ -1,1 +1,6 @@
-<Solution />
+<Solution>
+  <Folder Name="/Catalog/" />
+  <Folder Name="/Catalog/src/">
+    <Project Path="Catalog/src/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj" />
+  </Folder>
+</Solution>
