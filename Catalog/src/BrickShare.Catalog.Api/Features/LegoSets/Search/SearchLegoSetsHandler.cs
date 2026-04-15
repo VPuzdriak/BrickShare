@@ -9,6 +9,7 @@ namespace BrickShare.Catalog.Api.Features.LegoSets.Search;
 internal sealed class SearchLegoSetsHandler(CatalogDbContext dbContext) {
   public async Task<PagedResult<FoundLegoSetDto>> HandleAsync(
     string? searchTerm,
+    string? legoId,
     Guid? themeId,
     int page,
     int pageSize,
@@ -19,6 +20,10 @@ internal sealed class SearchLegoSetsHandler(CatalogDbContext dbContext) {
 
     if (!string.IsNullOrEmpty(searchTerm)) {
       query = query.Where(s => s.Name.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase));
+    }
+
+    if (!string.IsNullOrEmpty(legoId)) {
+      query = query.Where(s => s.LegoId.StartsWith(legoId, StringComparison.OrdinalIgnoreCase));
     }
 
     if (themeId is not null) {

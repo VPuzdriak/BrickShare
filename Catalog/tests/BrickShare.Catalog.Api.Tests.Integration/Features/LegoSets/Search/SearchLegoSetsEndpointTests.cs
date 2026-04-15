@@ -18,11 +18,15 @@ public sealed class SearchLegoSetsEndpointTests(WebApplicationFactory<Program> f
   : IClassFixture<WebApplicationFactory<Program>> {
   private readonly HttpClient _client = factory.CreateClient();
 
-  private static Uri SearchUri(string? searchTerm = null, Guid? themeId = null, int page = 1, int pageSize = 10) {
+  private static Uri SearchUri(string? searchTerm = null, string? legoId = null, Guid? themeId = null, int page = 1, int pageSize = 10) {
     var url = LegoSetsEndpoints.RoutePrefix + SearchLegoSetsEndpoint.Route;
     var queryParams = new List<string>();
     if (searchTerm is not null) {
       queryParams.Add($"searchTerm={Uri.EscapeDataString(searchTerm)}");
+    }
+
+    if (legoId is not null) {
+      queryParams.Add($"legoId={Uri.EscapeDataString(legoId)}");
     }
 
     if (themeId is not null) {
@@ -109,7 +113,7 @@ public sealed class SearchLegoSetsEndpointTests(WebApplicationFactory<Program> f
     await CreateLegoSetAsync("Creator Boat", Guid.NewGuid().ToString("N"), themeId);
 
     // Act
-    HttpResponseMessage response = await _client.GetAsync(SearchUri("Creator Car", themeId));
+    HttpResponseMessage response = await _client.GetAsync(SearchUri(searchTerm: "Creator Car", themeId: themeId));
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -133,6 +137,47 @@ public sealed class SearchLegoSetsEndpointTests(WebApplicationFactory<Program> f
   public async Task SearchLegoSets_WithSearchTermShorterThan3Chars_ReturnsBadRequest() {
     // Act
     HttpResponseMessage response = await _client.GetAsync(SearchUri("Te"));
+
+    // Assert
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+  }
+
+  [Fact]
+  public async Task SearchLegoSets_WithMatchingLegoId_ReturnsOkWithMatchingSets() {
+    // Arrange
+    var themeId = await CreateThemeAsync("Technic");
+    await CreateLegoSetAsync("Bulldozer 5000", "42001", themeId);
+    await CreateLegoSetAsync("Excavator 3000", "42002", themeId);
+
+    // Act
+    HttpResponseMessage response = await _client.GetAsync(SearchUri(legoId: "420"));
+
+    // Assert
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+    PagedResult<FoundLegoSetDto>? result = await response.Content.ReadFromJsonAsync<PagedResult<FoundLegoSetDto>>();
+    result.ShouldNotBeNull();
+    result.Items.ShouldContain(s => s.LegoId == "42001");
+    result.Items.ShouldContain(s => s.LegoId == "42002");
+  }
+
+  [Fact]
+  public async Task SearchLegoSets_WithNonMatchingLegoId_ReturnsOkWithEmptyList() {
+    // Act
+    HttpResponseMessage response = await _client.GetAsync(SearchUri(legoId: "99999"));
+
+    // Assert
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+    PagedResult<FoundLegoSetDto>? result = await response.Content.ReadFromJsonAsync<PagedResult<FoundLegoSetDto>>();
+    result.ShouldNotBeNull();
+    result.Items.ShouldBeEmpty();
+  }
+
+  [Fact]
+  public async Task SearchLegoSets_WithLegoIdShorterThan3Chars_ReturnsBadRequest() {
+    // Act
+    HttpResponseMessage response = await _client.GetAsync(SearchUri(legoId: "42"));
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
