@@ -14,7 +14,7 @@ namespace BrickShare.Catalog.Api.Tests.Integration.Features.LegoThemes.Retrieve;
 public sealed class GetThemesEndpointTests(WebApplicationFactory<Program> factory)
   : IClassFixture<WebApplicationFactory<Program>> {
   private readonly HttpClient _client = factory.CreateClient();
-  
+
   [Fact]
   public async Task GetThemes_WhenThemesExist_ReturnsOkWithThemes() {
     // Arrange
