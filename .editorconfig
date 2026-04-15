@@ -362,3 +362,7 @@ dotnet_diagnostic.CS8618.severity = error # Nullability of reference types in va
 
 dotnet_diagnostic.CA2016.severity = error # Require forwarding the cancellation token to async methods
 dotnet_diagnostic.CS0162.severity = error # Remove unreachable code
+
+# CA1812: Internal class never instantiated - false positive for DI-registered classes,
+# EF Core models, and ASP.NET Core model-bound request types.
+dotnet_diagnostic.CA1812.severity = none

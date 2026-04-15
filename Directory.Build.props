@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <AnalysisLevel>latest</AnalysisLevel>
         <AnalysisMode>all</AnalysisMode>
+        <NoWarn>AD0001</NoWarn>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
