@@ -9,6 +9,7 @@ internal sealed record AddTheme(string Name);
 
 internal sealed class AddThemeHandler(CatalogDbContext dbContext) {
   public async Task<LegoTheme> HandleAsync(AddTheme request, CancellationToken cancellationToken) {
+    var list = await dbContext.LegoThemes.ToListAsync(cancellationToken);
     LegoTheme? theme = await dbContext
       .LegoThemes
       .AsNoTracking()
