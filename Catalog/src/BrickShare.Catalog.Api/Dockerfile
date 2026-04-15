@@ -7,6 +7,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Build.props", "."]
 COPY ["Catalog/src/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj", "Catalog/src/BrickShare.Catalog.Api/"]
 RUN dotnet restore "Catalog/src/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj"
 COPY . .

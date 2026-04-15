@@ -1,5 +1,6 @@
 using BrickShare.Catalog.Api.Data;
 using BrickShare.Catalog.Api.Endpoints;
+using BrickShare.Catalog.Api.Features.LegoSets;
 using BrickShare.Catalog.Api.Features.LegoThemes;
 
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLegoThemesFeatures();
+builder.Services.AddLegoSetsFeatures();
 builder.Services.AddCatalogDbContext();
 
 builder.Services.AddHealthChecks();

@@ -7,5 +7,6 @@ internal sealed class LegoSet {
   public required DateOnly ReleaseDate { get; init; }
   public required int NumberOfParts { get; init; }
   public required int AgeFrom { get; init; }
+  public required Guid ThemeId { get; init; }
   public required LegoTheme Theme { get; init; }
 }
