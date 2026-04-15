@@ -10,7 +10,7 @@ internal static class SearchLegoSetsEndpoint {
       [AsParameters] SearchLegoSetsRequest request,
       SearchLegoSetsHandler handler,
       CancellationToken ct) => {
-        var result = await handler.HandleAsync(request.SearchTerm, request.ThemeId, request.Page, request.PageSize, ct);
+        var result = await handler.HandleAsync(request.SearchTerm, request.LegoId, request.ThemeId, request.Page, request.PageSize, ct);
         return Results.Ok(result);
       });
   }
@@ -19,6 +19,8 @@ internal static class SearchLegoSetsEndpoint {
 internal sealed record SearchLegoSetsRequest(
   [FromQuery]
   string? SearchTerm,
+  [FromQuery]
+  string? LegoId,
   [FromQuery]
   Guid? ThemeId,
   [FromQuery]

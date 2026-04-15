@@ -4,14 +4,19 @@ namespace BrickShare.Catalog.Api.Features.LegoSets.Search;
 
 internal sealed class SearchLegoSetsRequestValidator : AbstractValidator<SearchLegoSetsRequest> {
   public SearchLegoSetsRequestValidator() {
+    RuleFor(x => x)
+      .Must(x => x.SearchTerm is not null || x.ThemeId is not null || x.LegoId is not null)
+      .WithMessage("Either search term, lego id, or theme id must be provided.");
+
     RuleFor(x => x.SearchTerm)
       .MinimumLength(3)
       .WithMessage("Search term must be at least 3 characters long.")
       .When(x => x.SearchTerm is not null);
 
-    RuleFor(x => x)
-      .Must(x => x.SearchTerm is not null || x.ThemeId is not null)
-      .WithMessage("Either search term or theme id must be provided.");
+    RuleFor(x => x.LegoId)
+      .MinimumLength(3)
+      .WithMessage("Lego ID must be at least 3 characters long.")
+      .When(x => x.LegoId is not null);
 
     RuleFor(x => x.Page)
       .GreaterThanOrEqualTo(1)
@@ -22,4 +27,3 @@ internal sealed class SearchLegoSetsRequestValidator : AbstractValidator<SearchL
       .WithMessage("Page size must be between 1 and 100.");
   }
 }
-
