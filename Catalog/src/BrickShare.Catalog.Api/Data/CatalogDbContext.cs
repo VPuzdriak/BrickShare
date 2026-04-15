@@ -11,5 +11,6 @@ internal sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> option
 
   protected override void OnModelCreating(ModelBuilder modelBuilder) {
     modelBuilder.ApplyConfiguration(new LegoThemeConfiguration());
+    modelBuilder.ApplyConfiguration(new LegoSetConfiguration());
   }
 }
