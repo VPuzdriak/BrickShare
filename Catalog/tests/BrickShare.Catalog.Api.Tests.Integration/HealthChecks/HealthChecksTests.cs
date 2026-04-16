@@ -12,7 +12,7 @@ public sealed class HealthChecksTests(WebApplicationFactory<Program> factory)
 
   [Fact]
   public async Task HealthChecks_ReturnsHealthy() {
-    HttpResponseMessage response = await _client.GetAsync(new Uri("/health"));
+    HttpResponseMessage response = await _client.GetAsync(new Uri("/health", UriKind.Relative));
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
     string content = await response.Content.ReadAsStringAsync();
