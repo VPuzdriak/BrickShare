@@ -1,0 +1,5 @@
+# Only applies to files under /tests
+[*.cs]
+
+dotnet_diagnostic.CA1707.severity = none # CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1515.severity = none # CA1515: Prefer internal access for test classes

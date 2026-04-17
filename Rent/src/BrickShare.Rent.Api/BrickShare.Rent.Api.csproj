@@ -5,6 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="$(AssemblyName).Tests.Integration"/>
+    </ItemGroup>
+
+    <ItemGroup>
         <Content Include="..\..\..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
