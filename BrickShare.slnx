@@ -6,4 +6,11 @@
   <Folder Name="/Catalog/tests/">
     <Project Path="Catalog/tests/BrickShare.Catalog.Api.Tests.Integration/BrickShare.Catalog.Api.Tests.Integration.csproj" />
   </Folder>
+  <Folder Name="/Rent/" />
+  <Folder Name="/Rent/src/">
+    <Project Path="Rent/src/BrickShare.Rent.Api/BrickShare.Rent.Api.csproj" />
+  </Folder>
+  <Folder Name="/Rent/tests/">
+    <Project Path="Rent/tests/BrickShare.Rent.Api.Tests.Integration/BrickShare.Rent.Api.Tests.Integration.csproj" />
+  </Folder>
 </Solution>
