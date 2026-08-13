@@ -148,5 +148,5 @@ Or run the three requests in `BrickShare.Catalog.Api.http` directly from the edi
 
 ## Next
 
-Episode 4 — The first test: `WebApplicationFactory`, and why the first test in this course is
-an integration test rather than a unit test.
+[Episode 4 — The first test](episode-4.md): `WebApplicationFactory`, and why the first test in
+this course is an integration test rather than a unit test.

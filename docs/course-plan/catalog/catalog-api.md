@@ -119,7 +119,7 @@ for ten episodes that do not practise it would cost more credibility than it buy
 **Why an integration test before any unit test:** at this point the only thing that can break
 is composition — DI registration, configuration, startup. A unit test cannot see that.
 
-**Lands in:** `tests/BrickShare.Catalog.IntegrationTests/`
+**Lands in:** `tests/BrickShare.Catalog.IntegrationTests/`. Notes: [`episode-4.md`](episode-4.md).
 
 **Done when:** `dotnet test` is green.
 

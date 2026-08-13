@@ -20,3 +20,6 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 });
 
 app.Run();
+
+// Exposes the generated entry point so WebApplicationFactory<Program> can find it in tests.
+public partial class Program;

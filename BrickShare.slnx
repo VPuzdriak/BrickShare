@@ -2,4 +2,7 @@
   <Folder Name="/src/Catalog/">
     <Project Path="src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BrickShare.Catalog.IntegrationTests/BrickShare.Catalog.IntegrationTests.csproj" />
+  </Folder>
 </Solution>
