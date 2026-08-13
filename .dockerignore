@@ -1,0 +1,20 @@
+# Keeps the build context small and the image free of anything that isn't the running service.
+# The Dockerfile only ever copies files it names explicitly, but Docker still uploads the whole
+# context to the daemon before that filtering happens — a slow upload on a repo this size is
+# what this file prevents.
+
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+.git/
+.github/
+
+# Not part of the running service.
+tests/
+docs/
+*.md
+
+# The SDK image pins its own version; this file only matters to the dotnet CLI running
+# outside a container.
+global.json

@@ -174,5 +174,6 @@ error above, then put the line back.
 
 ## Next
 
-Episode 5 — One image, run locally: a multi-stage `Dockerfile` and a `docker-compose.yml` with
-a single service, so the container that ships is the container that's tested.
+[Episode 5 — One image, run locally](episode-5.md): a multi-stage `Dockerfile` and a
+`docker-compose.yml` with a single service, so the container that ships is the container
+that's tested.

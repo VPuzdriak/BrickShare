@@ -135,7 +135,8 @@ not re-restore every package.
 Compose has one service in it and looks pointless. It is the socket that Postgres, Azurite and
 a Rebrickable stub plug into later, and adding it now costs one file.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/Dockerfile`, `docker-compose.yml`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/Dockerfile`, `docker-compose.yml`. Notes:
+[`episode-5.md`](episode-5.md).
 
 **Done when:** `docker compose up` serves the same endpoints `dotnet run` did.
 
