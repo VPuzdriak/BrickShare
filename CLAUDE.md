@@ -18,18 +18,31 @@ actual job.
 Where a decision is genuinely close, say so and give the trade-off. Pretending a judgement
 call was obvious teaches worse than admitting it was a judgement call.
 
-## Current status — stop rule
+## Current status
 
-The repository is greenfield. There is no code, no architecture document and no
-infrastructure.
+There is still no code and no infrastructure. Design is in progress.
 
-**The use cases are not yet defined. Do not implement anything until they are.**
+| Step | State |
+| --- | --- |
+| 1. Define the use cases → `docs/IDEA.md` | **Done.** Eleven use cases, UC-1 to UC-11. |
+| 2. Design the architecture against them | **In progress**, one service at a time |
+| 3. Scaffold and implement | Not started |
 
-Order of work:
+**Do not scaffold or implement a service before its architecture document exists.** The
+reasoning has to be written down first — that is what this repository is for.
 
-1. Define the use cases → fill in the Use Cases section of `docs/IDEA.md`.
-2. Design the architecture against them → `docs/ARCHITECTURE.md`.
-3. Only then scaffold and implement.
+### Where architecture lives
+
+Per-service documents under `docs/architecture/`, one file each, readable on its own:
+
+- [`docs/architecture/catalog.md`](docs/architecture/catalog.md) — sets, copies, grades,
+  photographs. App Service · Postgres · Blob Storage.
+
+`docs/ARCHITECTURE.md` is reserved for the **system map** and gets written last, once there are
+several services to map. Writing it first would be guessing.
+
+`docs/IDEA.md` describes the business and contains **no technology at all** — no Azure service,
+no framework, no database. That separation is deliberate: keep it.
 
 ## Locked technical constraints
 
