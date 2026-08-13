@@ -100,7 +100,7 @@ instance you own, which is how a small outage becomes a large one.
 Nothing is checked yet — there are no dependencies. The shape goes in now so that Postgres and
 Blob have somewhere obvious to register later.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`. Notes: [`episode-3.md`](episode-3.md).
 
 **Done when:** both endpoints answer, and it is clear what would make each fail.
 

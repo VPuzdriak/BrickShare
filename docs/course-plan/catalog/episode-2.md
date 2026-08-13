@@ -215,5 +215,5 @@ git status --porcelain                                    # no bin/ or obj/
 
 ## Next
 
-[Episode 3 — Health checks](catalog-api.md): `/health/live` and `/health/ready`, and why they
+[Episode 3 — Health checks](episode-3.md): `/health/live` and `/health/ready`, and why they
 answer different questions.
