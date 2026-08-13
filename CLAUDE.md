@@ -41,6 +41,16 @@ Per-service documents under `docs/architecture/`, one file each, readable on its
 `docs/ARCHITECTURE.md` is reserved for the **system map** and gets written last, once there are
 several services to map. Writing it first would be guessing.
 
+### Build order
+
+`docs/course-plan/` holds the recording order — which episode builds what, and why that order.
+[`docs/course-plan/catalog-api.md`](docs/course-plan/catalog-api.md) is the catalog module.
+
+The build order is **not** the architecture document's structure, and the difference is
+deliberate. Notably, catalog ships **without events or an outbox**; they are retrofitted once a
+second service exists to consume them. Check the course plan before implementing something the
+architecture document describes — it may be staged for later on purpose.
+
 `docs/IDEA.md` describes the business and contains **no technology at all** — no Azure service,
 no framework, no database. That separation is deliberate: keep it.
 

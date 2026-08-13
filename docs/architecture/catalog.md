@@ -298,6 +298,13 @@ is volume, and it is named here so the switch is a decision rather than a rewrit
 
 ## Events — and why there is an outbox
 
+> **Delivered later than it is designed.** This section describes the finished service. The
+> course builds catalog **without** events and retrofits them once a second service exists —
+> see [`docs/course-plan/catalog-api.md`](../course-plan/catalog-api.md). The reason is that an
+> event published into a system with no subscriber is a message to nobody, and the problem the
+> outbox solves cannot be demonstrated without a consumer reacting wrongly on the other side.
+> The design is settled here; only its arrival is staged.
+
 Catalog publishes the facts the rest of BrickShare reacts to:
 
 | Event | Who cares |
