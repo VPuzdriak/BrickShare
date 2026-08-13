@@ -4,7 +4,7 @@ The recording order for the catalog module: what gets built, in which video, and
 order and not another.
 
 This is not the order the architecture document is written in, and it should not be.
-[`docs/architecture/catalog.md`](../architecture/catalog.md) describes the finished service —
+[`docs/architecture/catalog.md`](../../architecture/catalog.md) describes the finished service —
 every part of it, arranged by topic. A course has to arrive at that service one idea at a time,
 and each idea has to be usable the moment it lands.
 
@@ -81,7 +81,9 @@ on day one is structure ahead of need, and every layer it adds is one a student 
 without an example in front of them. Projects appear in this course when something forces them,
 and the first force arrives in episode 12.
 
-**Lands in:** `BrickShare.sln`, `src/Catalog/BrickShare.Catalog.Api/`
+**Lands in:** `BrickShare.slnx`, `src/Catalog/BrickShare.Catalog.Api/`, plus the repository
+hygiene that belongs with a skeleton — `.gitignore`, `global.json` pinning the SDK, and a
+`.http` file to call the endpoint with. Notes: [`episode-2.md`](episode-2.md).
 
 **Done when:** `dotnet run` serves a request.
 

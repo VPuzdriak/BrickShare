@@ -1,0 +1,5 @@
+@host = http://localhost:5080
+
+### The service answers
+GET {{host}}/
+Accept: application/json
