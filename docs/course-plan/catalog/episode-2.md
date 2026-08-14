@@ -26,7 +26,7 @@ belongs to a later episode:
 `Infrastructure` / `Api` split is structure ahead of need. A student cannot justify a layer
 without an example in front of them, and four empty projects on day one teach that layering is
 something you do rather than something you earn. The first project boundary in this course
-appears in episode 12, when value objects with no ASP.NET dependency force it.
+appears in episode 13, when value objects with no ASP.NET dependency force it.
 
 ## The sequence
 
@@ -119,9 +119,9 @@ episode's habit in miniature: **read what the tool gave you before accepting it.
 
 **No `ItemGroup`. Zero package references.** Worth pausing on: everything this episode builds
 comes from the shared framework, and the first NuGet dependency does not arrive until
-episode 15.
+episode 16.
 
-`Nullable` and `ImplicitUsings` stay where the template put them. Episode 9 lifts them into
+`Nullable` and `ImplicitUsings` stay where the template put them. Episode 10 lifts them into
 `Directory.Build.props` and adds warnings-as-errors alongside — moving them is part of what
 that episode is *for*, and doing it early would leave it with less to say.
 
@@ -172,7 +172,7 @@ GET {{host}}/
 Accept: application/json
 ```
 
-With OpenAPI stripped until episode 19, this is how the endpoint gets called — VS Code and
+With OpenAPI stripped until episode 20, this is how the endpoint gets called — VS Code and
 Rider both run `.http` files, and it costs no dependency.
 
 ### `.gitignore`
@@ -186,13 +186,13 @@ episode's diff is buried in build output.
 | Deleted | Why |
 | --- | --- |
 | The `/weatherforecast` endpoint and its `WeatherForecast` record | Sample data pretending to be a feature. It has nothing to do with a catalog service, and leaving it teaches students to build around scaffolding they never read. |
-| `builder.Services.AddOpenApi()` and `app.MapOpenApi()` | OpenAPI is episode 19. Removing it is what leaves the project with zero package references. |
+| `builder.Services.AddOpenApi()` and `app.MapOpenApi()` | OpenAPI is episode 20. Removing it is what leaves the project with zero package references. |
 | `app.UseHttpsRedirection()` | This service will run in a container behind App Service, which terminates TLS. With no HTTPS port configured, the middleware redirects to a port nothing is listening on. |
 | The `https` launch profile | Same reason — and it avoids sending students into the dev-certificate dance in the second episode of a course. Episode 6 shows where TLS actually gets terminated. |
 
 `appsettings.Development.json` is kept even though its contents currently duplicate
 `appsettings.json`. It is the standard place for environment overrides and starts earning its
-keep in episode 15.
+keep in episode 16.
 
 ## Talking points
 

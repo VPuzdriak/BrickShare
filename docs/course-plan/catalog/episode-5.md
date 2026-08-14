@@ -87,7 +87,7 @@ like it copies twice for no reason. It doesn't: Docker caches a layer by its inp
 can take real time — stays cached across every rebuild that only touched a `.cs` file. Copy
 everything up front instead, and every source edit invalidates restore too.
 
-This matters more once there's more than one project. When episode 12 adds a `Domain` project,
+This matters more once there's more than one project. When episode 13 adds a `Domain` project,
 this same layer-ordering pattern is what keeps the whole chain fast — copy every `.csproj`
 first, restore once, then copy source.
 
@@ -176,7 +176,7 @@ and the reason is concrete: the `aspnet:10.0` runtime image ships neither `curl`
 healthcheck would mean installing one, which grows the "small runtime base" this episode just
 spent its whole first half building. Trading that away for a healthcheck with nothing yet
 depending on it isn't worth it. `depends_on: condition: service_healthy` becomes relevant in
-episode 15, when Postgres joins with an official image that has healthcheck tooling built in —
+episode 16, when Postgres joins with an official image that has healthcheck tooling built in —
 and it's Postgres's own health that a compose-level check will need to express, not this
 service's.
 

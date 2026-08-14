@@ -145,17 +145,17 @@ parameter is xUnit's primary-constructor injection — the factory is handed in,
 
 **Test naming**: `MethodOrBehaviour_Condition_Expectation`, here shortened to
 `Live_returns_ok` because there's no condition to vary yet. The pattern is introduced now so
-episode 11's domain tests — which will have real conditions — have a convention already in
+episode 12's domain tests — which will have real conditions — have a convention already in
 place rather than inventing one under pressure.
 
 ## What this episode deliberately does not do
 
 - **No test for `/health/ready`.** It exercises the same `MapHealthChecks` code path as
   `/health/live` and would be testing the framework, not this project. It earns its own test in
-  episode 15, once a real dependency check exists to fail meaningfully.
+  episode 16, once a real dependency check exists to fail meaningfully.
 - **No coverage threshold, no coverage report even.** `coverlet.collector` ships with the xUnit
   template and sits unused. Measuring coverage on one test is theatre; it starts meaning
-  something in episode 10, once there's a body of tests for a number to describe.
+  something in episode 11, once there's a body of tests for a number to describe.
 - **No custom `WebApplicationFactory` subclass**, no test configuration override, no fake
   dependencies. There's exactly one dependency-free endpoint to call. Building factory
   customization for a service that doesn't need it yet is the same mistake as scaffolding four

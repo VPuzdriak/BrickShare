@@ -85,8 +85,8 @@ is the actual right size for what this episode deploys.
 
 **This grows later, for concrete reasons, not on a schedule:** a second service that wants the
 same App-Service-for-Containers shape is what earns a module — there's nothing to reuse with
-one caller. `main.tf` genuinely getting hard to read once Postgres (episode 15), Storage
-(episode 25) and Key Vault (episode 20) all land in it is what earns a split into multiple
+one caller. `main.tf` genuinely getting hard to read once Postgres (episode 16), Storage
+(episode 26) and Key Vault (episode 21) all land in it is what earns a split into multiple
 files. Both are named here so that whoever adds the fourth resource to this file knows exactly
 what signal they're watching for, rather than restructuring on a feeling.
 
@@ -302,7 +302,7 @@ there's no longer a blank to leave empty."
 | Linux Web App | `app-brickshare-catalog-dev` | was `app-brickshare-catalog-demo` |
 
 Same shape, real names this time — `-demo` said "throwaway" on purpose in episode 6; `-dev`
-says "this one persists," because episode 8's pipeline needs a live target to deploy into.
+says "this one persists," because episode 9's pipeline needs a live target to deploy into.
 Fixed, not randomised: predictable, sayable on camera, and stable across episodes that
 reference it. The trade-off — Azure Web App names are unique across every subscription in the
 world, not just this one — is small and already proven safe; episode 6 confirmed a near-
@@ -384,19 +384,26 @@ nothing is left for Terraform to reconcile. State and reality agree.
 
 ## What this episode is not
 
-No Postgres, no Storage, no Key Vault, no Application Insights, no Container Registry — every
-one of those is in `docs/architecture/catalog.md`'s infrastructure list, and every one of them
-arrives in the episode that gives it a reason: Postgres in episode 15, Blob Storage in episode
-25, Key Vault the moment episode 20 introduces the Rebrickable API key, Application Insights in
-episode 28. Building any of them now, before the feature that needs them exists, would be the
-exact structure-ahead-of-need mistake episode 2 spent its whole first half refusing to make.
+No Postgres, no Storage, no Key Vault, no Application Insights — every one of those is in
+`docs/architecture/catalog.md`'s infrastructure list, and every one of them arrives in the
+episode that gives it a reason: Postgres in episode 16, Blob Storage in episode 26, Key Vault
+the moment episode 21 introduces the Rebrickable API key, Application Insights in episode 29.
+Building any of them now, before the feature that needs them exists, would be the exact
+structure-ahead-of-need mistake episode 2 spent its whole first half refusing to make.
+
+**And no container registry — but only for one more episode.** That list also includes one, and
+unlike the rest its reason arrives immediately: episode 9's pipeline has to push an image
+somewhere, and Docker Hub cannot accept that push without a stored token. So episode 8 replaces
+the Docker Hub reference above with an ACR the app reads as its own managed identity. It stays
+Docker Hub here because this episode's job is Terraform, and adding a fourth resource to the
+episode that introduces the tool would blur both.
 
 **No module, no multi-file split, yet.** The target-shape section above names the two things
 that actually earn one — a second service reusing this shape, or this file genuinely getting
 long — rather than splitting on a schedule or a feeling.
 
 No `terraform destroy` at the end of this episode, unlike episode 6's portal teardown. This
-infrastructure is meant to persist — episode 8's pipeline needs a live App Service to deploy
+infrastructure is meant to persist — episode 9's pipeline needs a live App Service to deploy
 into, and "the loop closes" only means something if there's something on the other end of it.
 
 ## Verification
@@ -416,6 +423,8 @@ The episode's actual "Done when" needs the real backend and a real subscription:
 
 ## Next
 
-Episode 8 — GitHub Actions: the loop closes: build, test, image, push, deploy, on every push to
-`main` — landing on this exact App Service, with OIDC federated credentials so no Azure secret
-is ever stored in GitHub.
+[Episode 8 — A registry of our own](episode-8.md): the Docker Hub reference in the file above
+becomes an Azure Container Registry that the App Service reads as its own managed identity —
+private image, no credential anywhere. It goes before the pipeline rather than after it because
+episode 9 has to *push*, and pushing to Docker Hub from GitHub Actions means storing exactly the
+kind of token that episode's OIDC lesson exists to eliminate.

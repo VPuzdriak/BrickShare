@@ -17,7 +17,8 @@ gets shown before episode 7 replaces all of it with Terraform.
 - A Docker Hub account. The episode 5 image needs to live somewhere the portal can pull it
   from, and creating an Azure Container Registry here would be a fourth resource this episode
   never names — Docker Hub keeps the resource list exactly what the course plan says it is:
-  **a resource group, a plan, a web app.**
+  **a resource group, a plan, a web app.** A registry arrives in episode 8, once there is a
+  reason for one that is not "we need somewhere to put this."
 - The episode 5 image, built locally (`docker compose build` from the repo root).
 
 ### Get the image somewhere pullable
@@ -132,8 +133,8 @@ Click **Review + create → Create**. Wait for the notification.
 **Container tab:**
 - Image source: **Docker Hub.**
 - Access type: Public (assuming a public repo — say so, and mention that a private one needs
-  credentials here, which is exactly the kind of secret episode 9's "no secrets in
-  configuration" habit and episode 8's OIDC setup exist to keep out of a repo).
+  credentials here, which is exactly the kind of secret episode 10's "no secrets in
+  configuration" habit and episode 9's OIDC setup exist to keep out of a repo).
 - Image and tag: `<your-dockerhub-username>/brickshare-catalog-api:episode-6`.
 - **Port: `8080`.** Defaults to `80` — change it here, now, before moving on.
 
@@ -287,7 +288,7 @@ value of this episode is contrast: a viewer who has clicked through this by hand
 
 No app settings beyond `WEBSITES_PORT`, no custom domain, no scaling rules, no deployment
 slots. Those either don't exist yet for a reason (see the architecture doc for what Terraform
-will eventually configure) or belong to a specific later episode — slots are episode 29,
+will eventually configure) or belong to a specific later episode — slots are episode 30,
 health-probe wiring to `/health/ready` returns properly in episode 7 once it's declared in
 code rather than clicked.
 
@@ -299,6 +300,6 @@ resource type in it before `apply` runs? If yes, the episode did its job.
 
 ## Next
 
-[Episode 7 — Terraform: recreate it declaratively](catalog-api.md): the same resource group,
+[Episode 7 — Terraform: recreate it declaratively](episode-7.md): the same resource group,
 plan and web app, written as HCL — and the remote-state bootstrap problem that comes with
 writing infrastructure this way.
