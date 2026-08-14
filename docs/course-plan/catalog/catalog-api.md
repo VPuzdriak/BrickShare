@@ -159,7 +159,7 @@ before you let it create it. `terraform apply` against resources you have never 
 automation, it is trust.
 
 **Lands in:** nothing in the repository. This episode's output is understanding, and a deleted
-resource group.
+resource group. Script: [`episode-6.md`](episode-6.md).
 
 ### Episode 7 — Terraform: recreate it declaratively
 

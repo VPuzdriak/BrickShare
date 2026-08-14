@@ -221,6 +221,6 @@ docker compose down
 
 ## Next
 
-Episode 6 — The Azure portal, by hand — then delete it all: this same image, pushed and run on
-App Service, clicked together first so the building blocks are visible before anything
-generates them.
+[Episode 6 — The Azure portal, by hand — then delete it all](episode-6.md): this same image,
+pushed and run on App Service, clicked together first so the building blocks are visible
+before anything generates them.
