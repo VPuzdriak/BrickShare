@@ -21,6 +21,11 @@ provider "azurerm" {
   features {}
 }
 
+variable "image_tag" {
+  description = "Container image tag to deploy — the commit SHA the pipeline built."
+  type        = string
+}
+
 resource "azurerm_resource_group" "main" {
   name     = "rg-brickshare-dev"
   location = "westeurope"
@@ -47,7 +52,7 @@ resource "azurerm_linux_web_app" "catalog" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.catalog.id
-  
+
   identity {
     type = "SystemAssigned"
   }
@@ -56,7 +61,7 @@ resource "azurerm_linux_web_app" "catalog" {
     container_registry_use_managed_identity = true
 
     application_stack {
-      docker_image_name   = "brickshare-catalog-api:episode-8"
+      docker_image_name   = "brickshare-catalog-api:${var.image_tag}"
       docker_registry_url = "https://${azurerm_container_registry.main.login_server}"
     }
   }
