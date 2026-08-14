@@ -80,7 +80,7 @@ this step needs to be done off camera.
 az ad app federated-credential create --id "$APP_ID" --parameters '{
   "name": "github-main",
   "issuer": "https://token.actions.githubusercontent.com",
-  "subject": "repo:VPuzdriak/BrickShare:ref:refs/heads/main",
+  "subject": "repo:VPuzdriak@20270523/BrickShare@1322339990:ref:refs/heads/main",
   "audiences": ["api://AzureADTokenExchange"]
 }'
 ```
