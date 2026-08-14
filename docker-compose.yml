@@ -1,0 +1,19 @@
+services:
+  catalog-api:
+    build:
+      context: .
+      dockerfile: src/Catalog/BrickShare.Catalog.Api/Dockerfile
+    ports:
+      # Host 5080 matches the port dotnet run uses (launchSettings.json), so the URL a
+      # student already knows works unchanged against the container.
+      - "5080:8080"
+    environment:
+      # Explicit, not load-bearing yet: no code branches on environment. Left unset, the
+      # container defaults to Production, same as it will on App Service. Development is
+      # set here because this file describes the local inner loop, and the two should not
+      # silently drift apart as one gains behaviour the other doesn't.
+      ASPNETCORE_ENVIRONMENT: Development
+
+# One service, and it looks like overkill for one service. It's the socket Postgres, Azurite
+# and the Rebrickable stub plug into from episode 15 onward — adding it now costs this file
+# and nothing else.

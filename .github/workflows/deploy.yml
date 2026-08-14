@@ -1,0 +1,91 @@
+name: Deploy catalog API
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# id-token: write is what makes OIDC possible — it lets the job request a short-lived
+# token from GitHub describing which repository and branch is running. It is not a
+# default, and without it every Azure step below fails before it starts.
+permissions:
+  contents: read
+  id-token: write
+
+# Two pushes in quick succession would otherwise run two `terraform apply` calls against
+# one state file. The blob lease prevents corruption; this prevents the second run dying
+# on it.
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+env:
+  REGISTRY: crbrickshare
+  IMAGE_NAME: brickshare-catalog-api
+
+jobs:
+  # CI: is this commit good?
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - run: dotnet restore
+      - run: dotnet build --no-restore --configuration Release
+      - run: dotnet test --no-build --configuration Release
+
+  # Build the artifact once. Everything downstream refers to this tag, never rebuilds it.
+  image:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      # Uses the token azure/login just obtained. No docker login, no registry password.
+      - run: az acr login --name ${{ env.REGISTRY }}
+
+      # No --platform flag: the runner is already amd64. That flag existed to work around
+      # building on an Apple Silicon laptop, which is not a problem CI has.
+      - name: Build and push
+        run: |
+          docker build \
+            -f src/Catalog/BrickShare.Catalog.Api/Dockerfile \
+            -t ${{ env.REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            .
+          docker push ${{ env.REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  # CD: make this commit live. Terraform owns the image field, so the deployment is a
+  # variable change and nothing else.
+  deploy:
+    needs: image
+    runs-on: ubuntu-latest
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+
+      - run: terraform init -input=false
+
+      - run: terraform apply -auto-approve -input=false -var="image_tag=${{ github.sha }}"
+
+      - run: echo "Deployed $(terraform output -raw web_app_url)" >> "$GITHUB_STEP_SUMMARY"

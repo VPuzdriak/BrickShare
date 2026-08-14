@@ -44,7 +44,7 @@ several services to map. Writing it first would be guessing.
 ### Build order
 
 `docs/course-plan/` holds the recording order — which episode builds what, and why that order.
-[`docs/course-plan/catalog-api.md`](docs/course-plan/catalog-api.md) is the catalog module.
+[`docs/course-plan/catalog/catalog-api.md`](docs/course-plan/catalog/catalog-api.md) is the catalog module.
 
 The build order is **not** the architecture document's structure, and the difference is
 deliberate. Notably, catalog ships **without events or an outbox**; they are retrofitted once a

@@ -1,0 +1,11 @@
+@host = http://localhost:5080
+
+### The service answers
+GET {{host}}/
+Accept: application/json
+
+### Liveness — is the process alive? Never touches a dependency.
+GET {{host}}/health/live
+
+### Readiness — can this instance serve traffic? Runs every check tagged "ready".
+GET {{host}}/health/ready

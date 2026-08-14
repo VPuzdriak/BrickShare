@@ -4,7 +4,7 @@ The recording order for the catalog module: what gets built, in which video, and
 order and not another.
 
 This is not the order the architecture document is written in, and it should not be.
-[`docs/architecture/catalog.md`](../architecture/catalog.md) describes the finished service —
+[`docs/architecture/catalog.md`](../../architecture/catalog.md) describes the finished service —
 every part of it, arranged by topic. A course has to arrive at that service one idea at a time,
 and each idea has to be usable the moment it lands.
 
@@ -12,23 +12,23 @@ and each idea has to be usable the moment it lands.
 
 **1. A walking skeleton reaches production before any feature exists.**
 
-Episodes 1–8 build an API that does nothing, health-check it, test it, containerise it and
-deploy it to Azure through GitHub Actions. Only then does a single business rule get written.
+Episodes 1–9 build an API that does nothing, health-check it, test it, containerise it, give it
+a private registry and deploy it to Azure through GitHub Actions. Only then does a single business rule get written.
 
-This feels like a detour and is the opposite. Every feature after episode 8 lands through a
+This feels like a detour and is the opposite. Every feature after episode 9 lands through a
 loop that already works: write it, test it, push it, it is live. If deployment is left until
 the end, then the first time it is attempted there are twenty episodes of code to get running
 at once, and the episode where it goes wrong is the episode nobody watches twice.
 
 **2. Quality gates arrive as soon as there is a pipeline to enforce them.**
 
-`.editorconfig`, warnings-as-errors and analyzers land in episodes 9–10 — immediately after
+`.editorconfig`, warnings-as-errors and analyzers land in episodes 10–11 — immediately after
 CI/CD, not before it. A gate is only a gate if something fails because of it. Before there is a
 pipeline, warnings-as-errors is a local preference that a `--no-restore` or a different IDE can
 argue with; after it, a rule introduced on camera is enforced on every push from that moment
 on.
 
-The cost of waiting eight episodes is one cleanup pass over a `Program.cs` and a single test —
+The cost of waiting nine episodes is one cleanup pass over a `Program.cs` and a single test —
 close to nothing, because the skeleton is deliberately almost empty. That is the whole reason
 this ordering works, and it stops working if the codebase is allowed to grow first.
 
@@ -79,9 +79,11 @@ where it is going.
 four. The Clean Architecture template with `Domain`, `Application`, `Infrastructure` and `Api`
 on day one is structure ahead of need, and every layer it adds is one a student has to justify
 without an example in front of them. Projects appear in this course when something forces them,
-and the first force arrives in episode 12.
+and the first force arrives in episode 13.
 
-**Lands in:** `BrickShare.sln`, `src/Catalog/BrickShare.Catalog.Api/`
+**Lands in:** `BrickShare.slnx`, `src/Catalog/BrickShare.Catalog.Api/`, plus the repository
+hygiene that belongs with a skeleton — `.gitignore`, `global.json` pinning the SDK, and a
+`.http` file to call the endpoint with. Notes: [`episode-2.md`](episode-2.md).
 
 **Done when:** `dotnet run` serves a request.
 
@@ -98,7 +100,7 @@ instance you own, which is how a small outage becomes a large one.
 Nothing is checked yet — there are no dependencies. The shape goes in now so that Postgres and
 Blob have somewhere obvious to register later.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`. Notes: [`episode-3.md`](episode-3.md).
 
 **Done when:** both endpoints answer, and it is clear what would make each fail.
 
@@ -111,13 +113,13 @@ rest of the course.
 
 **Say this out loud:** *this is not TDD.* There is no behaviour to drive out — the test protects
 that the application starts and is wired correctly, which is worth protecting and is a
-different job. TDD begins properly in episode 11, on the first real rule. Claiming otherwise
-for ten episodes that do not practise it would cost more credibility than it buys.
+different job. TDD begins properly in episode 12, on the first real rule. Claiming otherwise
+for eleven episodes that do not practise it would cost more credibility than it buys.
 
 **Why an integration test before any unit test:** at this point the only thing that can break
 is composition — DI registration, configuration, startup. A unit test cannot see that.
 
-**Lands in:** `tests/BrickShare.Catalog.IntegrationTests/`
+**Lands in:** `tests/BrickShare.Catalog.IntegrationTests/`. Notes: [`episode-4.md`](episode-4.md).
 
 **Done when:** `dotnet test` is green.
 
@@ -133,7 +135,8 @@ not re-restore every package.
 Compose has one service in it and looks pointless. It is the socket that Postgres, Azurite and
 a Rebrickable stub plug into later, and adding it now costs one file.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/Dockerfile`, `docker-compose.yml`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/Dockerfile`, `docker-compose.yml`. Notes:
+[`episode-5.md`](episode-5.md).
 
 **Done when:** `docker compose up` serves the same endpoints `dotnet run` did.
 
@@ -156,7 +159,7 @@ before you let it create it. `terraform apply` against resources you have never 
 automation, it is trust.
 
 **Lands in:** nothing in the repository. This episode's output is understanding, and a deleted
-resource group.
+resource group. Script: [`episode-6.md`](episode-6.md).
 
 ### Episode 7 — Terraform: recreate it declaratively
 
@@ -168,14 +171,46 @@ has to come first and the course says plainly what that is; and `plan` as the fe
 justifies the whole tool. Being able to see what will change before it changes is the reason to
 write infrastructure this way, and it is the thing the portal cannot do.
 
-Module structure starts small — one module, a handful of resources — and grows as services do.
+Starts as a single `main.tf` — provider, backend, three resources, no module — and gains
+file structure or a module only once a second service or a growing file actually calls for
+it. The image still comes from Docker Hub, exactly as episode 6 left it; replacing that is the
+next episode's job, not this one's.
 
-**Lands in:** `infra/`
+**Lands in:** `infra/`. Notes: [`episode-7.md`](episode-7.md).
 
 **Done when:** `terraform apply` produces the environment episode 6 deleted, and `terraform
 plan` afterwards reports no changes.
 
-### Episode 8 — GitHub Actions: the loop closes
+### Episode 8 — A registry of our own
+
+**Builds:** an Azure Container Registry, and the App Service pulling from it as its own managed
+identity.
+
+**Teaches:** **managed identity as the alternative to a credential**, on the smallest possible
+example. A private Docker Hub repository would work — and would put a registry username and
+password into application settings. A public one avoids the secret by publishing the artifact
+instead. ACR with an `AcrPull` role assignment is the only option that is private *and* has
+nothing to store, and the episode ends by showing the app settings list with no registry
+password in it, because there never was one.
+
+Also: `plan` showing an **incremental** change for the first time — one resource added against
+infrastructure that already exists and is serving traffic. Episode 7 argued that was the point
+of the tool; this is where the argument gets paid.
+
+**Why here, immediately before the pipeline.** Episode 9 has to *push* an image, and pushing to
+Docker Hub from GitHub Actions means a personal access token stored as a repository secret —
+the exact thing episode 9's OIDC lesson exists to eliminate. Push to ACR and the same federated
+credential covers both. Switching registries afterwards would mean teaching the pipeline twice,
+the second time as a correction.
+
+**Lands in:** nothing in the repository — one resource and one role assignment added to the
+`infra/main.tf` from episode 7, which loses its only variable in the process. Notes:
+[`episode-8.md`](episode-8.md).
+
+**Done when:** the three URLs answer from a private image, and there is no registry credential
+anywhere in the app's configuration.
+
+### Episode 9 — GitHub Actions: the loop closes
 
 **Builds:** build → test → container image → push → deploy, on every push to `main`.
 
@@ -198,7 +233,7 @@ later in this course has to stop and fix deployment.
 
 *The pipeline exists, so every rule added here is enforced from the moment it is introduced.*
 
-### Episode 9 — Consistency and strictness
+### Episode 10 — Consistency and strictness
 
 **Builds:** `.editorconfig`, `Directory.Build.props`, `Directory.Packages.props`.
 
@@ -221,7 +256,7 @@ skeleton was kept almost empty precisely so this would cost nothing.
 **Done when:** the solution builds with zero warnings, and a deliberately sloppy line fails the
 build.
 
-### Episode 10 — Gates with teeth
+### Episode 11 — Gates with teeth
 
 **Builds:** analyzers and format verification wired into the pipeline.
 
@@ -230,7 +265,7 @@ build, not as a separate portal to visit; `dotnet format --verify-no-changes` as
 formatting is checked rather than argued about; and coverage collection, reported but not yet
 gated.
 
-**The distinction this episode exists to make:** episode 9 configured rules on one machine.
+**The distinction this episode exists to make:** episode 10 configured rules on one machine.
 This one makes them fail somebody else's push. Local configuration is advice; a red build is
 enforcement, and the difference is the whole reason the two episodes are separate.
 
@@ -249,7 +284,7 @@ anything to measure teaches students to chase the metric.
 *No infrastructure at all. Four episodes of pure C# and tests, which is where TDD becomes
 honest rather than performed.*
 
-### Episode 11 — TDD, properly
+### Episode 12 — TDD, properly
 
 **Builds:** the pricing rules, test-first — rental price, daily rate, deposit, all derived from
 a grade multiplier.
@@ -274,7 +309,7 @@ turn that into a bulk update that is wrong for every row it misses.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.UnitTests/`
 
-### Episode 12 — Money and identifiers
+### Episode 13 — Money and identifiers
 
 **Builds:** `Money`, `SetNumber`, `LabelCode` as value objects — and the `Domain` project they
 force into existence.
@@ -293,11 +328,11 @@ force into existence.
 **And now a second project.** The domain rules have earned separation: they reference no
 ASP.NET types, and putting them behind a project boundary makes that dependency direction
 enforced rather than intended. This is what "projects appear when something forces them" looks
-like in practice — episode 2 deferred it, episode 12 pays for it.
+like in practice — episode 2 deferred it, episode 13 pays for it.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Domain/` (new)
 
-### Episode 13 — Grades only fall
+### Episode 14 — Grades only fall
 
 **Builds:** the condition grade rules, test-first.
 
@@ -315,7 +350,7 @@ rather than as a flag on the general one. The tests for each stay short and the 
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Domain/`
 
-### Episode 14 — The copy state machine
+### Episode 15 — The copy state machine
 
 **Builds:** copy status transitions, test-first.
 
@@ -336,7 +371,7 @@ where the invariant is**.
 
 # Part 4 — persistence
 
-### Episode 15 — Postgres in Compose, EF Core mapping
+### Episode 16 — Postgres in Compose, EF Core mapping
 
 **Builds:** Postgres added to Compose, a `DbContext`, entity configurations, the first
 migration.
@@ -353,7 +388,7 @@ raw SQL.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`
 
-### Episode 16 — Integration tests against a real database
+### Episode 17 — Integration tests against a real database
 
 **Builds:** Testcontainers for PostgreSQL, and the test isolation strategy used from here on.
 
@@ -370,7 +405,7 @@ the pipeline changes.
 
 **Lands in:** `tests/BrickShare.Catalog.IntegrationTests/`
 
-### Episode 17 — Terraform: Postgres and managed identity
+### Episode 18 — Terraform: Postgres and managed identity
 
 **Builds:** Postgres Flexible Server in Terraform, and the app connecting to it **as its managed
 identity**.
@@ -388,7 +423,7 @@ recommendation, with the cost stated honestly so choosing the cheaper option is 
 
 **Lands in:** `infra/`
 
-### Episode 18 — Migrations in the pipeline
+### Episode 19 — Migrations in the pipeline
 
 **Builds:** a migration step in GitHub Actions, running before the new revision goes live.
 
@@ -409,7 +444,7 @@ against a schema it does not expect.
 
 # Part 5 — the write API
 
-### Episode 19 — Cataloguing a set
+### Episode 20 — Cataloguing a set
 
 **Builds:** the staff endpoint that creates a catalog entry, with validation and proper errors.
 
@@ -420,13 +455,13 @@ consistent instead of an ad-hoc JSON shape per endpoint; OpenAPI from the built-
 `Microsoft.AspNetCore.OpenApi`.
 
 **The one to spell out:** validation at the edge does not replace the domain rules from
-episodes 11–14. The edge rejects nonsense early with a good message; the domain refuses illegal
+episodes 12–15. The edge rejects nonsense early with a good message; the domain refuses illegal
 states no matter who calls it. Doing only the first gives an API that is safe until something
 calls it another way.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 20 — Talking to Rebrickable
+### Episode 21 — Talking to Rebrickable
 
 **Builds:** the Rebrickable client — typed `HttpClient`, resilience, and its tests.
 
@@ -449,7 +484,7 @@ never-stocked set fails. Caching is what keeps the consequence that small.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 21 — Two endpoints, for a security reason
+### Episode 22 — Two endpoints, for a security reason
 
 **Builds:** the split flow — `POST /catalog/lookups` fetches and stores the Rebrickable payload
 server-side; `POST /catalog/sets` references it and carries only the staff-typed fields.
@@ -471,7 +506,7 @@ true, since create cannot be reached without a successful lookup.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 22 — Registering and retiring copies
+### Episode 23 — Registering and retiring copies
 
 **Builds:** copy registration, individually and in batch, and retirement.
 
@@ -484,7 +519,7 @@ on every future return).
 **Retire is a state change, never a delete.** Rental history has to survive it, and a deleted
 row takes its history with it. The endpoint sets a timestamp and the copy stops being rentable.
 
-The episode-14 rule now runs end to end through HTTP: retiring a copy that is out on rent is
+The episode-15 rule now runs end to end through HTTP: retiring a copy that is out on rent is
 refused, and the test proves it.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
@@ -493,7 +528,7 @@ refused, and the test proves it.
 
 # Part 6 — the read API
 
-### Episode 23 — Browse, search and filter
+### Episode 24 — Browse, search and filter
 
 **Builds:** the public catalog endpoints — search by name and set number, filters on theme,
 piece count, age rating, price and availability, with paging.
@@ -509,7 +544,7 @@ to keep in sync with nothing paying for the sync.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 24 — Set detail, and the rules that are easy to break
+### Episode 25 — Set detail, and the rules that are easy to break
 
 **Builds:** the set detail endpoint and the per-set aggregates.
 
@@ -536,7 +571,7 @@ cheapest **available** copy so the page never advertises a price nobody can act 
 
 # Part 7 — files and identity
 
-### Episode 25 — Uploading photographs
+### Episode 26 — Uploading photographs
 
 **Builds:** Azurite in Compose, the staff upload endpoint, and its storage in Terraform.
 
@@ -551,7 +586,7 @@ naming it now makes the switch a decision rather than a rewrite.**
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`, `infra/`
 
-### Episode 26 — SAS, and a privacy rule in code
+### Episode 27 — SAS, and a privacy rule in code
 
 **Builds:** short-lived user-delegation SAS minting, and the published/evidence split.
 
@@ -575,7 +610,7 @@ un-publishing something is not.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 27 — Entra ID: protecting the staff endpoints
+### Episode 28 — Entra ID: protecting the staff endpoints
 
 **Builds:** authentication and authorization — app roles, policies, and tests that run as each
 role.
@@ -606,7 +641,7 @@ to an identity provider.**
 
 # Part 8 — production readiness
 
-### Episode 28 — Observability
+### Episode 29 — Observability
 
 **Builds:** OpenTelemetry wired to Application Insights — traces, metrics, structured logs.
 
@@ -620,7 +655,7 @@ control than the database, and it is usually the one that leaks.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 29 — Hardening the pipeline
+### Episode 30 — Hardening the pipeline
 
 **Builds:** the finished delivery pipeline.
 
@@ -628,7 +663,7 @@ control than the database, and it is usually the one that leaks.
 that fails the deployment rather than leaving it green and broken; deployment slots and warm-up;
 rollback as a practised operation rather than an improvisation.
 
-**Closes the loop opened in episode 8.** That pipeline proved a commit could reach Azure. This
+**Closes the loop opened in episode 9.** That pipeline proved a commit could reach Azure. This
 one makes it safe to let it.
 
 **Lands in:** `.github/workflows/`, `infra/`
@@ -637,14 +672,14 @@ one makes it safe to let it.
 
 ## Compressing the course
 
-Twenty-nine episodes is the honest count once each holds a single idea. Three pairs merge
+Thirty episodes is the honest count once each holds a single idea. Three pairs merge
 cleanly if fewer, longer videos are wanted:
 
 | Merge | Gives |
 | --- | --- |
-| **9 + 10** | One "quality gates" episode, config and enforcement together |
-| **23 + 24** | One "read API" episode |
-| **25 + 26** | One "photographs" episode covering upload and access together |
+| **10 + 11** | One "quality gates" episode, config and enforcement together |
+| **24 + 25** | One "read API" episode |
+| **26 + 27** | One "photographs" episode covering upload and access together |
 
 Nothing else merges without an episode doing two unrelated things. In particular **4 and 5 do
 not merge** — testing and containerisation share nothing, and the seam between them is where a
