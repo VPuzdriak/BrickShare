@@ -171,9 +171,11 @@ has to come first and the course says plainly what that is; and `plan` as the fe
 justifies the whole tool. Being able to see what will change before it changes is the reason to
 write infrastructure this way, and it is the thing the portal cannot do.
 
-Module structure starts small — one module, a handful of resources — and grows as services do.
+Starts as a single `main.tf` — provider, backend, three resources, no module — and gains
+file structure or a module only once a second service or a growing file actually calls for
+it.
 
-**Lands in:** `infra/`
+**Lands in:** `infra/`. Notes: [`episode-7.md`](episode-7.md).
 
 **Done when:** `terraform apply` produces the environment episode 6 deleted, and `terraform
 plan` afterwards reports no changes.
