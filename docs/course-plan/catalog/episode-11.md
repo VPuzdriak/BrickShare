@@ -421,7 +421,7 @@ not show up in a line count.
 
 ## Next
 
-**Part 3 — the domain, test-first.** [Episode 12](catalog-api.md#episode-12--tdd-properly) starts
+**Part 3 — the domain, test-first.** [Episode 12](episode-12.md) starts
 the pricing rules with a failing test, and it is the first episode in this course to write a line
 of business logic.
 
