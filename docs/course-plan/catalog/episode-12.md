@@ -721,6 +721,13 @@ public class PriceCalculatorGuardTests
     }
 
     [Fact]
+    public void Deposit_rejects_a_negative_retail_price()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            PriceCalculator.Deposit(-1.00m, ConditionGrade.New, Multipliers.Standard()));
+    }
+
+    [Fact]
     public void GradeMultipliers_rejects_a_table_missing_a_grade()
     {
         Dictionary<ConditionGrade, decimal> incomplete = new()
@@ -801,22 +808,24 @@ The four grades are now four near-identical `[Fact]`s, which is exactly what `[T
     [InlineData(ConditionGrade.Excellent, 21.24)]
     [InlineData(ConditionGrade.Good, 17.49)]
     [InlineData(ConditionGrade.Fair, 13.74)]
-    public void RentalPrice_applies_the_multiplier_for_each_grade(ConditionGrade grade, double expected)
+    public void RentalPrice_applies_the_multiplier_for_each_grade(ConditionGrade grade, decimal expected)
     {
         decimal price = PriceCalculator.RentalPrice(24.99m, grade, Multipliers.Standard());
 
-        Assert.Equal((decimal)expected, price);
+        Assert.Equal(expected, price);
     }
 ```
 
 **Two things to say, and the second one is the honest one.**
 
-`[InlineData]` cannot carry a `decimal` — attribute arguments must be compile-time constants and
-`decimal` is not one in the CLR's eyes. So the expected values arrive as `double` and are cast at
-the assertion. That is safe *here* because these are exact two-decimal literals and the cast
-happens before any arithmetic, and it is worth flagging out loud as the one place in this
-codebase where a `double` touches money at all. `[MemberData]` avoids it entirely at the cost of
-a static property, and swapping to it is fair.
+**The parameter is a `decimal` and the attribute argument is not**, and that asymmetry is worth
+ten seconds. `decimal` is not a legal attribute argument type in C# — the constant `24.99` inside
+`[InlineData]` is a `double`, and there is no `m` you can add to change that. xUnit converts it to
+the parameter's type when it invokes the test, so `decimal expected` works and no cast is needed
+in the body. It is exact here because these are short two-decimal literals well inside the range
+a `double` represents faithfully, and because the conversion happens before any arithmetic — but
+it *is* a `double` for one instant, and a theory carrying long or computed money values should use
+`[MemberData]`, which never leaves the type system.
 
 And the caveat that matters more: **a table of inputs compresses cases and hides rules.** The
 four rows above say "these numbers map to those numbers"; the two `[Fact]`s from step 2 said
@@ -887,7 +896,7 @@ Put the value back.
 
 ## Next
 
-[Episode 13 — Money and identifiers](catalog-api.md#episode-13--money-and-identifiers): `Money`,
+[Episode 13 — Money and identifiers](episode-13.md): `Money`,
 `SetNumber` and `LabelCode` as value objects, the `double` demonstration this episode kept
 promising, and the first moment the course lets a second project exist — because now something
 finally forces it.

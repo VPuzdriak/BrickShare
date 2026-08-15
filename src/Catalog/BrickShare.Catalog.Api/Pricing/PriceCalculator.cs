@@ -6,7 +6,7 @@ public static class PriceCalculator
 
     public static decimal RentalPrice(decimal baseRentalPrice, ConditionGrade grade, GradeMultipliers multipliers)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(baseRentalPrice, 0m);
+        ArgumentOutOfRangeException.ThrowIfNegative(baseRentalPrice);
         ArgumentNullException.ThrowIfNull(multipliers);
 
         return RoundToCents(baseRentalPrice * multipliers.For(grade));
@@ -28,6 +28,7 @@ public static class PriceCalculator
 
     public static decimal Deposit(decimal retailPrice, ConditionGrade grade, GradeMultipliers multipliers)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(retailPrice);
         ArgumentNullException.ThrowIfNull(multipliers);
 
         return RoundToCents(retailPrice * multipliers.For(grade));

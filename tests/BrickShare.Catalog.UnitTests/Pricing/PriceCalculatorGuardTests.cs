@@ -19,6 +19,13 @@ public class PriceCalculatorGuardTests
     }
 
     [Fact]
+    public void Deposit_rejects_a_negative_retail_price()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            PriceCalculator.Deposit(-1.00m, ConditionGrade.New, Multipliers.Standard()));
+    }
+
+    [Fact]
     public void GradeMultipliers_rejects_a_table_missing_a_grade()
     {
         Dictionary<ConditionGrade, decimal> incomplete = new()
