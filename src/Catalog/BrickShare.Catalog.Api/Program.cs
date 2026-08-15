@@ -14,10 +14,7 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => fa
 
 // Readiness: can this instance serve traffic? Runs every check tagged "ready".
 // Nothing is tagged yet — Postgres arrives in episode 15, Blob Storage in episode 25.
-app.MapHealthChecks("/health/ready", new HealthCheckOptions
-{
-    Predicate = check => check.Tags.Contains("ready")
-});
+app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
 app.Run();
 

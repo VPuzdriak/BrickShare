@@ -1,0 +1,26 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Was duplicated in both .csproj files. One place now, and the next project inherits it. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- The headline. A warning nobody has to fix is a warning nobody fixes. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- Makes the IDExxxx style rules from .editorconfig run during `dotnet build`,
+         not only inside an editor. Without this, .editorconfig is advice. -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Which analyzers run, and how many of them. See the note below on why not `All`. -->
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>Recommended</AnalysisMode>
+
+    <!-- Required by IDE0005 (unused usings) to run on build at all — a genuine
+         Roslyn quirk, not a preference. See step 4. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+</Project>
