@@ -5,9 +5,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Restore first, and copy nothing but the project file to do it. Docker caches each layer by
-# its inputs: as long as this .csproj is unchanged, this layer — and the NuGet restore it
-# triggers — is reused on every rebuild, however much application code just changed.
+# Restore first, copying only the files restore actually reads. Docker caches each layer by its
+# inputs: as long as these are unchanged, this layer — and the NuGet restore it triggers — is
+# reused on every rebuild, however much application code just changed.
+#
+# The three root files are not optional. MSBuild finds Directory.Build.props by walking UP from
+# the project directory, so without them this project has no TargetFramework (episode 10 moved it
+# out of the .csproj) and no package versions (central package management). .editorconfig comes
+# along so the rules enforced in here are the ones enforced in CI.
+COPY Directory.Build.props Directory.Packages.props .editorconfig ./
 COPY src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj src/Catalog/BrickShare.Catalog.Api/
 RUN dotnet restore src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj
 

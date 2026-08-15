@@ -21,8 +21,9 @@ different IDE, a `dotnet build` with the wrong flags, or a branch nobody built c
 it, and none of that would show up anywhere. After episode 9, the same property is a fact about
 whether a commit can reach production.
 
-The cost of waiting is one cleanup pass over a `Program.cs` and a single test file — close to
-nothing, because the skeleton was kept deliberately empty for exactly this moment. **Say that
+The cost of waiting is one cleanup pass over a `Program.cs`, a single test file and four lines of
+`Dockerfile` — close to nothing, because the skeleton was kept deliberately empty for exactly this
+moment. **Say that
 out loud**: the ordering only works because episodes 2–9 resisted writing features. Do this to a
 codebase with 200 files and it is a week of work nobody has budgeted, which is why in practice it
 never gets done at all.
@@ -632,9 +633,99 @@ somebody else's pull request. That progression — preference, then local rule, 
 is the shape of every quality control worth having, and the thing that moves you along it is
 severity, not adding rules."
 
-Revert the sloppy code, rebuild green, commit and push. The pipeline from episode 9 runs the same
-three jobs and stays green, because the code was already clean — but from this commit on it is
-`dotnet build` in CI saying so, not us.
+Revert the sloppy code, rebuild green, commit and push.
+
+**And then watch the pipeline go red anyway.** That is not a mistake in the recording — it is the
+next step, and it is the most valuable thing in this episode.
+
+---
+
+## Step 6 — The image build breaks, and the pipeline is what tells you
+
+Three signals said this commit was fine. `dotnet build` locally: green. `dotnet test` locally:
+green. CI's `build-test` job: green. The **`image` job** fails:
+
+```
+#13 [build 4/6] RUN dotnet restore src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj
+#13 0.571   Determining projects to restore...
+#13 0.613 /usr/share/dotnet/sdk/10.0.400/Sdks/Microsoft.NET.Sdk/targets/
+           Microsoft.NET.TargetFrameworkInference.targets(109,5): error NETSDK1013:
+           The TargetFramework value '' was not recognized. It may be misspelled. If not, then the
+           TargetFrameworkIdentifier and/or TargetFrameworkVersion properties must be specified
+           explicitly. [/src/src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj]
+```
+
+**Read the error before explaining it.** `TargetFramework` is empty. Step 2 moved it into
+`Directory.Build.props`, that file works fine on this laptop and in CI, and inside the container it
+does not exist.
+
+### Why: MSBuild walks up, and `COPY` does not
+
+`Directory.Build.props` is not referenced by anything. MSBuild finds it by walking **up** the
+directory tree from the project until it hits one. On a laptop the project is at
+`<repo>/src/Catalog/BrickShare.Catalog.Api/` and the walk reaches the repository root, where both
+props files sit.
+
+Inside the image, `WORKDIR /src` and the Dockerfile copied exactly one file:
+
+```
+/src/src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj
+```
+
+The walk goes up to `/src`, then `/`, and finds nothing. No `TargetFramework`. And had it got past
+that, no version for `SonarAnalyzer.CSharp` either, because central package management put versions
+in a file that is also not there.
+
+**The general lesson, and it is not really about Docker:** a Dockerfile's `COPY` list is a
+**hand-maintained duplicate of the project's file dependencies**. In episode 5 the `.csproj` *was*
+the entire dependency set, so copying it alone was correct — that Dockerfile was not sloppy, it was
+right for the repository as it existed. Episode 10 moved part of that set to the repository root,
+and nothing anywhere tells the Dockerfile. **There is no compiler for `COPY` lines**, and no test
+that fails locally. This class of bug is discoverable only by building the thing you ship.
+
+### The fix
+
+```diff
++ COPY Directory.Build.props Directory.Packages.props .editorconfig ./
+  COPY src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj src/Catalog/BrickShare.Catalog.Api/
+  RUN dotnet restore src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj
+```
+
+**The destination `./` is doing real work and is worth a sentence.** It puts the three files at
+`/src`, which is *above* the project — reproducing the repository layout the props files expect. Copy
+them next to the `.csproj` instead and the build still fails, for the same reason, which makes it a
+satisfying thing to try on camera.
+
+**Why `.editorconfig` comes along.** `Directory.Build.props` sets `EnforceCodeStyleInBuild`, so the
+container runs style analysis whether or not `.editorconfig` is present — and without it, it runs
+with *default* severities instead of the ones step 1 chose. Two builds of the same commit enforcing
+two different rule sets is exactly the kind of difference that surfaces months later as "it passes
+CI but the image build fails." **Honest cost:** editing `.editorconfig` now invalidates the restore
+layer, which is a cheap price for the two builds agreeing.
+
+**And why `global.json` does not**, since it is the obvious next question — it is still excluded by
+the `.dockerignore` written in episode 5, for the reason stated there: the image's SDK comes from
+its `FROM` tag, and `global.json` exists to make *developer machines* agree. Note the version they
+land on out loud, because it is a real difference and pretending otherwise would be dishonest:
+
+```
+host   →  10.0.100   (pinned by global.json)
+image  →  10.0.400   (whatever mcr.microsoft.com/dotnet/sdk:10.0 currently is)
+```
+
+Both build this project identically today. If that ever stops being true, copying `global.json` in
+is the fix — and it is a decision to make when there is a reason, not now.
+
+### The point of this step
+
+**Say this while the red job and the three green ones are on screen together:** "Episode 9 claimed
+the pipeline is the definition of done. This is the first time in this course that claim has cost
+anything. Three separate green signals agreed this commit was fine, and all three were structurally
+incapable of seeing the problem, because none of them built the artifact we actually ship. A local
+build tells you your code compiles. Only the pipeline tells you it deploys."
+
+Push the fix. All four jobs green, and the container that reaches Azure is built from the same
+three root files the laptop uses.
 
 ---
 
@@ -660,6 +751,10 @@ three jobs and stays green, because the code was already clean — but from this
 ```bash
 dotnet build       # 0 warnings, 0 errors
 dotnet test        # 1 passed
+
+# Not optional from this episode on — see step 6. The two above cannot see a broken image.
+docker build -f src/Catalog/BrickShare.Catalog.Api/Dockerfile .
+docker compose up  # /, /health/live and /health/ready answer as they have since episode 3
 ```
 
 Then, to see each gate work:
