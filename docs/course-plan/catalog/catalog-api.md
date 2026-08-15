@@ -339,7 +339,8 @@ ASP.NET types, and putting them behind a project boundary makes that dependency 
 enforced rather than intended. This is what "projects appear when something forces them" looks
 like in practice — episode 2 deferred it, episode 13 pays for it.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/` (new)
+**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/` (new).
+Notes: [`episode-13.md`](episode-13.md).
 
 ### Episode 14 — Grades only fall
 

@@ -1,4 +1,5 @@
-using BrickShare.Catalog.Api.Pricing;
+using BrickShare.Catalog.Domain;
+using BrickShare.Catalog.Domain.Pricing;
 
 namespace BrickShare.Catalog.UnitTests.Pricing;
 
@@ -7,17 +8,17 @@ public class RentalPriceTests
     [Fact]
     public void RentalPrice_for_a_new_copy_is_the_base_price()
     {
-        decimal price = PriceCalculator.RentalPrice(24.99m, ConditionGrade.New, Multipliers.Standard());
+        Money price = PriceCalculator.RentalPrice(new Money(24.99m), ConditionGrade.New, Multipliers.Standard());
 
-        Assert.Equal(24.99m, price);
+        Assert.Equal(24.99m, price.Amount);
     }
 
     [Fact]
     public void RentalPrice_for_an_excellent_copy_is_discounted_by_its_multiplier()
     {
-        decimal price = PriceCalculator.RentalPrice(24.99m, ConditionGrade.Excellent, Multipliers.Standard());
+        Money price = PriceCalculator.RentalPrice(new Money(24.99m), ConditionGrade.Excellent, Multipliers.Standard());
 
-        Assert.Equal(21.24m, price);
+        Assert.Equal(21.24m, price.Amount);
     }
 
     [Fact]
@@ -39,17 +40,17 @@ public class RentalPriceTests
             [ConditionGrade.Fair] = 0.55m
         });
 
-        Assert.Equal(21.24m, PriceCalculator.RentalPrice(24.99m, ConditionGrade.Excellent, before));
-        Assert.Equal(22.49m, PriceCalculator.RentalPrice(24.99m, ConditionGrade.Excellent, after));
+        Assert.Equal(21.24m, PriceCalculator.RentalPrice(new Money(24.99m), ConditionGrade.Excellent, before).Amount);
+        Assert.Equal(22.49m, PriceCalculator.RentalPrice(new Money(24.99m), ConditionGrade.Excellent, after).Amount);
     }
 
     [Fact]
     public void RentalPrice_is_rounded_to_whole_cents()
     {
         // 24.99 × 0.55 = 13.7445, which is not an amount anyone can be charged.
-        decimal price = PriceCalculator.RentalPrice(24.99m, ConditionGrade.Fair, Multipliers.Standard());
+        Money price = PriceCalculator.RentalPrice(new Money(24.99m), ConditionGrade.Fair, Multipliers.Standard());
 
-        Assert.Equal(13.74m, price);
+        Assert.Equal(13.74m, price.Amount);
     }
 
     [Fact]
@@ -57,9 +58,9 @@ public class RentalPriceTests
     {
         // 17.75 × 0.70 = 12.425 exactly — a midpoint, and the one case where the
         // rounding mode is visible. Banker's rounding would give 12.42.
-        decimal price = PriceCalculator.RentalPrice(17.75m, ConditionGrade.Good, Multipliers.Standard());
+        Money price = PriceCalculator.RentalPrice(new Money(17.75m), ConditionGrade.Good, Multipliers.Standard());
 
-        Assert.Equal(12.43m, price);
+        Assert.Equal(12.43m, price.Amount);
     }
 
     [Theory]
@@ -69,8 +70,8 @@ public class RentalPriceTests
     [InlineData(ConditionGrade.Fair, 13.74)]
     public void RentalPrice_applies_the_multiplier_for_each_grade(ConditionGrade grade, decimal expected)
     {
-        decimal price = PriceCalculator.RentalPrice(24.99m, grade, Multipliers.Standard());
+        Money price = PriceCalculator.RentalPrice(new Money(24.99m), grade, Multipliers.Standard());
 
-        Assert.Equal(expected, price);
+        Assert.Equal(new Money(expected), price);
     }
 }
