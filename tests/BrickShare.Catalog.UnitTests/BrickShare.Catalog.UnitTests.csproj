@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj" />
+    <ProjectReference Include="../../src/Catalog/BrickShare.Catalog.Domain/BrickShare.Catalog.Domain.csproj" />
   </ItemGroup>
 
 </Project>

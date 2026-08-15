@@ -23,5 +23,8 @@ await app.RunAsync();
 // S1118 wants a private constructor on a class with no instance members. This class cannot
 // have one: WebApplicationFactory<Program> needs a public, constructible entry point type.
 // The rule is right in general and wrong here, so it is turned off for these two lines only.
-public partial class Program;
+namespace BrickShare.Catalog.Api
+{
+    public partial class Program;
+}
 #pragma warning restore S1118

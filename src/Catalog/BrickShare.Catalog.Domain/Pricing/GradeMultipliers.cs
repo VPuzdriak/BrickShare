@@ -1,4 +1,4 @@
-namespace BrickShare.Catalog.Api.Pricing;
+namespace BrickShare.Catalog.Domain.Pricing;
 
 public sealed class GradeMultipliers
 {

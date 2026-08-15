@@ -18,15 +18,42 @@ actual job.
 Where a decision is genuinely close, say so and give the trade-off. Pretending a judgement
 call was obvious teaches worse than admitting it was a judgement call.
 
+### Code samples are test-first
+
+From episode 12 on, this course teaches TDD, so the scripts have to model it — including in the
+code samples themselves. Present testable code as **red → green → refactor**: the failing test
+first (a build error against a type that does not exist yet is a legitimate red), then the
+smallest implementation that passes it, then the clean-up.
+
+**Never a finished class with its tests shown underneath.** That is precisely the habit episode 12
+exists to break, and a script that does it teaches the opposite of what it says.
+
+Three kinds of code are not driven by a test, and a script containing one says so rather than
+pretending otherwise:
+
+- **Infrastructure and configuration** — Terraform, Compose, workflows, `.csproj`, `.editorconfig`.
+- **Wiring** with no behaviour of its own.
+- **Demonstrations whose whole point is that they compile** — a swapped argument, an analyzer
+  firing, a `double` losing a cent.
+
+When a test passes the moment it is written, keep it and say so: some tests drive a design and
+some describe a rule. Both belong in the suite, and only the first is TDD doing its job.
+
 ## Current status
 
-There is still no code and no infrastructure. Design is in progress.
+The catalog service is under construction, one episode at a time, and its walking skeleton
+already deploys to Azure on every push.
 
 | Step | State |
 | --- | --- |
 | 1. Define the use cases → `docs/IDEA.md` | **Done.** Eleven use cases, UC-1 to UC-11. |
-| 2. Design the architecture against them | **In progress**, one service at a time |
-| 3. Scaffold and implement | Not started |
+| 2. Design the architecture against them | **Catalog done.** No other service designed yet. |
+| 3. Plan the recording order → `docs/course-plan/` | **Done for catalog** — episodes 1 to 30. |
+| 4. Script and build, episode by episode | **Episodes 1–12 recorded and merged.** Episode 13 is scripted but not implemented. Nothing from 14 on is written. |
+
+In the repository today: `src/Catalog/BrickShare.Catalog.Api` (health checks, plus the pricing
+rules from episode 12), unit and integration test projects, `infra/main.tf` (App Service and ACR),
+and two GitHub Actions workflows. Everything else in the course plan is still ahead.
 
 **Do not scaffold or implement a service before its architecture document exists.** The
 reasoning has to be written down first — that is what this repository is for.

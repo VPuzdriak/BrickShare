@@ -1,4 +1,5 @@
-using BrickShare.Catalog.Api.Pricing;
+using BrickShare.Catalog.Domain;
+using BrickShare.Catalog.Domain.Pricing;
 
 namespace BrickShare.Catalog.UnitTests.Pricing;
 
@@ -8,21 +9,21 @@ public class PriceCalculatorGuardTests
     public void DailyRate_rejects_a_minimum_duration_of_zero_days()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            PriceCalculator.DailyRate(24.99m, 0, ConditionGrade.New, Multipliers.Standard()));
+            PriceCalculator.DailyRate(new Money(24.99m), 0, ConditionGrade.New, Multipliers.Standard()));
     }
 
     [Fact]
     public void RentalPrice_rejects_a_negative_base_price()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            PriceCalculator.RentalPrice(-1.00m, ConditionGrade.New, Multipliers.Standard()));
+            PriceCalculator.RentalPrice(new Money(-1.00m), ConditionGrade.New, Multipliers.Standard()));
     }
 
     [Fact]
     public void Deposit_rejects_a_negative_retail_price()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            PriceCalculator.Deposit(-1.00m, ConditionGrade.New, Multipliers.Standard()));
+            PriceCalculator.Deposit(new Money(-1.00m), ConditionGrade.New, Multipliers.Standard()));
     }
 
     [Fact]

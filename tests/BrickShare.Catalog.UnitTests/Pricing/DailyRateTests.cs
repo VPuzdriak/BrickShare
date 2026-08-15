@@ -1,4 +1,5 @@
-using BrickShare.Catalog.Api.Pricing;
+using BrickShare.Catalog.Domain;
+using BrickShare.Catalog.Domain.Pricing;
 
 namespace BrickShare.Catalog.UnitTests.Pricing;
 
@@ -8,9 +9,9 @@ public class DailyRateTests
     public void DailyRate_divides_the_rental_price_by_the_minimum_duration()
     {
         // Rental price 21.24 over a 7-day minimum. 21.24 ÷ 7 = 3.0342857…
-        decimal dailyRate = PriceCalculator.DailyRate(24.99m, 7, ConditionGrade.Excellent, Multipliers.Standard());
+        Money dailyRate = PriceCalculator.DailyRate(new Money(24.99m), 7, ConditionGrade.Excellent, Multipliers.Standard());
 
-        Assert.Equal(3.03m, dailyRate);
+        Assert.Equal(3.03m, dailyRate.Amount);
     }
 
     [Fact]
@@ -18,12 +19,12 @@ public class DailyRateTests
     {
         GradeMultipliers multipliers = Multipliers.Standard();
 
-        decimal rentalPrice = PriceCalculator.RentalPrice(24.99m, ConditionGrade.Excellent, multipliers);
-        decimal dailyRate = PriceCalculator.DailyRate(24.99m, 7, ConditionGrade.Excellent, multipliers);
+        Money rentalPrice = PriceCalculator.RentalPrice(new Money(24.99m), ConditionGrade.Excellent, multipliers);
+        Money dailyRate = PriceCalculator.DailyRate(new Money(24.99m), 7, ConditionGrade.Excellent, multipliers);
 
         // The minimum duration is a commercial floor: the whole rental price is paid whether
         // the set comes back on day 1 or day 7. The daily rate prices the days AFTER the
         // minimum, so this inequality is the rule working, not rounding drift.
-        Assert.NotEqual(rentalPrice, dailyRate * 7);
+        Assert.NotEqual(rentalPrice.Amount, dailyRate.Amount * 7);
     }
 }
