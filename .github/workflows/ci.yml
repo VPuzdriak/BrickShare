@@ -1,0 +1,42 @@
+name: CI
+
+# Pull requests only. Pushes to main are covered by deploy.yml, which builds and tests
+# before it deploys anything.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One group per pull request: github.ref is refs/pull/<n>/merge here, so this only ever
+# cancels an earlier run of the SAME PR, never a teammate's. A new push makes the previous
+# run's answer irrelevant. Contrast deploy.yml, which uses one global group and never
+# cancels, because interrupting a terraform apply is actively harmful.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - run: dotnet restore
+
+      # First, because it is the fastest failure and the one that needs no thought to fix.
+      # A developer whose PR is red for indentation should learn that in twenty seconds.
+      - name: Verify formatting
+        run: dotnet format --verify-no-changes --no-restore
+
+      # Warnings-as-errors (episode 10) and SonarAnalyzer (step 1) both bite here.
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release

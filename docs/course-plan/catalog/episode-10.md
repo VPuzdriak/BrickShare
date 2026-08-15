@@ -692,6 +692,6 @@ against, so every line in it is equally unexplained a year later.
 ## Next
 
 [Episode 11 — Gates with teeth](episode-11.md): SonarAnalyzer as a Roslyn analyzer,
-`dotnet format --verify-no-changes` as a CI step, coverage collected but not gated — and branch
-protection, so a red check stops a merge instead of merely reporting one. Everything configured
+`dotnet format --verify-no-changes` as a CI step, and branch protection, so a red check stops a
+merge instead of merely reporting one. Everything configured
 today applies on **this** machine. The next episode makes it apply to everybody.

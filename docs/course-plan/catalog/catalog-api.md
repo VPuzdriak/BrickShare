@@ -223,7 +223,7 @@ of done" means in practice.
 **The milestone.** From here on, every episode ends with a push that deploys itself. Nothing
 later in this course has to stop and fix deployment.
 
-**Lands in:** `.github/workflows/`
+**Lands in:** `.github/workflows/`. Notes: [`episode-9.md`](episode-9.md).
 
 **Done when:** a commit reaches Azure without anyone touching a terminal.
 
@@ -251,7 +251,9 @@ later in this course has to stop and fix deployment.
 test. That is the entire reason this episode comes after deployment rather than before it — the
 skeleton was kept almost empty precisely so this would cost nothing.
 
-**Lands in:** repository root.
+**Lands in:** repository root — `.editorconfig`, `Directory.Build.props`,
+`Directory.Packages.props`, and the cleanup they force on both `.csproj` files. Notes:
+[`episode-10.md`](episode-10.md).
 
 **Done when:** the solution builds with zero warnings, and a deliberately sloppy line fails the
 build.
@@ -262,20 +264,26 @@ build.
 
 **Teaches:** **SonarAnalyzer.CSharp** as a Roslyn analyzer — running in the IDE and in the
 build, not as a separate portal to visit; `dotnet format --verify-no-changes` as a CI step, so
-formatting is checked rather than argued about; and coverage collection, reported but not yet
-gated.
+formatting is checked rather than argued about; and branch protection, so a red check blocks a
+merge instead of merely reporting one.
 
 **The distinction this episode exists to make:** episode 10 configured rules on one machine.
 This one makes them fail somebody else's push. Local configuration is advice; a red build is
 enforcement, and the difference is the whole reason the two episodes are separate.
 
-A note on coverage: it is collected and shown, and no threshold is set yet. A coverage number
-on a project with four tests is not a quality signal, and setting a gate before there is
-anything to measure teaches students to chase the metric.
+**No code coverage here** — not collected, not reported, not gated. A coverage number on a
+project with one test is not a quality signal, and a measurement nobody can act on teaches
+students to add reporting as a reflex rather than because a question needed answering. It waits
+until part 3 has produced a body of tests worth describing, and the episode it lands in is not
+decided yet.
 
-**Lands in:** `.github/workflows/`, `Directory.Packages.props`
+**Lands in:** `.github/workflows/ci.yml` (new), `Directory.Build.props`,
+`Directory.Packages.props` — plus a branch protection ruleset configured on camera, which is the
+only thing in this module that lives in GitHub settings rather than in the repository. Notes:
+[`episode-11.md`](episode-11.md).
 
-**Done when:** a formatting violation and an analyzer violation each fail CI.
+**Done when:** a formatting violation and an analyzer violation each fail CI, and the merge button
+is blocked until they are fixed.
 
 ---
 
