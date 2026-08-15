@@ -315,7 +315,8 @@ No dependencies, real business consequence, and the tests read like the rules do
 An admin changing one multiplier re-prices the entire catalog (UC-1.5), and stored values would
 turn that into a bulk update that is wrong for every row it misses.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.UnitTests/`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.UnitTests/`.
+Notes: [`episode-12.md`](episode-12.md).
 
 ### Episode 13 — Money and identifiers
 
