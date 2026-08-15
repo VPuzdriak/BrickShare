@@ -15,6 +15,7 @@ WORKDIR /src
 # along so the rules enforced in here are the ones enforced in CI.
 COPY Directory.Build.props Directory.Packages.props .editorconfig ./
 COPY src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj src/Catalog/BrickShare.Catalog.Api/
+COPY src/Catalog/BrickShare.Catalog.Domain/BrickShare.Catalog.Domain.csproj src/Catalog/BrickShare.Catalog.Domain/
 RUN dotnet restore src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj
 
 # Now the rest of the source. This layer invalidates on every code change, which is fine —
