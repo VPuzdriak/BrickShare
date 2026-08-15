@@ -16,7 +16,12 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => fa
 // Nothing is tagged yet — Postgres arrives in episode 15, Blob Storage in episode 25.
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
-app.Run();
+await app.RunAsync();
 
 // Exposes the generated entry point so WebApplicationFactory<Program> can find it in tests.
+#pragma warning disable S1118
+// S1118 wants a private constructor on a class with no instance members. This class cannot
+// have one: WebApplicationFactory<Program> needs a public, constructible entry point type.
+// The rule is right in general and wrong here, so it is turned off for these two lines only.
 public partial class Program;
+#pragma warning restore S1118
