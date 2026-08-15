@@ -1159,7 +1159,7 @@ remembering.
 
 ## Next
 
-[Episode 14 — Grades only fall](catalog-api.md#episode-14--grades-only-fall): the condition-grade
+[Episode 14 — Grades only fall](episode-14.md): the condition-grade
 rules, test-first — *New can never be regained*, grades move downward only, and a repair is a
 **different operation** rather than the same regrade with a bigger argument. The first episode
 where the domain refuses something a caller asks for.

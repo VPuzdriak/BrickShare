@@ -358,7 +358,7 @@ Notes: [`episode-13.md`](episode-13.md).
 **The general lesson:** when a rule has an exception, model the exception as its own operation
 rather than as a flag on the general one. The tests for each stay short and the rule stays true.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/`. Notes: [`episode-14.md`](episode-14.md).
 
 ### Episode 15 — The copy state machine
 
@@ -468,6 +468,13 @@ consistent instead of an ad-hoc JSON shape per endpoint; OpenAPI from the built-
 episodes 12–15. The edge rejects nonsense early with a good message; the domain refuses illegal
 states no matter who calls it. Doing only the first gives an API that is safe until something
 calls it another way.
+
+**And the domain exception lands here, as a demonstrated fix.** Episodes 14, 15 and 23 throw
+`InvalidOperationException` for a refused business rule, which an API layer cannot tell apart from
+a null-reference bug. This episode shows a perfectly reasonable staff request returning
+**500 Internal Server Error**, then introduces a domain exception type, maps it to a `409`
+`ProblemDetails`, and refactors those throws and their tests on camera. Deferred to here on
+purpose: the distinction is not real until there is an endpoint on the other side of it.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 

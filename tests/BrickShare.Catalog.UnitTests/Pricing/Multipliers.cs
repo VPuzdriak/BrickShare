@@ -1,3 +1,4 @@
+using BrickShare.Catalog.Domain;
 using BrickShare.Catalog.Domain.Pricing;
 
 namespace BrickShare.Catalog.UnitTests.Pricing;
