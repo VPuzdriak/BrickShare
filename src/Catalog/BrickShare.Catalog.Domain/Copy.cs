@@ -10,11 +10,16 @@ public sealed class Copy
     {
         Label = label;
         Grade = grade;
+        Status = CopyStatus.Available;
     }
 
     public LabelCode Label { get; }
 
     public ConditionGrade Grade { get; private set; }
+
+    public CopyStatus Status { get; private set; }
+
+    # region Grage
 
     public void Regrade(ConditionGrade newGrade)
     {
@@ -50,10 +55,51 @@ public sealed class Copy
         Grade = newGrade;
     }
 
+    #endregion
+
     public static Copy Register(LabelCode label, ConditionGrade startingGrade)
     {
         ArgumentNullException.ThrowIfNull(label);
 
         return new Copy(label, startingGrade);
     }
+
+    #region Status
+
+    public void Reserve() => TransitionTo(CopyStatus.Reserved, CopyStatus.Available);
+
+    public void ReleaseReservation() => TransitionTo(CopyStatus.Available, CopyStatus.Reserved);
+
+    public void Collect() => TransitionTo(CopyStatus.OnRent, CopyStatus.Reserved);
+
+    public void Return() => TransitionTo(CopyStatus.AwaitingInspection, CopyStatus.OnRent);
+
+    public void BeginInspection() => TransitionTo(CopyStatus.InInspection, CopyStatus.AwaitingInspection);
+
+    public void Shelve() => TransitionTo(CopyStatus.Available, CopyStatus.InInspection);
+
+    public void SendForRepair() => TransitionTo(CopyStatus.InRepair, CopyStatus.InInspection);
+
+    public void CompleteRepair() => TransitionTo(CopyStatus.Available, CopyStatus.InRepair);
+
+    public void WriteOffAsLost() => TransitionTo(CopyStatus.Lost, CopyStatus.OnRent);
+
+    public void Recover() => TransitionTo(CopyStatus.AwaitingInspection, CopyStatus.Lost);
+
+    public void Retire() =>
+        TransitionTo(CopyStatus.Retired,
+            CopyStatus.Available, CopyStatus.InInspection, CopyStatus.InRepair);
+
+    private void TransitionTo(CopyStatus to, params CopyStatus[] allowedFrom)
+    {
+        if (!allowedFrom.Contains(Status))
+        {
+            throw new InvalidOperationException(
+                $"A copy cannot go from {Status} to {to}.");
+        }
+
+        Status = to;
+    }
+
+    #endregion
 }
