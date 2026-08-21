@@ -368,6 +368,11 @@ rather than as a flag on the general one. The tests for each stay short and the 
 inspection → In inspection → Available | In repair | Retired` — with illegal moves refused by
 the domain rather than merely absent from a user interface.
 
+**And the states that chain leaves out**, because it is the *typical path* rather than the state
+machine: `Lost` (UC-11.2), the release of an unclaimed reservation, and the recovery of a lost
+copy back into *Awaiting inspection* (UC-5.2). Enumerating states from the definitions rather
+than from the happy path is the episode's opening lesson.
+
 **The rule that shapes the service:** a copy **cannot be retired while a rental is active on
 it**. Because copy status is catalog's own data, that is a local check inside one transaction.
 If rental state lived in another service, enforcing it would mean asking a question whose
@@ -375,7 +380,7 @@ answer can be stale before it arrives — and a copy could be retired in the gap
 check and the write. This is the concrete example behind an abstract principle: **put the data
 where the invariant is**.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/`. Notes: [`episode-15.md`](episode-15.md).
 
 ---
 

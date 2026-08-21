@@ -49,7 +49,7 @@ already deploys to Azure on every push.
 | 1. Define the use cases → `docs/IDEA.md` | **Done.** Eleven use cases, UC-1 to UC-11. |
 | 2. Design the architecture against them | **Catalog done.** No other service designed yet. |
 | 3. Plan the recording order → `docs/course-plan/` | **Done for catalog** — episodes 1 to 30. |
-| 4. Script and build, episode by episode | **Episodes 1–12 recorded and merged.** Episode 13 is scripted but not implemented. Nothing from 14 on is written. |
+| 4. Script and build, episode by episode | **Episodes 1–12 recorded and merged.** Episodes 13, 14 and 15 are scripted but not implemented. Nothing from 16 on is written. |
 
 In the repository today: `src/Catalog/BrickShare.Catalog.Api` (health checks, plus the pricing
 rules from episode 12), unit and integration test projects, `infra/main.tf` (App Service and ACR),

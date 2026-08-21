@@ -643,10 +643,9 @@ Then two deliberate breakages, each of which should turn something red:
 
 ## Next
 
-[Episode 15 — The copy state machine](catalog-api.md#episode-15--the-copy-state-machine): the
-lifecycle from `docs/IDEA.md` — `Available → Reserved → On rent → Awaiting inspection → In
-inspection → Available | In repair | Retired` — with illegal moves refused by the domain rather
-than merely absent from a user interface.
+[Episode 15 — The copy state machine](episode-15.md): the lifecycle from `docs/IDEA.md` — all
+eight statuses, not just the seven on the typical path — with illegal moves refused by the domain
+rather than merely absent from a user interface.
 
 It also brings the rule that shapes the whole service: **a copy cannot be retired while a rental is
 active on it**. Because copy status is catalog's own data, that is a local check inside one
