@@ -20,7 +20,12 @@ RUN dotnet restore src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csp
 
 # Now the rest of the source. This layer invalidates on every code change, which is fine —
 # it's cheap. Restore, the expensive step, already happened above and stays cached.
+#
+# Both projects, and the second line is the one that is easy to forget: restore is satisfied by a
+# .csproj, but the compiler needs the .cs files behind it. A project reference added without a
+# matching COPY here restores cleanly and then fails to build inside the image only.
 COPY src/Catalog/BrickShare.Catalog.Api/ src/Catalog/BrickShare.Catalog.Api/
+COPY src/Catalog/BrickShare.Catalog.Domain/ src/Catalog/BrickShare.Catalog.Domain/
 RUN dotnet publish src/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj \
     --configuration Release \
     --no-restore \
