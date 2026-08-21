@@ -8,16 +8,20 @@ public sealed class Copy
 {
     private Copy(LabelCode label, ConditionGrade grade)
     {
+        Id = Guid.CreateVersion7();
         Label = label;
         Grade = grade;
         Status = CopyStatus.Available;
     }
+
+    public Guid Id { get; }
 
     public LabelCode Label { get; }
 
     public ConditionGrade Grade { get; private set; }
 
     public CopyStatus Status { get; private set; }
+    public DateTimeOffset? RetiredAt { get; private set; }
 
     # region Grage
 
@@ -86,9 +90,13 @@ public sealed class Copy
 
     public void Recover() => TransitionTo(CopyStatus.AwaitingInspection, CopyStatus.Lost);
 
-    public void Retire() =>
+    public void Retire(DateTimeOffset retiredAt)
+    {
         TransitionTo(CopyStatus.Retired,
             CopyStatus.Available, CopyStatus.InInspection, CopyStatus.InRepair);
+
+        RetiredAt = retiredAt;
+    }
 
     private void TransitionTo(CopyStatus to, params CopyStatus[] allowedFrom)
     {

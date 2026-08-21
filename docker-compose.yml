@@ -14,6 +14,23 @@ services:
       # silently drift apart as one gains behaviour the other doesn't.
       ASPNETCORE_ENVIRONMENT: Development
 
-# One service, and it looks like overkill for one service. It's the socket Postgres, Azurite
-# and the Rebrickable stub plug into from episode 15 onward — adding it now costs this file
-# and nothing else.
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: brickshare_catalog
+      POSTGRES_USER: brickshare
+      POSTGRES_PASSWORD: brickshare
+    ports:
+      # Published for the humans, not for the API. psql, Rider's database tool and `dotnet ef`
+      # all run on the host and all need a route in.
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brickshare -d brickshare_catalog"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - catalog-postgres:/var/lib/postgresql
+
+volumes:
+  catalog-postgres:

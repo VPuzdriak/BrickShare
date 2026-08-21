@@ -401,7 +401,8 @@ second way to reach the database, a second thing to keep consistent and a second
 wrong, and nothing in this service needs it. If a query ever genuinely needs raw SQL, EF runs
 raw SQL.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`.
+Notes: [`episode-16.md`](episode-16.md).
 
 ### Episode 17 — Integration tests against a real database
 

@@ -124,7 +124,7 @@ public class CopyStatusTests
     {
         Copy copy = Available();
 
-        copy.Retire();
+        copy.Retire(AnyInstant);
 
         Assert.Equal(CopyStatus.Retired, copy.Status);
     }
@@ -134,7 +134,7 @@ public class CopyStatusTests
     {
         Copy copy = OnRent();
 
-        Assert.Throws<InvalidOperationException>(() => copy.Retire());
+        Assert.Throws<InvalidOperationException>(() => copy.Retire(AnyInstant));
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class CopyStatusTests
     {
         Copy copy = InInspection();
 
-        copy.Retire();
+        copy.Retire(AnyInstant);
 
         Assert.Equal(CopyStatus.Retired, copy.Status);
     }
@@ -169,7 +169,7 @@ public class CopyStatusTests
     public void A_retired_copy_cannot_be_reserved()
     {
         Copy copy = Available();
-        copy.Retire();
+        copy.Retire(AnyInstant);
 
         Assert.Throws<InvalidOperationException>(copy.Reserve);
     }
@@ -189,10 +189,14 @@ public class CopyStatusTests
     public void A_retired_copy_cannot_be_recovered()
     {
         Copy copy = Available();
-        copy.Retire();
+
+        copy.Retire(AnyInstant);
 
         Assert.Throws<InvalidOperationException>(copy.Recover);
     }
+
+    private static readonly DateTimeOffset AnyInstant =
+        new(2026, 3, 14, 9, 30, 0, TimeSpan.Zero);
 
     private static Copy Available() =>
         Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.New);

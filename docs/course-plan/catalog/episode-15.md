@@ -1189,7 +1189,7 @@ Then three deliberate breakages, each of which should turn something red:
 
 ## Next
 
-[Episode 16 — Postgres in Compose, EF Core mapping](catalog-api.md#episode-16--postgres-in-compose-ef-core-mapping):
+[Episode 16 — Postgres in Compose, EF Core mapping](episode-16.md):
 Postgres joins `docker-compose.yml`, and `Money`, `ConditionGrade`, `CopyStatus` and `Copy` get a
 `DbContext`, explicit `IEntityTypeConfiguration` classes and a first migration committed as a
 reviewable file.

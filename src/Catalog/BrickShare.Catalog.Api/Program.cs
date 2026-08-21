@@ -1,8 +1,15 @@
+using BrickShare.Catalog.Api.Persistence;
+
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHealthChecks();
+builder.Services.AddDbContext<CatalogDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Catalog")));
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<CatalogDbContext>(tags: ["ready"]);
 
 var app = builder.Build();
 
