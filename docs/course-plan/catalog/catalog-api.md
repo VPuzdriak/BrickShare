@@ -419,7 +419,8 @@ starting state rather than whatever the previous test left behind.
 **And it works in CI**, because episode 5 already made Docker part of the workflow. Nothing in
 the pipeline changes.
 
-**Lands in:** `tests/BrickShare.Catalog.IntegrationTests/`
+**Lands in:** `tests/BrickShare.Catalog.IntegrationTests/`. Notes:
+[`episode-17.md`](episode-17.md).
 
 ### Episode 18 — Terraform: Postgres and managed identity
 

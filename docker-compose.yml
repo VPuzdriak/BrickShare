@@ -13,6 +13,9 @@ services:
       # set here because this file describes the local inner loop, and the two should not
       # silently drift apart as one gains behaviour the other doesn't.
       ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:18

@@ -399,6 +399,13 @@ dotnet_diagnostic.IDE1006.severity = warning
 [tests/**/*.cs]
 dotnet_diagnostic.CA1707.severity = none
 
+# CA1711 reserves the "Collection" suffix for types that implement IEnumerable. A collection
+# *definition* is xUnit's own term for a marker class that is never instantiated and never
+# enumerated, and DatabaseCollection is the name in xUnit's documentation. Same reason as CA1707
+# above: the CA17xx naming rules govern a published library's API surface, and a test assembly
+# has none.
+dotnet_diagnostic.CA1711.severity = none
+
 # EF Core writes these files; nobody edits them, so style rules have no one to instruct. The
 # analyzers stay on for every other file in the project, which is the point of scoping it here
 # rather than lowering the bar globally.
