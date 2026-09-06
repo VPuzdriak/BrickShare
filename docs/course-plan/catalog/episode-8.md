@@ -263,12 +263,17 @@ so the switch reads as planned rather than as a correction:
 - **Deployment slots** (the final episode). Every slot gets its own system-assigned principal,
   so every role assignment has to be duplicated per slot. A user-assigned identity is shared —
   one grant covers all of them.
-- **Postgres with Entra authentication** (episode 18). The database-side role is bound to a
-  specific principal, and anything that replaces the web app changes that principal and silently
-  orphans the role. A user-assigned identity survives the app being recreated.
+- **A database role bound to a specific principal.** Entra authentication to Postgres creates a role
+  inside the database tied to the identity's object id, and a system-assigned identity is destroyed
+  and recreated with the resource that owns it. Replace the web app and the role is left pointing at
+  a principal that no longer exists — the app cannot log in, and nothing in `terraform plan` says
+  why. A user-assigned identity survives the app being recreated.
 
-Neither is a problem yet. When one becomes a problem, switching is its own worthwhile episode
-about why Azure has two kinds of managed identity in the first place.
+Neither is a problem yet, and neither is fixed the moment it first appears: Postgres arrives in
+episode 18 and takes the system-assigned identity as it stands, with that hazard named and its
+trigger written down. The switch happens once, at the end of this module, where deployment slots
+force it anyway — and it is its own worthwhile episode about why Azure has two kinds of managed
+identity in the first place.
 
 **The propagation window — say this before applying, not after it breaks.**
 

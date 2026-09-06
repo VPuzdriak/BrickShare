@@ -1,12 +1,47 @@
+using Azure.Core;
+using Azure.Identity;
+
 using BrickShare.Catalog.Api.Persistence;
 
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 
+using Npgsql;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<CatalogDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Catalog")));
+builder.Services.AddSingleton(_ =>
+{
+    var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration.GetConnectionString("Catalog"));
+    /*
+     A connection string that carries a password is Compose or Testcontainers, and it is left
+     exactly as it is. One with no password is Azure, where the password is a token that has to
+     be fetched and expires.
+    */
+    if (string.IsNullOrEmpty(dataSourceBuilder.ConnectionStringBuilder.Password))
+    {
+        var credential = new DefaultAzureCredential();
+
+        dataSourceBuilder.UsePasswordProvider(
+            passwordProvider: _ =>
+                throw new NotSupportedException(
+                    "Open connections asynchronously: fetching a token from a blocking Open() deadlocks."),
+            passwordProviderAsync: async (_, cancellationToken) =>
+            {
+                var token = await credential.GetTokenAsync(
+                    new TokenRequestContext(["https://ossrdbms-aad.database.windows.net/.default"]),
+                    cancellationToken);
+
+                return token.Token;
+            }
+        );
+    }
+
+    return dataSourceBuilder.Build();
+});
+
+builder.Services.AddDbContext<CatalogDbContext>((sp, options) =>
+    options.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<CatalogDbContext>(tags: ["ready"]);

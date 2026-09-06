@@ -21,9 +21,31 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_client_config" "current" {}
+
 variable "image_tag" {
   description = "Container image tag to deploy — the commit SHA the pipeline built."
   type        = string
+}
+
+variable "postgres_admin_object_id" {
+  description = "Object id of the Entra group that administers the Postgres server."
+  type        = string
+}
+
+variable "postgres_admin_name" {
+  description = "Display name of that group. Postgres uses it as the login role name, so it must match Entra exactly."
+  type        = string
+}
+
+variable "developer_ip" {
+  description = "Public IP allowed through the Postgres firewall for the step 8 bootstrap. Null in CI."
+  type        = string
+  default     = null
+}
+
+locals {
+  catalog_app_name = "app-brickshare-catalog-dev"
 }
 
 resource "azurerm_resource_group" "main" {
@@ -39,6 +61,55 @@ resource "azurerm_container_registry" "main" {
   admin_enabled       = false
 }
 
+resource "azurerm_postgresql_flexible_server" "catalog" {
+  name                = "psql-brickshare-catalog-dev"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+
+  version               = "18"
+  sku_name              = "B_Standard_B1ms"
+  storage_mb            = 32768
+  backup_retention_days = 7
+  zone                  = "1"
+
+  authentication {
+    active_directory_auth_enabled = true
+    password_auth_enabled         = false
+  }
+}
+
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "catalog" {
+  server_name         = azurerm_postgresql_flexible_server.catalog.name
+  resource_group_name = azurerm_resource_group.main.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  object_id           = var.postgres_admin_object_id
+  principal_name      = var.postgres_admin_name
+  principal_type      = "Group"
+}
+
+resource "azurerm_postgresql_flexible_server_database" "catalog" {
+  name      = "brickshare_catalog"
+  server_id = azurerm_postgresql_flexible_server.catalog.id
+  collation = "en_US.utf8"
+  charset   = "utf8"
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "azure_services" {
+  name             = "AllowAzureServices"
+  server_id        = azurerm_postgresql_flexible_server.catalog.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "developer" {
+  count = var.developer_ip == null ? 0 : 1
+
+  name             = "developer"
+  server_id        = azurerm_postgresql_flexible_server.catalog.id
+  start_ip_address = var.developer_ip
+  end_ip_address   = var.developer_ip
+}
+
 resource "azurerm_service_plan" "catalog" {
   name                = "plan-brickshare-catalog-dev"
   resource_group_name = azurerm_resource_group.main.name
@@ -48,7 +119,7 @@ resource "azurerm_service_plan" "catalog" {
 }
 
 resource "azurerm_linux_web_app" "catalog" {
-  name                = "app-brickshare-catalog-dev"
+  name                = local.catalog_app_name
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.catalog.id
@@ -67,8 +138,9 @@ resource "azurerm_linux_web_app" "catalog" {
   }
 
   app_settings = {
-    WEBSITES_PORT          = "8080"
-    ASPNETCORE_ENVIRONMENT = "Production"
+    WEBSITES_PORT              = "8080"
+    ASPNETCORE_ENVIRONMENT     = "Production"
+    ConnectionStrings__Catalog = "Host=${azurerm_postgresql_flexible_server.catalog.fqdn};Port=5432;Database=${azurerm_postgresql_flexible_server_database.catalog.name};Username=${local.catalog_app_name};SSL Mode=Require"
   }
 }
 
