@@ -1322,7 +1322,7 @@ regresses, this is the pair of commands that disagrees.
 
 ## Next
 
-[Episode 18 — Terraform: Postgres and managed identity](catalog-api.md#episode-18--terraform-postgres-and-managed-identity):
+[Episode 18 — Terraform: Postgres and managed identity](episode-18.md):
 the database this episode proved the mapping against still does not exist in Azure.
 
 Episode 16 deployed a `DbContext` with nothing to connect to, and it has been sitting there reporting

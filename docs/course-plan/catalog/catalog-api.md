@@ -435,10 +435,24 @@ most tutorials, and it is a credential that is copied into local files, pasted i
 never rotated. A managed identity has no value to steal. The setup is slightly more work once
 and removes an entire category of incident permanently.
 
-Network posture is decided here too — private endpoints with public access disabled as the
-recommendation, with the cost stated honestly so choosing the cheaper option is a decision.
+Network posture is decided here too, and **the episode builds the cheaper option on purpose**:
+public access with an "allow Azure services" firewall rule, having said plainly what that rule
+actually admits — every Azure tenant in the region. It is the wrong answer for production and it is
+chosen as a **course cost decision**, so that a student following along is not paying for a virtual
+network, a private DNS zone and possibly a plan-tier upgrade to protect a database with nothing in
+it. Private endpoints with public access disabled arrive at the end of the course, once the service
+is finished and there is something worth protecting.
 
-**Lands in:** `infra/`
+**And the identity stays system-assigned.** The database role is bound to a principal that dies with
+the web app, which is a real hazard — it is named here with its exact trigger, and fixed in episode
+30 alongside deployment slots, which want the same thing for their own reason.
+
+**Lands in:** `infra/`, `src/Catalog/BrickShare.Catalog.Api/Program.cs`,
+`Directory.Packages.props`, `.github/workflows/deploy.yml`. Notes:
+[`episode-18.md`](episode-18.md).
+
+**Done when:** `/health/ready` returns 200 from Azure for the first time, and the app's configuration
+holds a database connection string with no password in it.
 
 ### Episode 19 — Migrations in the pipeline
 
@@ -686,6 +700,16 @@ control than the database, and it is usually the one that leaks.
 **Teaches:** GitHub environments and manual approval before production; a post-deploy smoke test
 that fails the deployment rather than leaving it green and broken; deployment slots and warm-up;
 rollback as a practised operation rather than an improvisation.
+
+**And two debts named earlier come due here**, both because slots are what finally force them:
+
+- **The user-assigned managed identity.** Every slot gets its own system-assigned principal, so
+  every role assignment would have to be duplicated per slot — and the Postgres role from episode 18
+  is bound to a principal that dies with the app it belongs to. One identity, shared, fixes both.
+- **The network posture.** Episode 18 shipped public access with an "allow Azure services" firewall
+  rule as a stated course cost decision. The service is finished by now and the database has
+  something in it, so this is where it moves behind a private endpoint with public access disabled —
+  including the private DNS failures that make it worth watching rather than reading about.
 
 **Closes the loop opened in episode 9.** That pipeline proved a commit could reach Azure. This
 one makes it safe to let it.
