@@ -595,7 +595,7 @@ builder.Services.AddSingleton(_ =>
 
         dataSourceBuilder.UsePasswordProvider(
             passwordProvider: _ => throw new NotSupportedException(
-                "Open connections asynchronously: fetching a token from a blocking Open() deadlocks."),
+                "Open connections asynchronously: a blocking Open() would hold a thread-pool thread for the length of a network call."),
             passwordProviderAsync: async (_, cancellationToken) =>
             {
                 var token = await credential.GetTokenAsync(
@@ -642,9 +642,23 @@ end of episode 17. It also means the interesting path is the one nothing can tes
 here rather than hidden, and is why step 7 deploys it and reads the log.
 
 **The synchronous provider throws on purpose.** Fetching a token is a network call. Doing it from
-inside a blocking `Open()` is how thread-pool starvation happens under load — the failure appears as
-timeouts everywhere, at the worst moment, and points at nothing. Throwing turns a production
-performance mystery into an exception on the first line of the first test that takes the wrong path.
+inside a blocking `Open()` holds a thread-pool thread for the whole of it, which is how thread-pool
+starvation happens under load — the failure appears as timeouts everywhere, at the worst moment, and
+points at nothing. Throwing turns a production performance mystery into an exception on the first
+line of the first caller that takes the wrong path.
+
+**Say what it is not, because the word is easy to reach for and wrong here.** This is not a
+deadlock. There is no `.Result` and no `.GetAwaiter().GetResult()`, and Azure.Identity's
+`GetToken` is a real synchronous method rather than an async one in disguise. A blocking fetch would
+*work*; it would just work by occupying a thread that ASP.NET Core needs for something else. The
+guard is about a threading budget, not about a hang.
+
+**And name the first caller it will catch**, since it is closer than it looks: EF Core's migration
+commands are synchronous — `Migrate()`, with no async surface in the tooling. Anything that applies
+a migration through this application's `DbContext` will open a connection the blocking way and hit
+this exception. That is not a bug in the guard. It is episode 19 arriving early, and the answer
+there is that a migration runner is a console process where blocking is the correct thing to do —
+so it gets a composition root of its own rather than a hole in this one.
 
 ---
 
@@ -1288,7 +1302,7 @@ Then the Azure checks, in order:
 
 ## Next
 
-[Episode 19 — Migrations in the pipeline](catalog-api.md#episode-19--migrations-in-the-pipeline):
+[Episode 19 — Migrations in the pipeline](episode-19.md):
 this episode created a database with nothing in it, and every table this course has designed since
 episode 13 is still only a C# class and a migration file nobody has run against Azure.
 

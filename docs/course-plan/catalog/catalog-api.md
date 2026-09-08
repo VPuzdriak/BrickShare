@@ -466,7 +466,9 @@ the worst possible moment to discover it.
 Also: **backward-compatible migrations**, because for a few seconds during a deployment the old
 code and the new schema are both live. Add before you remove; never rename in one step.
 
-**Lands in:** `.github/workflows/`
+**Lands in:** `.github/workflows/`, plus two `output` blocks in `infra/main.tf` so the migration
+job can read the server's address out of state rather than retyping it. Notes:
+[`episode-19.md`](episode-19.md).
 
 **Done when:** a schema change reaches Azure through the pipeline, with the app never starting
 against a schema it does not expect.

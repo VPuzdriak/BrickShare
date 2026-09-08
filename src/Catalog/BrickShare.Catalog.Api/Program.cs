@@ -25,7 +25,7 @@ builder.Services.AddSingleton(_ =>
         dataSourceBuilder.UsePasswordProvider(
             passwordProvider: _ =>
                 throw new NotSupportedException(
-                    "Open connections asynchronously: fetching a token from a blocking Open() deadlocks."),
+                    "Open connections asynchronously: a blocking Open() would hold a thread-pool thread for the length of a network call."),
             passwordProviderAsync: async (_, cancellationToken) =>
             {
                 var token = await credential.GetTokenAsync(

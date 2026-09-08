@@ -152,6 +152,14 @@ resource "azurerm_role_assignment" "acr_pull" {
   principal_id         = azurerm_linux_web_app.catalog.identity[0].principal_id
 }
 
+output "postgres_fqdn" {
+  value = azurerm_postgresql_flexible_server.catalog.fqdn
+}
+
+output "postgres_database" {
+  value = azurerm_postgresql_flexible_server_database.catalog.name
+}
+
 output "web_app_url" {
   value = "https://${azurerm_linux_web_app.catalog.default_hostname}"
 }

@@ -38,6 +38,25 @@ jobs:
       - run: dotnet build --no-restore --configuration Release
       - run: dotnet test --no-build --configuration Release
 
+      - name: Restore local tools
+        run: dotnet tool restore
+
+      # --self-contained so the artifact carries its own runtime: the job that runs it needs
+      # nothing installed. -r linux-x64 because that is the runner it will execute on, and a
+      # self-contained build has to be told what it is targeting.
+      - name: Build migration bundle
+        run: |
+          dotnet ef migrations bundle \
+            --project src/Catalog/BrickShare.Catalog.Api \
+            --configuration Release \
+            --self-contained -r linux-x64 \
+            --output efbundle
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: efbundle
+          path: efbundle
+
   # Build the artifact once. Everything downstream refers to this tag, never rebuilds it.
   image:
     needs: build-test
@@ -64,10 +83,59 @@ jobs:
             .
           docker push ${{ env.REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
+  # Apply the schema change before the code that depends on it is released. This job is the only
+  # thing in the repository that connects to the database as an administrator.
+  migrate:
+    needs: image
+    runs-on: ubuntu-latest
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # DefaultAzureCredential inside the bundle needs a signed-in Azure context. This step is
+      # what provides it, and it is the same OIDC login the image job already uses.
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
+      # Reading two outputs, not applying anything. The state is the one place the server's
+      # address is written down; retyping it here would be the literal episode 18 step 5 refused.
+      - name: Read database address from Terraform state
+        working-directory: infra
+        run: |
+          terraform init -input=false
+          {
+            echo "PG_FQDN=$(terraform output -raw postgres_fqdn)"
+            echo "PG_DATABASE=$(terraform output -raw postgres_database)"
+          } >> "$GITHUB_ENV"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: efbundle
+
+      - run: chmod +x efbundle
+
+      - name: Apply migrations
+        env:
+          # The same configuration key App Service sets, and the same shape: no password, because
+          # the bundle fetches a token exactly the way the application does.
+          ConnectionStrings__Catalog: "Host=${{ env.PG_FQDN }};Port=5432;Database=${{ env.PG_DATABASE }};Username=${{ vars.POSTGRES_ADMIN_NAME }};SSL Mode=Require"
+        run: ./efbundle
   # CD: make this commit live. Terraform owns the image field, so the deployment is a
   # variable change and nothing else.
   deploy:
-    needs: image
+    needs:
+      - image
+      - migrate
     runs-on: ubuntu-latest
     env:
       ARM_USE_OIDC: true
