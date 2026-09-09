@@ -18,6 +18,60 @@ is plausible. A shop that rented large sets by the month would type exactly this
 
 ```
 HTTP/1.1 500 Internal Server Error
+content-length: 0
+```
+
+**Nothing.** Episode 22 gave malformed requests a `400` a client could read, and a *well-formed*
+request the business refuses still gets an empty 500. The server did exactly what it was told, by a
+rule written in episode 20, and had no way to say so.
+
+**Done when** a refused business rule comes back `409` carrying the domain's own sentence, a genuine
+defect still comes back `500`, and the twelve assertions in the episode 14 and 15 test files have
+been refactored on camera to say which of the two they mean.
+
+## Before recording
+
+- Episode 22 merged: the FluentValidation validator and `400 ProblemDetails` on malformed input.
+- A branch.
+- [`episode-14.md`](episode-14.md) and [`episode-15.md`](episode-15.md) open. Twelve assertions
+  across their two test files change today, and it is worth having the originals on screen.
+
+**Step 3 is a refactor driven from the test side**, which is a shape this course has not shown yet:
+the assertions change first, the suite goes red in a way that has nothing to do with the endpoint,
+and only then does `Copy.cs` change. That is what "the tests are the specification" looks like when
+the specification is about a *type* rather than a value.
+
+---
+
+## Step 1 — First, stop the empty body
+
+Before diagnosing anything, make every failure the shape episode 22's `400` already is.
+`Program.cs`:
+
+```csharp
+// Turns any unhandled failure into RFC 9457 instead of an empty body.
+builder.Services.AddProblemDetails(options =>
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Instance ??= context.HttpContext.Request.Path;
+
+        // One id in the response and in the logs, so a screenshot from a staff member is enough
+        // to find the request. Episode 34 wires the other end of this.
+        context.ProblemDetails.Extensions["traceId"] =
+            Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
+    });
+```
+
+and, right after `var app = builder.Build();`:
+
+```csharp
+app.UseExceptionHandler();
+```
+
+with `using System.Diagnostics;`. Re-run the `curl`:
+
+```
+HTTP/1.1 500 Internal Server Error
 content-type: application/problem+json
 
 {
@@ -28,33 +82,19 @@ content-type: application/problem+json
 }
 ```
 
-**Machine-readable, consistent with episode 22's 400 — and a lie.** It says the server failed. The
-server did exactly what it was told, by a rule written in episode 20, and then had no way to say so.
+**Better, and still wrong**, and the gap between those two words is the rest of the episode. The body
+is machine-readable, consistent with episode 22's `400`, and carries an id somebody can quote. It is
+also **a machine-readable lie**: it says the server failed.
 
-The exception message is absent too, and that default is right: exception text leaks table names,
+Notice the exception message is absent, and that default is right — exception text leaks table names,
 file paths and internal structure to whoever asked. **The framework cannot tell that this particular
-message was written for a human, because nothing in the code says so** — which is the whole
-diagnosis.
+message was written for a human, because nothing in the code says so**, which is the whole diagnosis.
 
-**Done when** a refused business rule comes back `409` carrying the domain's own sentence, a genuine
-defect still comes back `500`, and the twelve assertions in the episode 14 and 15 test files have
-been refactored on camera to say which of the two they mean.
-
-## Before recording
-
-- Episode 22 merged: the validator, `AddProblemDetails`, `UseExceptionHandler`.
-- A branch.
-- [`episode-14.md`](episode-14.md) and [`episode-15.md`](episode-15.md) open. Twelve assertions
-  across their two test files change today, and it is worth having the originals on screen.
-
-**Step 2 is a refactor driven from the test side**, which is a shape this course has not shown yet:
-the assertions change first, the suite goes red in a way that has nothing to do with the endpoint,
-and only then does `Copy.cs` change. That is what "the tests are the specification" looks like when
-the specification is about a *type* rather than a value.
+**This step is wiring**, and `UseExceptionHandler` is the hook step 4 plugs into.
 
 ---
 
-## Step 1 — Why the type is the problem
+## Step 2 — Why the type is the problem
 
 `Copy.Regrade` throws `InvalidOperationException`. So does `Copy.Retire` on a copy that is out on
 rent. So does `CatalogSet.Catalogue`. And so does:
@@ -104,7 +144,7 @@ Actual:   InternalServerError
 
 ---
 
-## Step 2 — A type that means "the business said no"
+## Step 3 — A type that means "the business said no"
 
 `src/Catalog/BrickShare.Catalog.Domain/DomainRuleViolationException.cs`:
 
@@ -207,7 +247,7 @@ argument guard is, by definition, a bug in this codebase.**
 
 ---
 
-## Step 3 — Green: mapping it to a status code
+## Step 4 — Green: mapping it to a status code
 
 `src/Catalog/BrickShare.Catalog.Api/DomainRuleViolationExceptionHandler.cs`:
 
@@ -310,13 +350,14 @@ different direction — the database, not the domain. Episode 24.
 **No logging of refusals.** *How often does staff try to catalogue a set twice* is a question worth
 answering and it is episode 34's, along with the rule about what must never be logged.
 
-**No change to `ArgumentException` handling**, deliberately, per step 2. Those stay 500s and should.
+**No change to `ArgumentException` handling**, deliberately, per step 3. Those stay 500s and should.
 
 ## Verification
 
 | Check | Expected |
 | --- | --- |
 | `dotnet build` | 0 warnings — including CA1032 on the new exception type |
+| Every 4xx and 5xx response | Carries `instance` and `traceId` |
 | `dotnet test` | Green, including the twelve refactored assertions |
 | `POST` with `minimumRentalDays: 30` | `409`, `detail` quoting the 28-day rule verbatim |
 | `POST` with `{}` | Still `400`. Episode 22's path is untouched |
@@ -332,7 +373,7 @@ And one deliberate breakage, in the style episode 15 ended with. In
 
 Everything still compiles — and **the 409 test goes red**, because `DomainRuleViolationException`
 does not derive from `InvalidOperationException`, so the handler now claims nothing. That is step
-2's inheritance decision defending itself: had the type derived from `InvalidOperationException` to
+3's inheritance decision defending itself: had the type derived from `InvalidOperationException` to
 be "compatible", this edit would have been silent, and the service would have started reporting
 disposed-`DbContext` bugs to staff as *the catalog refused this change*.
 

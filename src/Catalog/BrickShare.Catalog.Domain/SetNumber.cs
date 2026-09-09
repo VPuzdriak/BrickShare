@@ -4,7 +4,7 @@ namespace BrickShare.Catalog.Domain;
 
 public sealed record SetNumber
 {
-    private const int MaxLength = 32;
+    public const int MaxLength = 32;
 
     private SetNumber(string value)
     {

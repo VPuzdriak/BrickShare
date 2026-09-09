@@ -519,26 +519,38 @@ left for a student to notice.
 
 ### Episode 22 — Refusing nonsense at the edge
 
-**Builds:** the request validator, and `ProblemDetails` (RFC 9457) as the house error format.
+**Builds:** the request validator, in **FluentValidation**, returning `400 ProblemDetails`
+(RFC 9457).
 
 **Teaches:** why an empty request body currently returns **500** and why that is unusable for
-everybody who sees it; collecting *every* failing field rather than returning on the first; and a
-standard error shape being worth using mostly because **it stops being a decision** — twelve
-endpoints and four developers otherwise produce four different error envelopes.
+everybody who sees it; a standard error shape being worth using mostly because **it stops being a
+decision**; and a library adopted with its costs on screen rather than hidden.
 
-**The one to spell out:** validation at the edge does not replace the domain rules from episodes
-12–15 and 20. The edge asks *could any shop, anywhere, mean this?*; the domain asks *does **this**
-shop allow it?* The worked example is one field: `minimumRentalDays` of 0 is nonsense and belongs
-at the edge; 29 is perfectly sensible and is refused by a rule about another service's payment
-window, so it stays in the domain and is deliberately **not** duplicated in the validator.
+**The library is a stated exception to the deferral rule**, not the rule bending. Episode 21 refused
+`Asp.Versioning` because it solves a problem this service does not have; FluentValidation solves one
+that is on screen, has two more validators scheduled in episodes 26 and 27, and is standard
+equipment a course cannot honestly skip. **The exception is argued on camera, and so is its price:**
+`ToDictionary()` names errors after C# properties, so the first green turns red again on
+`SetNumber` versus `setNumber`, and the fix is a mutable global static.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`. Notes: [`episode-22.md`](episode-22.md).
+**The one to spell out:** the split is not *which rules live at the edge*. It is **who decides and
+who answers the caller**, and the nine rules in this validator go three ways — **delegated**
+(`.Must(v => SetNumber.TryParse(v, out _))`, one implementation, in the domain), **duplicated on
+purpose** (`minimumRentalDays >= 1`, two, so an HTTP caller gets the field named), and **domain
+only** (the 28-day maximum, deliberately absent). And the library just made the wrong thing easier:
+`[Required]` could not express that maximum, `.LessThanOrEqualTo(28)` is six characters.
 
-**Done when:** `{}` comes back `400` with seven named fields in `application/problem+json`.
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `Directory.Packages.props`, and one word in
+`SetNumber.cs` — `MaxLength` goes public so the error message cannot quote a stale number. Notes:
+[`episode-22.md`](episode-22.md).
+
+**Done when:** `{}` comes back `400` with seven fields in `application/problem+json`, named in the
+client's own spelling.
 
 ### Episode 23 — A refused rule is not a bug
 
-**Builds:** `DomainRuleViolationException`, an `IExceptionHandler`, and the `409` mapping.
+**Builds:** `AddProblemDetails` as the house format for failures nobody wrote a `return` for, then
+`DomainRuleViolationException`, an `IExceptionHandler` and the `409` mapping.
 
 **Teaches:** the episode's whole subject in one sentence — episodes 14, 15 and 20 refuse business
 rules by throwing `InvalidOperationException`, which is also what the runtime throws for a disposed
@@ -635,6 +647,11 @@ row takes its history with it. The endpoint sets a timestamp and the copy stops 
 
 The episode-15 rule now runs end to end through HTTP: retiring a copy that is out on rent is
 refused, and the test proves it.
+
+**And the validation story scales up here**, which is what episode 22 said it was waiting for: a
+batch is `RuleForEach` over a collection, three validators make `AddValidatorsFromAssemblyContaining`
+worth the loss of explicitness, and the handler-level call gives way to an endpoint filter. `LabelCode`
+gets the `MaxLength` treatment episode 22 gave `SetNumber`.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
