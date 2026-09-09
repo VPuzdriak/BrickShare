@@ -453,7 +453,7 @@ becomes the better shape. One operation is not that moment.
 **And to correct episode 15 slightly**, which called `retired_at` "a database concern with a
 database default": it is not. A `DEFAULT now()` on the column records **when the row was written**,
 which is a different fact — it drifts by however long the transaction took, and it is simply wrong
-if the retirement is ever recorded after the fact. The endpoint in episode 23 passes the instant in,
+if the retirement is ever recorded after the fact. The endpoint in episode 27 passes the instant in,
 and the domain records what it was told.
 
 ---
@@ -692,14 +692,14 @@ support tool nobody remembered to put the check in. **It is the same principle e
 step on — put the enforcement where the data is — arriving as a schema line instead of a domain
 guard.**
 
-The application check is still worth having, in episode 23, for the message: a `409` explaining
+The application check is still worth having, in episode 27, for the message: a `409` explaining
 which label is taken reads better than a wrapped `23505`. **But it is a nicety over a guarantee, and
 that ordering matters** — a nicety implemented as if it were the guarantee is how databases end up
 with duplicates.
 
 **And the plan promised two constraints here, not one.** *Unique constraints on set number and label
 code.* Only the label code lands, because there is no `catalog_sets` table yet — see the end of this
-episode for why, and episode 22 for where it goes. The argument is the same one, twice.
+episode for why, and episode 26 for where it goes. The argument is the same one, twice.
 
 ### `timestamp with time zone`, never `timestamp`
 
@@ -742,8 +742,8 @@ finds it.
 
 With a concurrency token, EF adds the token to the `WHERE` clause and checks how many rows it
 changed. Zero rows means somebody else got there first, and `DbUpdateConcurrencyException` is
-thrown. Episode 20 builds the `ProblemDetails` mapping that turns a refusal into a `409`, and
-episode 23 is where a copy write path exists to raise this one — a staff member reloads and sees the
+thrown. Episode 23 builds the `ProblemDetails` mapping that turns a refusal into a `409`, and
+episode 27 is where a copy write path exists to raise this one — a staff member reloads and sees the
 repair rather than silently erasing it.
 
 **`xmin` is the elegant part and it is Postgres-specific.** Every row already carries a hidden
@@ -824,7 +824,7 @@ holds no money — rental price, daily rate and deposit are computed, never stor
 drove out with tests, and the two prices that *are* stored belong to `catalog_sets`, which does not
 exist yet.
 
-So what lands is not a column. It is the thing that makes the first money column, in episode 22,
+So what lands is not a column. It is the thing that makes the first money column, in episode 26,
 impossible to get wrong by forgetting — and *by forgetting* is the only way this goes wrong, which
 is exactly why it is a convention rather than a line repeated in each configuration file.
 `HasColumnType("numeric(10,2)")` written per property is correct for precisely as long as everybody
@@ -970,10 +970,11 @@ and the comment episode 3 left behind gets corrected on camera. It reads:
 // Nothing is tagged yet — Postgres arrives in episode 15, Blob Storage in episode 25.
 ```
 
-Both numbers are wrong, by one episode each, because the plan moved after the comment was written:
+Both numbers are stale, because the plan moved after the comment was written — Postgres landed
+here, in 16, and photographs are now episode 31:
 
 ```csharp
-// Postgres, as of this episode. Blob Storage joins it in episode 26.
+// Postgres, as of this episode. Blob Storage joins it in episode 31.
 ```
 
 **A comment that names a future episode is a comment that goes stale**, and this one is a small
@@ -1052,15 +1053,15 @@ withholding it until it would pass.
 - **No `catalog_sets`, no `set_id`, no set-number constraint.** The domain has no `CatalogSet` type,
   and inventing one to satisfy a schema diagram is structure ahead of need — the argument episodes 2
   and 13 made about projects, arriving as a table. A `copies` table with no set to point at is an
-  honest description of a domain that has no set in it. Episode 22 creates sets, and brings the
+  honest description of a domain that has no set in it. Episode 26 creates sets, and brings the
   table, the foreign key and the second unique constraint with the code that fills them. **This is
   what incremental migrations are for**, and it is why the second one being routine matters more
   than the first one being complete.
 - **No checklist items, photographs, grade multipliers, Rebrickable snapshots or outbox.** All five
-  are in the architecture's schema; none has code that writes to it. Photographs are episodes 26 and
-  27, the checklist and snapshots are episode 22, and the outbox belongs to the messaging module by
+  are in the architecture's schema; none has code that writes to it. Photographs are episodes 31 and
+  27, the checklist and snapshots are episode 26, and the outbox belongs to the messaging module by
   the course plan's staging rule — an outbox with no subscriber is a table nobody reads.
-- **No `baseline_weight_grams`.** It is recorded at registration, which is episode 23, and it is a
+- **No `baseline_weight_grams`.** It is recorded at registration, which is episode 27, and it is a
   column with no domain property yet.
 - **No repository, no unit of work.** `DbContext` is both — it tracks changes and commits them
   atomically — and wrapping it in an interface that exposes the same methods with different names
@@ -1068,7 +1069,7 @@ withholding it until it would pass.
   Postgres, so the usual reason for the abstraction, faking the database, is one this course
   deliberately does not want.
 - **No query, no endpoint, nothing that reads a copy back.** Not one `SaveChanges` runs in this
-  episode. Registration through HTTP is episode 23.
+  episode. Registration through HTTP is episode 27.
 - **No test that touches a database** — episode 17, with Testcontainers, and it collects every claim
   step 7 made.
 - **No Postgres in Azure** (18) and **no migration in the pipeline** (19).

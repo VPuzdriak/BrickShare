@@ -445,7 +445,7 @@ is finished and there is something worth protecting.
 
 **And the identity stays system-assigned.** The database role is bound to a principal that dies with
 the web app, which is a real hazard — it is named here with its exact trigger, and fixed in episode
-30 alongside deployment slots, which want the same thing for their own reason.
+35 alongside deployment slots, which want the same thing for their own reason.
 
 **Lands in:** `infra/`, `src/Catalog/BrickShare.Catalog.Api/Program.cs`,
 `Directory.Packages.props`, `.github/workflows/deploy.yml`. Notes:
@@ -477,31 +477,105 @@ against a schema it does not expect.
 
 # Part 5 — the write API
 
-### Episode 20 — Cataloguing a set
+### Episode 20 — The set the copies are copies of
 
-**Builds:** the staff endpoint that creates a catalog entry, with validation and proper errors.
+**Builds:** the `CatalogSet` aggregate test-first, its EF configuration and the `catalog_sets`
+migration. No HTTP at all.
 
-**Teaches:** endpoint groups and route organisation; versioning under `/api/v1` from the first
-public endpoint rather than when it hurts; validation at the edge with the domain still
-enforcing its own rules; **`ProblemDetails` (RFC 9457)** so failures are machine-readable and
-consistent instead of an ad-hoc JSON shape per endpoint; OpenAPI from the built-in
-`Microsoft.AspNetCore.OpenApi`.
+**Teaches:** the 28-day maximum rental as a rule that lives where it can be **enforced** rather
+than where it originates — it exists because UC-2's write-off must fire while a Stripe deposit
+authorization is still capturable, and catalog does not know what Stripe is. Also: validation in a
+static factory rather than a constructor, because EF calls the constructor when it materialises a
+row and a rule applied on *read* explodes the day the business changes its policy.
 
-**The one to spell out:** validation at the edge does not replace the domain rules from
-episodes 12–15. The edge rejects nonsense early with a good message; the domain refuses illegal
-states no matter who calls it. Doing only the first gives an API that is safe until something
-calls it another way.
+**Why the domain type gets its own episode.** The next four argue about status codes. Arguing about
+what a set *is* at the same time means neither argument lands, and the rules here are the thing all
+three of episode 22–24's gates are guarding.
 
-**And the domain exception lands here, as a demonstrated fix.** Episodes 14, 15 and 23 throw
-`InvalidOperationException` for a refused business rule, which an API layer cannot tell apart from
-a null-reference bug. This episode shows a perfectly reasonable staff request returning
-**500 Internal Server Error**, then introduces a domain exception type, maps it to a `409`
-`ProblemDetails`, and refactors those throws and their tests on camera. Deferred to here on
-purpose: the distinction is not real until there is an endpoint on the other side of it.
+**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/`, `src/Catalog/BrickShare.Catalog.Api/`.
+Notes: [`episode-20.md`](episode-20.md).
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
+**Done when:** `catalog_sets` exists in Azure, applied by the pipeline, with money as
+`numeric(10,2)` and the set number unique in the database.
 
-### Episode 21 — Talking to Rebrickable
+### Episode 21 — The first endpoint
+
+**Builds:** `POST /api/v1/catalog/sets` — route group, handler, request and response records,
+`201 Created`.
+
+**Teaches:** endpoint groups and route organisation, so `Program.cs` stays a readable list rather
+than becoming a file people only search; `/api/v1` as a **literal prefix and not `Asp.Versioning`**,
+because every feature of that library is for running two versions at once and this service runs
+zero — the prefix is free now and unbuyable later; and a response DTO rather than the entity,
+with the counter-argument stated honestly since at this size the two are identical.
+
+**And the least comfortable `curl` in the module**, at the end: the same request, against Azure,
+from anywhere on the internet, with no token. Named here as a mitigation-not-a-control rather than
+left for a student to notice.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`. Notes: [`episode-21.md`](episode-21.md).
+
+**Done when:** a `201` comes back from Azure with a row to show for it.
+
+### Episode 22 — Refusing nonsense at the edge
+
+**Builds:** the request validator, and `ProblemDetails` (RFC 9457) as the house error format.
+
+**Teaches:** why an empty request body currently returns **500** and why that is unusable for
+everybody who sees it; collecting *every* failing field rather than returning on the first; and a
+standard error shape being worth using mostly because **it stops being a decision** — twelve
+endpoints and four developers otherwise produce four different error envelopes.
+
+**The one to spell out:** validation at the edge does not replace the domain rules from episodes
+12–15 and 20. The edge asks *could any shop, anywhere, mean this?*; the domain asks *does **this**
+shop allow it?* The worked example is one field: `minimumRentalDays` of 0 is nonsense and belongs
+at the edge; 29 is perfectly sensible and is refused by a rule about another service's payment
+window, so it stays in the domain and is deliberately **not** duplicated in the validator.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`. Notes: [`episode-22.md`](episode-22.md).
+
+**Done when:** `{}` comes back `400` with seven named fields in `application/problem+json`.
+
+### Episode 23 — A refused rule is not a bug
+
+**Builds:** `DomainRuleViolationException`, an `IExceptionHandler`, and the `409` mapping.
+
+**Teaches:** the episode's whole subject in one sentence — episodes 14, 15 and 20 refuse business
+rules by throwing `InvalidOperationException`, which is also what the runtime throws for a disposed
+`DbContext`, a double-awaited `Task` and a collection modified during iteration, so **an API layer
+cannot tell a business rule from a defect.** A perfectly reasonable staff request returns 500 on
+camera, then a type fixes it.
+
+**Watch the shape of the refactor**, which is the first of its kind in this course: twelve
+assertions across the episode 14 and 15 test files change *first*, the suite goes red in twelve
+places that have nothing to do with the endpoint, and only then does `Copy.cs` change.
+
+**And the close call, stated as one:** 409 versus 422. The architecture document says 409 and 409
+ships; the case for 422 is given rather than hidden, along with why 400 would be actively wrong.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/`, `src/Catalog/BrickShare.Catalog.Api/`,
+`tests/BrickShare.Catalog.UnitTests/`. Notes: [`episode-23.md`](episode-23.md).
+
+**Done when:** a refused rule is a `409` carrying the domain's own sentence, and a genuine defect
+is still a `500`.
+
+### Episode 24 — Two people, one Titanic
+
+**Builds:** the duplicate-set-number refusal, through episode 23's handler, plus the `.http` file
+that documents all three failures.
+
+**Teaches:** the last of the three gates, and the only one that **cannot be closed in C#**. The
+obvious implementation queries before inserting; the obvious implementation is a race, and it does
+not remove the failure path — it makes it rare, which is worse, because a bug that happens on one
+deployment in fifty is one nobody can reproduce. **The database is the only participant that sees
+both transactions.** Also: why the `when` filter naming one constraint matters, since a bare
+`catch (DbUpdateException)` starts lying the moment episode 27 adds a second unique index.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`. Notes: [`episode-24.md`](episode-24.md).
+
+**Done when:** the same set number twice gives `201` then `409`, and `count(*)` is 1.
+
+### Episode 25 — Talking to Rebrickable
 
 **Builds:** the Rebrickable client — typed `HttpClient`, resilience, and its tests.
 
@@ -524,7 +598,7 @@ never-stocked set fails. Caching is what keeps the consequence that small.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 22 — Two endpoints, for a security reason
+### Episode 26 — Two endpoints, for a security reason
 
 **Builds:** the split flow — `POST /catalog/lookups` fetches and stores the Rebrickable payload
 server-side; `POST /catalog/sets` references it and carries only the staff-typed fields.
@@ -546,7 +620,7 @@ true, since create cannot be reached without a successful lookup.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 23 — Registering and retiring copies
+### Episode 27 — Registering and retiring copies
 
 **Builds:** copy registration, individually and in batch, and retirement.
 
@@ -566,9 +640,42 @@ refused, and the test proves it.
 
 ---
 
+### Episode 28 — What this API says about itself
+
+**Builds:** the OpenAPI document, from the built-in `Microsoft.AspNetCore.OpenApi`.
+
+**Teaches:** a document generated from the C# types rather than hand-written and immediately
+stale; endpoint metadata — `WithSummary`, `ProducesValidationProblem`, `ProducesProblem` — for the
+status codes the types cannot express; and a tag per resource, which is the difference between a
+reference document and a list.
+
+**Why here and not with the first endpoint.** Episodes 20–24 built one endpoint group, and a
+document describing one group is a worse version of the `.http` file that already exists. By now
+there are three — lookups, sets, copies — and eleven endpoints, so the argument for tags is
+something on screen rather than something asserted.
+
+**The honest note this episode has to make:** `ProducesProblem(409)` is a hand-maintained claim
+that nothing verifies. Delete the handler and the document keeps advertising the 409. That is the
+standing weakness of generated-from-code API documentation, and the mitigation is that episodes
+22, 23 and 24 pinned those three status codes with integration tests — **the behaviour is checked
+even though the document is not.**
+
+**And why it is mapped in every environment**, unlike the `dotnet new` template's
+`IsDevelopment()` guard: the document describes routes that are already reachable, so hiding it is
+not a security control — it is an inconvenience for the people integrating with you and no
+obstacle to anyone probing the service. Security here is episode 33's job, and it is
+authorization, not obscurity. The counter-argument is real and stated: in some organisations
+publishing an attack-surface map is a compliance question, and the guard is one line.
+
+**No Swagger UI.** A human-browsable page is a separate dependency serving a separate purpose, and
+the `.http` file from episode 24 is what exploration looks like here — version controlled, which a
+web page is not.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `Directory.Packages.props`
+
 # Part 6 — the read API
 
-### Episode 24 — Browse, search and filter
+### Episode 29 — Browse, search and filter
 
 **Builds:** the public catalog endpoints — search by name and set number, filters on theme,
 piece count, age rating, price and availability, with paging.
@@ -584,7 +691,7 @@ to keep in sync with nothing paying for the sync.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 25 — Set detail, and the rules that are easy to break
+### Episode 30 — Set detail, and the rules that are easy to break
 
 **Builds:** the set detail endpoint and the per-set aggregates.
 
@@ -611,7 +718,7 @@ cheapest **available** copy so the page never advertises a price nobody can act 
 
 # Part 7 — files and identity
 
-### Episode 26 — Uploading photographs
+### Episode 31 — Uploading photographs
 
 **Builds:** Azurite in Compose, the staff upload endpoint, and its storage in Terraform.
 
@@ -626,7 +733,7 @@ naming it now makes the switch a decision rather than a rewrite.**
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`, `infra/`
 
-### Episode 27 — SAS, and a privacy rule in code
+### Episode 32 — SAS, and a privacy rule in code
 
 **Builds:** short-lived user-delegation SAS minting, and the published/evidence split.
 
@@ -650,7 +757,7 @@ un-publishing something is not.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 28 — Entra ID: protecting the staff endpoints
+### Episode 33 — Entra ID: protecting the staff endpoints
 
 **Builds:** authentication and authorization — app roles, policies, and tests that run as each
 role.
@@ -681,7 +788,7 @@ to an identity provider.**
 
 # Part 8 — production readiness
 
-### Episode 29 — Observability
+### Episode 34 — Observability
 
 **Builds:** OpenTelemetry wired to Application Insights — traces, metrics, structured logs.
 
@@ -695,7 +802,7 @@ control than the database, and it is usually the one that leaks.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 30 — Hardening the pipeline
+### Episode 35 — Hardening the pipeline
 
 **Builds:** the finished delivery pipeline.
 
@@ -722,14 +829,16 @@ one makes it safe to let it.
 
 ## Compressing the course
 
-Thirty episodes is the honest count once each holds a single idea. Three pairs merge
-cleanly if fewer, longer videos are wanted:
+Thirty-five episodes is the honest count once each holds a single idea, and each one fits a
+ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos are wanted:
 
 | Merge | Gives |
 | --- | --- |
 | **10 + 11** | One "quality gates" episode, config and enforcement together |
-| **24 + 25** | One "read API" episode |
-| **26 + 27** | One "photographs" episode covering upload and access together |
+| **20 + 21** | One "the set and its endpoint" episode |
+| **23 + 24** | One "refusing a well-formed request" episode, domain and database together |
+| **29 + 30** | One "read API" episode |
+| **31 + 32** | One "photographs" episode covering upload and access together |
 
 Nothing else merges without an episode doing two unrelated things. In particular **4 and 5 do
 not merge** — testing and containerisation share nothing, and the seam between them is where a

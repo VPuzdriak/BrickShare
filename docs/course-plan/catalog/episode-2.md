@@ -172,7 +172,7 @@ GET {{host}}/
 Accept: application/json
 ```
 
-With OpenAPI stripped until episode 20, this is how the endpoint gets called — VS Code and
+With OpenAPI stripped until episode 28, this is how the endpoint gets called — VS Code and
 Rider both run `.http` files, and it costs no dependency.
 
 ### `.gitignore`
@@ -186,7 +186,7 @@ episode's diff is buried in build output.
 | Deleted | Why |
 | --- | --- |
 | The `/weatherforecast` endpoint and its `WeatherForecast` record | Sample data pretending to be a feature. It has nothing to do with a catalog service, and leaving it teaches students to build around scaffolding they never read. |
-| `builder.Services.AddOpenApi()` and `app.MapOpenApi()` | OpenAPI is episode 20. Removing it is what leaves the project with zero package references. |
+| `builder.Services.AddOpenApi()` and `app.MapOpenApi()` | OpenAPI is episode 28. Removing it is what leaves the project with zero package references. |
 | `app.UseHttpsRedirection()` | This service will run in a container behind App Service, which terminates TLS. With no HTTPS port configured, the middleware redirects to a port nothing is listening on. |
 | The `https` launch profile | Same reason — and it avoids sending students into the dev-certificate dance in the second episode of a course. Episode 6 shows where TLS actually gets terminated. |
 

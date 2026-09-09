@@ -288,7 +288,7 @@ value of this episode is contrast: a viewer who has clicked through this by hand
 
 No app settings beyond `WEBSITES_PORT`, no custom domain, no scaling rules, no deployment
 slots. Those either don't exist yet for a reason (see the architecture doc for what Terraform
-will eventually configure) or belong to a specific later episode — slots are episode 30,
+will eventually configure) or belong to a specific later episode — slots are episode 35,
 health-probe wiring to `/health/ready` returns properly in episode 7 once it's declared in
 code rather than clicked.
 

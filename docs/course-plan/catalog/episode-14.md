@@ -583,15 +583,15 @@ The problem is that it means two completely different things:
 `InvalidOperationException` cannot tell those apart, so an API layer catching it has to guess — and
 the guess is wrong roughly half the time in either direction.
 
-**Episode 20 fixes this on camera**, and in that order deliberately: it puts the first real endpoint
+**Episode 23 fixes this on camera**, and in that order deliberately: episodes 20 and 21 put the first endpoint
 in front of these rules, shows a perfectly reasonable staff request coming back as
 `500 Internal Server Error`, and *then* introduces a domain exception type and maps it to a proper
 `ProblemDetails` response. The throws written today, and their tests, get refactored there.
 
 **Why not just do it now?** Because the distinction only becomes real when there is something on
-the other side of it. A type introduced today would be justified by a promise about episode 20
+the other side of it. A type introduced today would be justified by a promise about episode 23
 rather than by anything on screen — and the course's own rule is that structure appears when
-something forces it. Nothing here forces it yet. Episode 20 does, visibly, in one HTTP response.
+something forces it. Nothing here forces it yet. Episode 23 does, visibly, in one HTTP response.
 
 What this episode *does* owe you is the warning, which is this section.
 
@@ -622,7 +622,7 @@ and no configuration — the domain grows and the delivery pipeline does not not
 - **No persistence, no entity identity.** Episode 16 gives `Copy` a key and an `Equals` worth
   writing. Today reference equality is correct because there is nowhere for a second instance of
   the same copy to come from.
-- **No endpoint**, and **no authorization**. Who is allowed to regrade is episode 28's question,
+- **No endpoint**, and **no authorization**. Who is allowed to regrade is episode 33's question,
   and the answer there is a policy — not an `if` inside the domain.
 - **No domain exception type** — see step 7.
 

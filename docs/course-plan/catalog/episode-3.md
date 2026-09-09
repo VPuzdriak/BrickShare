@@ -49,7 +49,7 @@ app.MapGet("/", () => new { service = "BrickShare Catalog API" });
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
 
 // Readiness: can this instance serve traffic? Runs every check tagged "ready".
-// Nothing is tagged yet — Postgres arrives in episode 16, Blob Storage in episode 26.
+// Nothing is tagged yet — Postgres arrives in episode 16, Blob Storage in episode 31.
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("ready")
@@ -118,7 +118,7 @@ belongs behind authentication, if it is wanted at all.
 
 **Health endpoints will need excluding from request logging.** A probe hitting two endpoints
 every few seconds produces more log entries than real traffic does. That is dealt with in
-episode 29, when logging is configured properly, and is noted here so it does not look
+episode 34, when logging is configured properly, and is noted here so it does not look
 forgotten.
 
 **No `/health` aggregate endpoint.** A third route that means "one of the above" invites

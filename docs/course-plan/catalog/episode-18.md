@@ -1242,7 +1242,7 @@ Splitting environments is a real episode about state files, naming and promotion
 would double the running cost to demonstrate a problem nobody has.
 
 **No Key Vault.** Still nothing to put in one — which is the nicest thing this episode can say about
-itself. Episode 21 introduces the first genuine secret in the system, the Rebrickable API key, and
+itself. Episode 25 introduces the first genuine secret in the system, the Rebrickable API key, and
 Key Vault arrives there because something needs it.
 
 **No local change at all.** Compose still uses `Username=brickshare;Password=brickshare`, and that is

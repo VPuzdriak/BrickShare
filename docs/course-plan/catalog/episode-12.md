@@ -770,7 +770,7 @@ enforced where a set is created (episode 20), and `PriceCalculator` has no busin
 opinion about it. A function that validates its neighbours' invariants is a function that has to
 be updated when the neighbours change.
 
-**The split to state, since episode 20 will make it explicit:** the edge validates a request so
+**The split to state, since episode 22 will make it explicit:** the edge validates a request so
 the caller gets a good message; the domain refuses illegal states no matter who calls it. These
 guards are the second kind. They exist so that a bug in some future endpoint fails loudly at the
 calculation rather than quietly producing a negative deposit.
@@ -865,7 +865,7 @@ production without anyone touching a workflow file.
 - **No persistence.** The multiplier table is four rows in Postgres from episode 16. Today it is
   a constructor parameter, which is all the domain ever needs to know about it.
 - **No endpoint.** Pricing surfaces through the read API in part 6, and the admin two-phase edit
-  in episode 28. A rule with no caller is fine for one episode.
+  in episode 33. A rule with no caller is fine for one episode.
 - **No mocking library, and no assertion library.** There is nothing to mock — that is why this
   rule was chosen — and `Assert.Equal` is enough. Worth one sentence: comparing `decimal`s with
   `Assert.Equal` is **exact**, with no tolerance parameter, which is a small preview of why

@@ -380,7 +380,7 @@ Quoted verbatim, so they are recognisable rather than mysterious:
 ## What this episode is not
 
 **No environments, approvals, deployment slots, smoke tests or rollback.** All of that is
-episode 30, which exists to make this pipeline *safe* rather than merely *working*. Shipping
+episode 35, which exists to make this pipeline *safe* rather than merely *working*. Shipping
 straight to a live app on every push is exactly right for a course environment with one
 consumer, and would be reckless with real customers — the difference is worth stating out loud
 now so nobody copies this workflow into a job.

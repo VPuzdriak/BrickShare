@@ -105,7 +105,7 @@ And then:
 - **`decimal` is not exact.** EF warns about this on every model with a `decimal` in it, because
   SQLite's storage classes have no fixed-point type. Episode 13's entire opening argument evaporates.
 - **Different collation.** SQLite's `LIKE` is case-insensitive for ASCII by default; Postgres's is
-  not. That is a test that passes and a search endpoint that does not, and episode 24 is where it
+  not. That is a test that passes and a search endpoint that does not, and episode 29 is where it
   would be discovered.
 - **No `xmin`**, so claim two is untestable.
 - **And the decisive one: the migration will not run.** `20260821222411_InitialCatalog` was generated
@@ -525,7 +525,7 @@ first and it finds no tables, resets nothing, and every test after the first inh
 one's rows — which presents as an assertion failure in a test that is individually green.
 
 **`SchemasToInclude = ["public"]`** is narrower than the default and says what it means. There is one
-schema in this database, and naming it means a future extension schema — `pg_trgm` in episode 24
+schema in this database, and naming it means a future extension schema — `pg_trgm` in episode 29
 installs into one — is opted into rather than swept.
 
 **Read the package rather than trusting it.** Respawn's Postgres adapter issues a single
@@ -550,8 +550,8 @@ This was the closest call in the episode and it deserves the table.
 
 | Strategy | Why not here |
 | --- | --- |
-| **A transaction per test, rolled back** | The fastest option, and genuinely tempting — no deletes at all. It breaks as soon as the code under test opens its own transaction, which episode 23's batch registration does by design. And it does not reach across connections, so the moment a test goes through `WebApplicationFactory` (step 9) the app is on a different connection and sees none of the test's setup. |
-| **A database per test class** | Perfect isolation, and the classes could run in parallel again. It pays the migration run once per class, and that bill grows with every migration this course adds between here and episode 30 — the cost lands later, on the people least able to see where it came from. |
+| **A transaction per test, rolled back** | The fastest option, and genuinely tempting — no deletes at all. It breaks as soon as the code under test opens its own transaction, which episode 27's batch registration does by design. And it does not reach across connections, so the moment a test goes through `WebApplicationFactory` (step 9) the app is on a different connection and sees none of the test's setup. |
+| **A database per test class** | Perfect isolation, and the classes could run in parallel again. It pays the migration run once per class, and that bill grows with every migration this course adds between here and episode 35 — the cost lands later, on the people least able to see where it came from. |
 | **A hand-written `TRUNCATE`** | About ten lines, no package, and correct today. |
 
 **The last one is the close call, and it should be said out loud rather than waved past**, because a
@@ -560,12 +560,12 @@ behind a scaffolder*, and a ten-line `ResetAsync` that truncates every table in
 `context.Model.GetEntityTypes()` is fully readable in the file it lives in. That is a real argument
 and it very nearly wins.
 
-What decides it is the schema this repository is about to grow. Episode 22 brings `catalog_sets` and
-a foreign key from `copies`; episodes 26 and 27 bring `photographs`; the messaging module brings an
-outbox. From that point, "empty every table" is a graph-ordering problem, and the hand-written
+What decides it is the schema this repository is about to grow. Episode 20 brings `catalog_sets`,
+episode 27 a foreign key from `copies`; episodes 31 and 32 bring `photographs`; the messaging module
+brings an outbox. From that point, "empty every table" is a graph-ordering problem, and the hand-written
 version either grows a topological sort or grows a `CASCADE` that is quietly deleting more than the
 author checked. **Respawn is the ten lines, already written, already handling the case that arrives
-in five episodes.**
+in three episodes.**
 
 **And that is the fair shape of the trade-off, not a rule about packages.** Explicit wins when the
 explicit version stays small. Here it does not.
@@ -893,7 +893,7 @@ box.
 
 With it, EF puts the loaded `xmin` in the `WHERE` clause, matches zero rows, and raises
 `DbUpdateConcurrencyException` — which the colleague's screen turns into "somebody changed this,
-reload". Episode 20 maps it to a `409`; episode 23 is where a real write path raises it.
+reload". Episode 23 maps it to a `409`; episode 27 is where a real write path raises it.
 
 ### The red, by removal, and it is invisible everywhere else
 
@@ -938,7 +938,7 @@ whoever reads this file in a year knows what the three lines are for.
 - It protects writes made **through this `DbContext`**. `psql`, a migration script and a support tool
   all bypass it.
 - It is *optimistic*: it detects a collision, it does not prevent one. Something has to catch the
-  exception or the collision merely becomes a `500`, which is episode 20's job.
+  exception or the collision merely becomes a `500`, which is episode 23's job.
 - It says nothing about two writes that are *both* fine. It is not a lock.
 
 ---
@@ -1027,7 +1027,7 @@ protected override void ConfigureWebHost(IWebHostBuilder builder) =>
 
 It works. And it has **deleted the registration from `Program.cs` and put a different one in its
 place** — so whatever the test then proves, it proves about the test's registration. Any mistake in
-the real one, any option set alongside it, any interceptor or logging filter added in episode 29, is
+the real one, any option set alongside it, any interceptor or logging filter added in episode 34, is
 now outside the test's reach and the test stays green regardless.
 
 The version above changes **one configuration key**. `Program.cs` reads
@@ -1068,9 +1068,9 @@ with a dependency in the picture.
 
 This step goes a little beyond "collect episode 16's two debts", and it is a judgement call rather
 than an obvious inclusion. Two reasons it is in: without it, `CatalogApiFactory` has no consumer and
-the pattern arrives cold in episode 20 in the middle of a different lesson; and it is the only test
+the pattern arrives cold in episode 21 in the middle of a different lesson; and it is the only test
 in the whole repository that runs `Program.cs` against anything real. One test, and it buys the
-harness that episodes 20, 22, 23, 24 and 25 all sit on.
+harness that episodes 21 to 24, 26, 27, 29 and 30 all sit on.
 
 ---
 
@@ -1268,8 +1268,8 @@ And the three smaller files, for completeness — `DatabaseCollection.cs`, `Data
   a transcription of the migration, which is a transcription of `CopyConfiguration`. Three copies of
   one sentence, and none of them is a rule about LEGO boxes.
 - **No `numeric(10,2)` test** — there is still no money column. `MoneyConverter` and the convention
-  in `ConfigureConventions` get their first real column in episode 22.
-- **No HTTP tests beyond readiness**, because there are no endpoints. Episode 20 brings the first
+  in `ConfigureConventions` get their first real column in episode 26.
+- **No HTTP tests beyond readiness**, because there are no endpoints. Episode 21 brings the first
   one, and it arrives into a harness that already exists.
 - **No repository, no unit of work.** Episode 16 deferred the question with a reason — *episode 17's
   tests run against a real Postgres, so the usual reason for the abstraction, faking the database, is

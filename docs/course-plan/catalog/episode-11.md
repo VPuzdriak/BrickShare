@@ -403,7 +403,7 @@ not show up in a line count.
   checkbox.
 - **No `terraform plan` on pull requests.** Episode 9 deferred this to "once the quality gates
   exist", and it is now possible — but a plan is only useful if someone reads it before an apply
-  happens, which needs the environments and approvals from episode 30. Adding it now would produce
+  happens, which needs the environments and approvals from episode 35. Adding it now would produce
   a step everyone learns to scroll past, and a check nobody reads is worse than no check, because
   it looks like protection that is not there.
 - **No caching of NuGet packages or build output.** The run is under two minutes. Speed is not the

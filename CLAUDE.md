@@ -48,12 +48,15 @@ already deploys to Azure on every push.
 | --- | --- |
 | 1. Define the use cases → `docs/IDEA.md` | **Done.** Eleven use cases, UC-1 to UC-11. |
 | 2. Design the architecture against them | **Catalog done.** No other service designed yet. |
-| 3. Plan the recording order → `docs/course-plan/` | **Done for catalog** — episodes 1 to 30. |
-| 4. Script and build, episode by episode | **Episodes 1–12 recorded and merged.** Episodes 13, 14 and 15 are scripted but not implemented. Nothing from 16 on is written. |
+| 3. Plan the recording order → `docs/course-plan/` | **Done for catalog** — episodes 1 to 35. |
+| 4. Script and build, episode by episode | **Episodes 1–19 recorded and merged.** Episodes 20–24 are scripted but not implemented. Nothing from 25 on is written. |
 
-In the repository today: `src/Catalog/BrickShare.Catalog.Api` (health checks, plus the pricing
-rules from episode 12), unit and integration test projects, `infra/main.tf` (App Service and ACR),
-and two GitHub Actions workflows. Everything else in the course plan is still ahead.
+In the repository today: `src/Catalog/BrickShare.Catalog.Api` (health checks, EF Core persistence
+and the migration bundle), `src/Catalog/BrickShare.Catalog.Domain` (`Money`, `SetNumber`,
+`LabelCode`, the pricing rules, the grade rules and the copy state machine), unit and integration
+test projects running against Testcontainers, `infra/main.tf` (App Service, ACR and Postgres
+Flexible Server), and two GitHub Actions workflows including a gated migration job. Everything else
+in the course plan is still ahead.
 
 **Do not scaffold or implement a service before its architecture document exists.** The
 reasoning has to be written down first — that is what this repository is for.

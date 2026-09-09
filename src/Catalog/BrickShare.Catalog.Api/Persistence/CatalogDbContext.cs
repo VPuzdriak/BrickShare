@@ -8,6 +8,8 @@ namespace BrickShare.Catalog.Api.Persistence;
 
 public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
 {
+    public DbSet<CatalogSet> Sets => Set<CatalogSet>();
+
     public DbSet<Copy> Copies => Set<Copy>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

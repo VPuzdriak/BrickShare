@@ -873,7 +873,7 @@ the `[**/Migrations/*.cs]` section episode 16 added to `.editorconfig` marks the
 carry no analyzer or style burden and cost nothing in review. **The folder is large and the
 maintenance is not.**
 
-This project has one migration. It will have several by episode 30 and none of this will be relevant.
+This project has one migration. It will have several by episode 35 and none of this will be relevant.
 It is worth knowing anyway, because the day it matters, the wrong version — delete the files, hope —
 is the intuitive one.
 
@@ -961,7 +961,7 @@ where table_name = 'copies' and grantee = 'app-brickshare-catalog-dev';
 ```
 
 Four rows, no `CREATE`, no ownership. **Say what an empty result would have meant**, because it is
-the failure episode 18 predicted and it would not surface until episode 20's first endpoint: the
+the failure episode 18 predicted and it would not surface until episode 21's first endpoint: the
 migration ran as some other principal, the default privileges did not apply, and the application gets
 `permission denied for table copies` on a table it can plainly see. That is a confusing enough error
 to be worth recognising once here, in a step where nothing is broken.
@@ -1025,7 +1025,7 @@ Four consequences, and they are the honest cost of the convenience:
   corporate network — a normal thing for a company to do — and the migrate job starts timing out. The
   error is a connection timeout, which reads as an outage rather than as a policy, and it will be
   debugged as one.
-- **Episode 30 breaks it on purpose.** Moving the database behind a private endpoint with public
+- **Episode 35 breaks it on purpose.** Moving the database behind a private endpoint with public
   access disabled removes this route entirely, by design. The replacements are known and each is real
   work: a runner inside the virtual network, a Container Apps job that runs the same bundle from
   inside, or a firewall rule created and torn down around the migration.
@@ -1051,7 +1051,7 @@ table large enough that `ALTER` takes minutes, and this one has no rows.
 **No rollback automation.** A red migrate job leaves everything untouched, which is step 9's whole
 point, but there is no "roll the schema back" button and there deliberately is not one. Rolling
 *forward* — with the expand-and-contract discipline making the previous code still valid — is the
-practised operation. Deployment slots and a rehearsed rollback are episode 30.
+practised operation. Deployment slots and a rehearsed rollback are episode 35.
 
 **No seed data.** A migration that inserts rows is a real technique with a real cost, and the first
 thing this service will want seeded is the grade multiplier table. That belongs with the episode that
@@ -1060,7 +1060,7 @@ introduces multipliers, where it can be argued about with something concrete on 
 **No separate migration identity.** The pipeline's existing service principal joined an existing
 group, and that is the whole identity story. It inherits the hazard episode 18 named: these roles are
 bound to principals, and the *application's* one is system-assigned and dies with the web app.
-Episode 30 fixes that with a user-assigned identity, alongside slots.
+Episode 35 fixes that with a user-assigned identity, alongside slots.
 
 **No environments.** There is still one resource group called `dev` serving as production, so
 "migrate staging first" is not a thing this pipeline can do. It is the obvious next question about
@@ -1116,13 +1116,18 @@ to run. That is the difference between a deployment step you trust and one you s
 
 ## Next
 
-[Episode 20 — Cataloguing a set](catalog-api.md#episode-20--cataloguing-a-set): there is now a
-database with a table in it, an application with permission to read and write that table, and not a
-single endpoint that does either.
+[Episode 20 — The set the copies are copies of](episode-20.md): there is now a database with a table
+in it, an application with permission to read and write that table, and not a single endpoint that
+does either.
 
 Everything since episode 12 has been rules with no way in — pricing, `Money`, `LabelCode`, grades, the
-copy state machine, a mapping and a schema. Episode 20 opens the first door: the staff endpoint that
-creates a catalog entry, with validation at the edge, `ProblemDetails` for failures, and the moment
-where a perfectly reasonable request returns **500** because a refused business rule and a
-null-reference bug look identical to an API layer. That is the episode where the domain exception
-finally earns its existence, on camera, as a fix to something visibly wrong.
+copy state machine, a mapping and a schema. **Episodes 20 to 24 build the staff endpoint that
+catalogues a set**, one idea at a time, and the first of them has no HTTP in it at all: `Copy` has
+existed since episode 13 and the thing it is a copy of has never been modelled.
+
+Then episode 21 opens the door, and 22, 23 and 24 close the three gates behind it — the edge
+rejecting nonsense with a `400`, the domain refusing a legal-looking request with a `409`, and the
+database refusing a set number somebody has already used. The middle one is where a perfectly
+reasonable staff request returns **500**, because a refused business rule and a null-reference bug
+look identical to an API layer, and where the domain exception finally earns its existence on camera
+as a fix to something visibly wrong.
