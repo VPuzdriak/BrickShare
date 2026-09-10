@@ -960,11 +960,20 @@ where table_name = 'copies' and grantee = 'app-brickshare-catalog-dev';
  app-brickshare-catalog-dev | DELETE
 ```
 
-Four rows, no `CREATE`, no ownership. **Say what an empty result would have meant**, because it is
-the failure episode 18 predicted and it would not surface until episode 21's first endpoint: the
-migration ran as some other principal, the default privileges did not apply, and the application gets
-`permission denied for table copies` on a table it can plainly see. That is a confusing enough error
-to be worth recognising once here, in a step where nothing is broken.
+Four rows, no `CREATE`, no ownership. **Say what an empty result would have meant**, because it is a
+failure that would not surface until episode 21's first endpoint: the application gets
+`permission denied for table copies` on a table it can plainly see. Two causes produce it, and this
+query cannot tell them apart:
+
+- **The migration ran as some other principal**, so the default privileges did not apply to the
+  tables it created. Episode 18 predicted this one. The owner column above is what rules it out.
+- **Episode 18 step 8's grants went to the wrong database** — its three `SCHEMA public` statements
+  resolve against whatever database you were connected to, and all of them succeed either way. Step
+  8's own verification is what catches this; if the result here is empty and the owner column looks
+  right, that is where to go back to.
+
+**This is the last cheap moment to find either.** Nothing is broken here, and an empty result is a
+five-minute fix; the same empty result found from a `42501` in production is an afternoon.
 
 And the history table:
 

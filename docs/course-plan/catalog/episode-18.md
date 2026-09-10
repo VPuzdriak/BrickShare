@@ -889,7 +889,14 @@ binding.
 
 ### Grant it what it needs, and nothing else
 
-Reconnect to the application database — `\c brickshare_catalog` — and:
+**Reconnect first. This is the single easiest line in the episode to skip, and skipping it is
+silent.**
+
+```
+\c brickshare_catalog
+```
+
+Then:
 
 ```sql
 GRANT CONNECT ON DATABASE brickshare_catalog TO "app-brickshare-catalog-dev";
@@ -903,6 +910,26 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
 ```
 
 Four things to say, and the last two are the ones that matter later.
+
+**Why that `\c` matters more than it looks.** Three of those four statements say `public`, and
+`public` means *the current database's* public schema. Only the first names its target:
+
+| Statement | Resolves against |
+| --- | --- |
+| `GRANT CONNECT ON DATABASE brickshare_catalog` | the database it **names** — works from anywhere |
+| `GRANT USAGE ON SCHEMA public` | the **current** database |
+| `GRANT … ON ALL TABLES IN SCHEMA public` | the **current** database |
+| `ALTER DEFAULT PRIVILEGES IN SCHEMA public` | the **current** database |
+
+Run them still connected to `postgres` and **all four succeed**. Postgres prints `GRANT` four times
+and nothing is wrong, because nothing *is* wrong — you granted real privileges on a real schema, in
+the wrong database.
+
+**What that costs, precisely:** the app can still log in, so `/health/ready` returns 200 and stays
+200 — `CanConnectAsync` never touches a table. Nothing looks wrong until the first endpoint INSERTs,
+**five episodes later**, and the error is `42501: permission denied for table catalog_sets` on a
+table you can plainly see. **A mistake that produces no error, no failing check and a green health
+probe is the most expensive kind there is** — hence the verification below rather than a warning.
 
 **The quotes are not optional.** An unquoted identifier is folded to lower case by Postgres, and the
 role name contains no capitals here but will the moment somebody names a resource `Catalog-Api`.
@@ -925,6 +952,39 @@ for its own sake — it is the architecture document's rule about startup migrat
 database rather than by everyone remembering. An application that _cannot_ alter the schema cannot
 accidentally alter the schema on startup, on all three instances at once, which is episode 19's
 entire subject.
+
+### Check it landed, before moving on
+
+Do not take four `GRANT` messages as evidence. Still connected to `brickshare_catalog`:
+
+```sql
+select current_database();
+
+select pg_get_userbyid(defaclrole) as for_role,
+       defaclnamespace::regnamespace as schema,
+       defaclacl
+from pg_default_acl;
+```
+
+```
+ current_database
+------------------
+ brickshare_catalog
+
+           for_role           | schema |              defaclacl
+------------------------------+--------+--------------------------------------
+ BrickShare Catalog DB Admins | public | {"app-brickshare-catalog-dev=arwd/…"}
+```
+
+**One row, in `brickshare_catalog`.** Empty means the `ALTER DEFAULT PRIVILEGES` went somewhere else
+— run `select current_database()` and look at the answer rather than at the SQL.
+
+`arwd` is how Postgres stores that privilege set — append (INSERT), read (SELECT), write (UPDATE),
+delete.
+
+**Not** `information_schema.table_privileges` — that is the obvious query and it returns zero rows
+right now, correctly, because no tables exist yet. It is the right check in episode 19, once the
+migration has created some.
 
 ### The hazard this creates, named now
 
