@@ -28,7 +28,7 @@ public class CopyGradeTests
     {
         Copy copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.Fair);
 
-        Assert.Throws<InvalidOperationException>(() => copy.Regrade(ConditionGrade.Good));
+        Assert.Throws<DomainRuleViolationException>(() => copy.Regrade(ConditionGrade.Good));
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class CopyGradeTests
     {
         Copy copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.New);
 
-        Assert.Throws<InvalidOperationException>(() => copy.Regrade(ConditionGrade.New));
+        Assert.Throws<DomainRuleViolationException>(() => copy.Regrade(ConditionGrade.New));
     }
 
     [Fact]
@@ -64,8 +64,8 @@ public class CopyGradeTests
     {
         Copy copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.Good);
 
-        Assert.Throws<InvalidOperationException>(() => copy.RaiseGradeAfterRepair(ConditionGrade.Fair));
-        Assert.Throws<InvalidOperationException>(() => copy.RaiseGradeAfterRepair(ConditionGrade.Good));
+        Assert.Throws<DomainRuleViolationException>(() => copy.RaiseGradeAfterRepair(ConditionGrade.Fair));
+        Assert.Throws<DomainRuleViolationException>(() => copy.RaiseGradeAfterRepair(ConditionGrade.Good));
     }
 
     [Fact]
@@ -73,6 +73,6 @@ public class CopyGradeTests
     {
         Copy copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.Excellent);
 
-        Assert.Throws<InvalidOperationException>(() => copy.RaiseGradeAfterRepair(ConditionGrade.New));
+        Assert.Throws<DomainRuleViolationException>(() => copy.RaiseGradeAfterRepair(ConditionGrade.New));
     }
 }

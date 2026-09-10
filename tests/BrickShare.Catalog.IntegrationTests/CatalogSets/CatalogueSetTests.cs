@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BrickShare.Catalog.IntegrationTests.CatalogSets;
 
@@ -38,7 +39,24 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
         Assert.Contains("minimumRentalDays", problem.Errors.Keys);
     }
 
-    private static object ValidRequest() => new
+    [Fact]
+    public async Task A_minimum_rental_period_the_shop_cannot_honour_is_refused()
+    {
+        HttpClient client = Database.Api.CreateClient();
+
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            "/api/v1/catalog/sets", ValidRequest(minimumRentalDays: 30));
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+
+        ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+
+        Assert.NotNull(problem);
+        Assert.Contains("28", problem.Detail);
+    }
+
+
+    private static object ValidRequest(int minimumRentalDays = 7) => new
     {
         setNumber = "10294-1",
         name = "Titanic",
@@ -47,7 +65,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
         pieceCount = 9090,
         retailPrice = 629.99m,
         baseRentalPrice = 60.00m,
-        minimumRentalDays = 7,
+        minimumRentalDays,
         minimumAge = 18
     };
 }

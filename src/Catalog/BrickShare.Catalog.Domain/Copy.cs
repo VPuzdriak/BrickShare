@@ -29,13 +29,13 @@ public sealed class Copy
     {
         if (newGrade == ConditionGrade.New)
         {
-            throw new InvalidOperationException(
+            throw new DomainRuleViolationException(
                 "New is a starting grade only. A copy that has been out cannot be New again.");
         }
 
         if (newGrade.IsBetterThan(Grade))
         {
-            throw new InvalidOperationException(
+            throw new DomainRuleViolationException(
                 $"A copy cannot be regraded from {Grade} up to {newGrade}. Grades only fall.");
         }
 
@@ -46,13 +46,13 @@ public sealed class Copy
     {
         if (newGrade == ConditionGrade.New)
         {
-            throw new InvalidOperationException(
+            throw new DomainRuleViolationException(
                 "New is a starting grade only. A repair can restore a copy, never its seal.");
         }
 
         if (!newGrade.IsBetterThan(Grade))
         {
-            throw new InvalidOperationException(
+            throw new DomainRuleViolationException(
                 $"A repair must improve the grade. {newGrade} is not better than {Grade}.");
         }
 
@@ -102,7 +102,7 @@ public sealed class Copy
     {
         if (!allowedFrom.Contains(Status))
         {
-            throw new InvalidOperationException(
+            throw new DomainRuleViolationException(
                 $"A copy cannot go from {Status} to {to}.");
         }
 

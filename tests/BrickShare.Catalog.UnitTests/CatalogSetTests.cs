@@ -7,7 +7,7 @@ public class CatalogSetTests
     [Fact]
     public void A_set_cannot_require_a_rental_longer_than_the_shop_can_recover_it_in()
     {
-        Assert.Throws<InvalidOperationException>(() => Catalogue(minimumRentalDays: 29));
+        Assert.Throws<DomainRuleViolationException>(() => Catalogue(minimumRentalDays: 29));
     }
 
     [Fact]

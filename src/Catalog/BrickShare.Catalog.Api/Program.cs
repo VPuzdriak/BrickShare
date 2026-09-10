@@ -4,6 +4,7 @@ using System.Text.Json;
 using Azure.Core;
 using Azure.Identity;
 
+using BrickShare.Catalog.Api;
 using BrickShare.Catalog.Api.Endpoints;
 using BrickShare.Catalog.Api.Persistence;
 
@@ -55,6 +56,8 @@ builder.Services.AddSingleton(_ =>
 
 builder.Services.AddDbContext<CatalogDbContext>((sp, options) =>
     options.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
+
+builder.Services.AddExceptionHandler<DomainRuleViolationExceptionHandler>();
 
 // Turns any unhandled failure into RFC 9457 instead of an empty body.
 builder.Services.AddProblemDetails(options =>

@@ -69,7 +69,7 @@ public class CopyStatusTests
     {
         Copy copy = Available();
 
-        Assert.Throws<InvalidOperationException>(copy.Collect);
+        Assert.Throws<DomainRuleViolationException>(copy.Collect);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class CopyStatusTests
     {
         Copy copy = OnRent();
 
-        Assert.Throws<InvalidOperationException>(() => copy.Reserve());
+        Assert.Throws<DomainRuleViolationException>(copy.Reserve);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class CopyStatusTests
     {
         Copy copy = InInspection();
 
-        Assert.Throws<InvalidOperationException>(() => copy.CompleteRepair());
+        Assert.Throws<DomainRuleViolationException>(copy.CompleteRepair);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class CopyStatusTests
     {
         Copy copy = OnRent();
 
-        Assert.Throws<InvalidOperationException>(() => copy.Retire(AnyInstant));
+        Assert.Throws<DomainRuleViolationException>(() => copy.Retire(AnyInstant));
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class CopyStatusTests
     {
         Copy copy = Available();
 
-        Assert.Throws<InvalidOperationException>(copy.WriteOffAsLost);
+        Assert.Throws<DomainRuleViolationException>(copy.WriteOffAsLost);
     }
 
     [Fact]
@@ -171,7 +171,7 @@ public class CopyStatusTests
         Copy copy = Available();
         copy.Retire(AnyInstant);
 
-        Assert.Throws<InvalidOperationException>(copy.Reserve);
+        Assert.Throws<DomainRuleViolationException>(copy.Reserve);
     }
 
     [Fact]
@@ -192,7 +192,7 @@ public class CopyStatusTests
 
         copy.Retire(AnyInstant);
 
-        Assert.Throws<InvalidOperationException>(copy.Recover);
+        Assert.Throws<DomainRuleViolationException>(copy.Recover);
     }
 
     private static readonly DateTimeOffset AnyInstant =

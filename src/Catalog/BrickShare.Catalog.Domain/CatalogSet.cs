@@ -78,7 +78,7 @@ public sealed class CatalogSet
 
         if (minimumRentalDays > MaximumRentalDays)
         {
-            throw new InvalidOperationException(
+            throw new DomainRuleViolationException(
                 $"A set cannot require {minimumRentalDays} days. The shop rents for at most "
                 + $"{MaximumRentalDays} days, so a longer minimum could never be met.");
         }
