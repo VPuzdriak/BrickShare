@@ -13,6 +13,9 @@ services:
       # set here because this file describes the local inner loop, and the two should not
       # silently drift apart as one gains behaviour the other doesn't.
       ASPNETCORE_ENVIRONMENT: Development
+      # Inside the Compose network the database answers to its service name, not localhost.
+      # Without this the container falls back to appsettings.json and dials itself.
+      ConnectionStrings__Catalog: "Host=postgres;Port=5432;Database=brickshare_catalog;Username=brickshare;Password=brickshare"
     depends_on:
       postgres:
         condition: service_healthy

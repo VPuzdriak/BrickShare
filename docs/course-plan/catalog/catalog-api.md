@@ -519,8 +519,9 @@ left for a student to notice.
 
 ### Episode 22 — Refusing nonsense at the edge
 
-**Builds:** the request validator, in **FluentValidation**, returning `400 ProblemDetails`
-(RFC 9457).
+**Builds:** the request validator, in **FluentValidation**, plus `ProblemDetails` (RFC 9457) as the
+house error shape — `AddProblemDetails` decorates the `400` this episode builds, which is why it
+lands here rather than with the 500s.
 
 **Teaches:** why an empty request body currently returns **500** and why that is unusable for
 everybody who sees it; a standard error shape being worth using mostly because **it stops being a
@@ -549,8 +550,7 @@ client's own spelling.
 
 ### Episode 23 — A refused rule is not a bug
 
-**Builds:** `AddProblemDetails` as the house format for failures nobody wrote a `return` for, then
-`DomainRuleViolationException`, an `IExceptionHandler` and the `409` mapping.
+**Builds:** `DomainRuleViolationException`, an `IExceptionHandler`, and the `409` mapping.
 
 **Teaches:** the episode's whole subject in one sentence — episodes 14, 15 and 20 refuse business
 rules by throwing `InvalidOperationException`, which is also what the runtime throws for a disposed

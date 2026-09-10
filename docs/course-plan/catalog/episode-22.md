@@ -211,7 +211,36 @@ alternative is `.OverridePropertyName("setNumber")` on all nine rules. **It is t
 library, paid once, where startup decisions are visible** — and a dependency that appears to cost
 nothing usually means you have not looked yet.
 
-Green, and the `curl` from the cold open now says something useful:
+### Two more lines, so every failure has one shape
+
+```csharp
+builder.Services.AddProblemDetails(options =>
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Instance ??= context.HttpContext.Request.Path;
+
+        // One id in the response and in the logs, so a screenshot from a staff member is enough
+        // to find the request. Episode 34 wires the other end of this.
+        context.ProblemDetails.Extensions["traceId"] =
+            Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
+    });
+```
+
+and, right after `var app = builder.Build();`:
+
+```csharp
+app.UseExceptionHandler();
+```
+
+with `using System.Diagnostics;`.
+
+**The test was already green before these two lines** — they change nothing it asserts. They are
+here because `CustomizeProblemDetails` runs for `TypedResults.ValidationProblem` too, so **these are
+what put `instance` and `traceId` on the `400` this step just built.** Register them where the
+response they decorate is on screen, not with the 500s that need them for a different reason —
+that is episode 23.
+
+Now the `curl` from the cold open says something useful:
 
 ```
 HTTP/1.1 400 Bad Request
@@ -221,6 +250,7 @@ content-type: application/problem+json
   "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
   "title": "One or more validation errors occurred.",
   "status": 400,
+  "instance": "/api/v1/catalog/sets",
   "errors": {
     "setNumber": ["A set number is required, and cannot be longer than 32 characters."],
     "name": ["A name is required."],
@@ -229,7 +259,8 @@ content-type: application/problem+json
     "pieceCount": ["A set has at least one piece."],
     "retailPrice": ["A retail price cannot be negative."],
     "minimumRentalDays": ["A rental lasts at least one day."]
-  }
+  },
+  "traceId": "00-82ac88d5…-00"
 }
 ```
 
@@ -311,8 +342,10 @@ in every language already reads it. `TypedResults.ValidationProblem` produces it
 The alternative is an in-house envelope whose failure mode is not that it is bad but that it is
 *inconsistent*: twelve endpoints, four developers, and a client needing a function that tries
 `{"error": …}`, `{"message": …}` and a bare string. **A standard is worth using mostly because it
-stops being a decision.** Making it the house format for failures nobody wrote a `return` for is
-episode 23 — that needs an unhandled exception to be worth watching.
+stops being a decision.**
+
+`AddProblemDetails` above already extends that shape to failures nobody wrote a `return` for. What it
+cannot do is make them *truthful*, and that is episode 23.
 
 ### Edge validation does not replace the domain
 
@@ -383,11 +416,13 @@ log line. Episode 34.
 | --- | --- |
 | `dotnet build` | 0 warnings |
 | `dotnet test` | Green, including `An_empty_request_is_refused_field_by_field` |
-| `POST` with `{}` | `400`, `application/problem+json`, seven fields in `errors` |
-| Those seven keys | **camelCase** — `setNumber`, not `SetNumber`. Delete the `PropertyNameResolver` line and watch all three key assertions fail |
+| `POST` with `{}` | `400`, `application/problem+json`, **six** fields in `errors` — the three prices and `minimumAge` all default to 0, which is legal |
+| The cold open's `curl` | Seven, because it sends `retailPrice: -5` |
+| Those keys | **camelCase** — `setNumber`, not `SetNumber`. Delete the `PropertyNameResolver` line and watch all three key assertions fail |
+| Every 4xx and 5xx body | Carries `instance` and `traceId` |
 | `SetNumber.MaxLength` changed to 24 | The 400 message says *24 characters* with no second edit. Put it back |
 | `POST` with a valid body | Still `201`. The validator refuses nothing it should not |
-| `POST` with `minimumRentalDays: 30` | **`500` with an empty body.** Expected — episode 23 |
+| `POST` with `minimumRentalDays: 30` | **`500`, RFC 9457-shaped, claiming the server failed.** Expected — episode 23 |
 | The Azure URL, same three requests | Identical answers |
 
 ## Next
