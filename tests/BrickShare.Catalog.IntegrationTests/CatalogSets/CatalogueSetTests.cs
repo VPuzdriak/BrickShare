@@ -1,8 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 
+using BrickShare.Catalog.Api.Persistence;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BrickShare.Catalog.IntegrationTests.CatalogSets;
 
@@ -55,6 +58,23 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
         Assert.Contains("28", problem.Detail);
     }
 
+    [Fact]
+    public async Task A_set_that_is_already_catalogued_cannot_be_catalogued_again()
+    {
+        HttpClient client = Database.Api.CreateClient();
+
+        HttpResponseMessage first = await client.PostAsJsonAsync(
+            "/api/v1/catalog/sets", ValidRequest());
+        Assert.Equal(HttpStatusCode.Created, first.StatusCode);
+
+        HttpResponseMessage second = await client.PostAsJsonAsync(
+            "/api/v1/catalog/sets", ValidRequest());
+
+        Assert.Equal(HttpStatusCode.Conflict, second.StatusCode);
+
+        await using CatalogDbContext dbContext = Database.NewDbContext();
+        Assert.Equal(1, await dbContext.Sets.CountAsync());
+    }
 
     private static object ValidRequest(int minimumRentalDays = 7) => new
     {

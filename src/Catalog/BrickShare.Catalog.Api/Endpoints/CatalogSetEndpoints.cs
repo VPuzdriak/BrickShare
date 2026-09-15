@@ -5,6 +5,9 @@ using FluentValidation;
 using FluentValidation.Results;
 
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+
+using Npgsql;
 
 namespace BrickShare.Catalog.Api.Endpoints;
 
@@ -44,10 +47,23 @@ public static class CatalogSetEndpoints
             request.MinimumAge);
 
         database.Sets.Add(catalogSet);
-        await database.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await database.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex) when (IsAlreadyCatalogued(ex))
+        {
+            throw new DomainRuleViolationException($"Set {request.SetNumber} is already catalogued.", ex);
+        }
 
         return TypedResults.Created($"/api/v1/sets/{catalogSet.Id}", CatalogSetResponse.From(catalogSet));
     }
+
+    private static bool IsAlreadyCatalogued(DbUpdateException ex) =>
+        ex.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation, ConstraintName: "ix_catalog_sets_set_number"
+        };
 }
 
 /// <summary>
