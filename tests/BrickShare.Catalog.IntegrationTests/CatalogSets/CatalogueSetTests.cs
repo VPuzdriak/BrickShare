@@ -82,7 +82,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
         name = "Titanic",
         theme = "Icons",
         year = 2021,
-        pieceCount = 9090,
+        pieceCount = 9092,
         retailPrice = 629.99m,
         baseRentalPrice = 60.00m,
         minimumRentalDays,

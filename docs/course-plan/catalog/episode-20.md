@@ -56,16 +56,16 @@ Read it out, because these five episodes deliberately build only half of it:
 > **minifigures**. Staff then type the four fields Rebrickable cannot supply: **retail price**,
 > **base rental price**, **minimum rental duration** and **age rating**.
 
-The lookup, the snapshot, the image copy and the checklist are episodes 25 and 26. Episodes 20 to 24
+The lookup, the snapshot, the image copy and the checklist are episodes 25 and 27. Episodes 20 to 24
 build **the set and the create call**, taking every field — product facts and staff-typed four
 alike.
 
 **Say now that this is temporary and why**, because otherwise the next four episodes teach something
-episode 26 spends its whole runtime undoing:
+episode 27 spends its whole runtime undoing:
 
 > Accepting `name`, `theme` and `pieceCount` from the client means anyone who can call this endpoint
 > can invent a LEGO set that does not exist. That is an authorization bug wearing the costume of an
-> API design choice, and it is episode 26's whole subject. It is built the wrong way first because
+> API design choice, and it is episode 27's whole subject. It is built the wrong way first because
 > the fix is only convincing once the wrong version is on screen and obviously reasonable.
 
 **This step is not code.**
@@ -422,14 +422,14 @@ separation is deliberate: the type and its rules are worth understanding before 
 status code to argue about.
 
 **No `set_id` on `copies`.** A copy plainly belongs to a set, and the foreign key is not here. It
-arrives in episode 27, with the endpoint that registers copies *against* a set — the first moment
+arrives in episode 28, with the endpoint that registers copies *against* a set — the first moment
 anything can write it. A nullable column with nothing populating it lies for seven episodes, and
 every read written in the meantime has to handle a case that exists only because it shipped early.
 
 **No checklist table.** `catalog_set_checklist_items` is seeded from the minifigures a Rebrickable
 lookup returns, and `source = 'rebrickable' | 'manual'` is a column whose whole point is that
 distinction. Building it now means building it with only the manual half of its story available.
-Episode 26 has both halves.
+Episode 27 has both halves.
 
 ## Verification
 

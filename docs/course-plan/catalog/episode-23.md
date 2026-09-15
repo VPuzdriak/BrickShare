@@ -309,7 +309,7 @@ there.
 different direction — the database, not the domain. Episode 24.
 
 **No logging of refusals.** *How often does staff try to catalogue a set twice* is a question worth
-answering and it is episode 34's, along with the rule about what must never be logged.
+answering and it is episode 35's, along with the rule about what must never be logged.
 
 **No change to `ArgumentException` handling**, deliberately, per step 2. Those stay 500s and should.
 

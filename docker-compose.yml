@@ -16,6 +16,7 @@ services:
       # Inside the Compose network the database answers to its service name, not localhost.
       # Without this the container falls back to appsettings.json and dials itself.
       ConnectionStrings__Catalog: "Host=postgres;Port=5432;Database=brickshare_catalog;Username=brickshare;Password=brickshare"
+      Rebrickable__ApiKey: ${REBRICKABLE_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy

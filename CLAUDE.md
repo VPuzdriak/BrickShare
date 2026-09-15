@@ -48,8 +48,8 @@ already deploys to Azure on every push.
 | --- | --- |
 | 1. Define the use cases → `docs/IDEA.md` | **Done.** Eleven use cases, UC-1 to UC-11. |
 | 2. Design the architecture against them | **Catalog done.** No other service designed yet. |
-| 3. Plan the recording order → `docs/course-plan/` | **Done for catalog** — episodes 1 to 35. |
-| 4. Script and build, episode by episode | **Episodes 1–19 recorded and merged.** Episodes 20–24 are scripted but not implemented. Nothing from 25 on is written. |
+| 3. Plan the recording order → `docs/course-plan/` | **Done for catalog** — episodes 1 to 36. |
+| 4. Script and build, episode by episode | **Episodes 1–19 recorded and merged.** Episodes 20–25 are scripted but not implemented. Nothing from 26 on is written. |
 
 In the repository today: `src/Catalog/BrickShare.Catalog.Api` (health checks, EF Core persistence
 and the migration bundle), `src/Catalog/BrickShare.Catalog.Domain` (`Money`, `SetNumber`,

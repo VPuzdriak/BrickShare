@@ -52,7 +52,7 @@ public class CatalogSetTests
             "Titanic",
             "Icons",
             2021,
-            9090,
+            9092,
             retailPrice ?? new Money(629.99m),
             new Money(60.00m),
             minimumRentalDays,

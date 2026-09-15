@@ -873,7 +873,7 @@ the `[**/Migrations/*.cs]` section episode 16 added to `.editorconfig` marks the
 carry no analyzer or style burden and cost nothing in review. **The folder is large and the
 maintenance is not.**
 
-This project has one migration. It will have several by episode 35 and none of this will be relevant.
+This project has one migration. It will have several by episode 36 and none of this will be relevant.
 It is worth knowing anyway, because the day it matters, the wrong version — delete the files, hope —
 is the intuitive one.
 
@@ -1034,7 +1034,7 @@ Four consequences, and they are the honest cost of the convenience:
   corporate network — a normal thing for a company to do — and the migrate job starts timing out. The
   error is a connection timeout, which reads as an outage rather than as a policy, and it will be
   debugged as one.
-- **Episode 35 breaks it on purpose.** Moving the database behind a private endpoint with public
+- **Episode 36 breaks it on purpose.** Moving the database behind a private endpoint with public
   access disabled removes this route entirely, by design. The replacements are known and each is real
   work: a runner inside the virtual network, a Container Apps job that runs the same bundle from
   inside, or a firewall rule created and torn down around the migration.
@@ -1060,7 +1060,7 @@ table large enough that `ALTER` takes minutes, and this one has no rows.
 **No rollback automation.** A red migrate job leaves everything untouched, which is step 9's whole
 point, but there is no "roll the schema back" button and there deliberately is not one. Rolling
 *forward* — with the expand-and-contract discipline making the previous code still valid — is the
-practised operation. Deployment slots and a rehearsed rollback are episode 35.
+practised operation. Deployment slots and a rehearsed rollback are episode 36.
 
 **No seed data.** A migration that inserts rows is a real technique with a real cost, and the first
 thing this service will want seeded is the grade multiplier table. That belongs with the episode that
@@ -1069,7 +1069,7 @@ introduces multipliers, where it can be argued about with something concrete on 
 **No separate migration identity.** The pipeline's existing service principal joined an existing
 group, and that is the whole identity story. It inherits the hazard episode 18 named: these roles are
 bound to principals, and the *application's* one is system-assigned and dies with the web app.
-Episode 35 fixes that with a user-assigned identity, alongside slots.
+Episode 36 fixes that with a user-assigned identity, alongside slots.
 
 **No environments.** There is still one resource group called `dev` serving as production, so
 "migrate staging first" is not a thing this pipeline can do. It is the obvious next question about

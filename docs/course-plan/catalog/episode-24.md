@@ -105,7 +105,7 @@ HTTP/1.1 409 Conflict
 ```
 
 **No new handler, no new status code, no new anything.** One exception type, three causes now — a
-domain rule, a database constraint, and whatever episode 27 adds next. That is what a well-chosen
+domain rule, a database constraint, and whatever episode 28 adds next. That is what a well-chosen
 seam looks like from the far side.
 
 ### Why not check first
@@ -136,12 +136,12 @@ is guessing about a moment that has not happened yet.
 Two things worth adding while the code is on screen:
 
 - **A pre-check is a legitimate optimisation, not a correctness measure.** If cataloguing were
-  expensive — a Rebrickable call and an image copy, which is exactly what episodes 25 and 26 add —
+  expensive — a Rebrickable call and an image copy, which is exactly what episodes 25 and 27 add —
   failing fast before spending it is worth doing. It just has to be *in addition to* the catch,
   never instead of it.
 - **The `when` filter is doing real work.** `catch (DbUpdateException)` alone would report *any*
   write failure as "already catalogued": a foreign key violation, a check constraint, a concurrency
-  conflict. Episode 27 adds a second unique constraint to this service and that catch block would
+  conflict. Episode 28 adds a second unique constraint to this service and that catch block would
   start lying about it. Naming the constraint keeps the claim as narrow as the evidence.
 
 ---
@@ -222,10 +222,10 @@ is where that becomes a real test.
 That is the opposite of the concurrency conflict episode 16 mapped, where retrying *is* the answer —
 and the two arriving as different status codes is what lets a client tell them apart.
 
-**No OpenAPI document.** Three status codes now exist and nothing describes them. Episode 28, once
+**No OpenAPI document.** Three status codes now exist and nothing describes them. Episode 29, once
 there are enough endpoint groups for a document to be worth generating.
 
-**Still no authorization.** Five episodes in, the endpoint is open. Episode 33.
+**Still no authorization.** Five episodes in, the endpoint is open. Episode 34.
 
 ## Verification
 
@@ -242,15 +242,18 @@ there are enough endpoint groups for a document to be worth generating.
 
 ## Next
 
-[Episode 25 — Talking to Rebrickable](catalog-api.md#episode-25--talking-to-rebrickable):
-the endpoint these five episodes built believes whatever it is told, and the next two are about
-where the truth actually comes from.
+[Episode 25 — Talking to Rebrickable](episode-25.md): the endpoint these five episodes built
+believes whatever it is told, and the next three are about where the truth actually comes from.
 
-Episode 25 builds the typed `HttpClient` — timeout, retry with backoff and circuit breaker via
-`Microsoft.Extensions.Http.Resilience`, and what each one is protecting against, because retry
-without a circuit breaker turns a slow dependency into a self-inflicted outage. It is also where
-**Key Vault appears**, at the moment there is finally a genuine secret to keep: the Rebrickable API
-key. Every credential in this system so far has been a managed identity, and that streak was the
-point — it ends here because a third party's API key is a real secret with nowhere else to go.
+Episode 25 builds the typed `HttpClient` — rate limiter, timeouts, retry with backoff and circuit
+breaker via `Microsoft.Extensions.Http.Resilience`, and what each one is protecting against, because
+retry without a circuit breaker turns a slow dependency into a self-inflicted outage. Its tests
+start a stub HTTP server and point the real client at it, so the whole pipeline runs offline and
+burns nobody's API quota.
 
-Then episode 26 takes the request body these five episodes built and deletes most of it.
+Episode 26 then takes the key that episode 25 leaves sitting in configuration and puts it in **Key
+Vault**, at the moment there is finally a genuine secret to keep. Every credential in this system so
+far has been a managed identity, and that streak was the point — it ends here, because a third
+party's API key is a real secret with nowhere else to go.
+
+Then episode 27 takes the request body these five episodes built and deletes most of it.

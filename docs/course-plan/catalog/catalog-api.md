@@ -445,7 +445,7 @@ is finished and there is something worth protecting.
 
 **And the identity stays system-assigned.** The database role is bound to a principal that dies with
 the web app, which is a real hazard — it is named here with its exact trigger, and fixed in episode
-35 alongside deployment slots, which want the same thing for their own reason.
+36 alongside deployment slots, which want the same thing for their own reason.
 
 **Lands in:** `infra/`, `src/Catalog/BrickShare.Catalog.Api/Program.cs`,
 `Directory.Packages.props`, `.github/workflows/deploy.yml`. Notes:
@@ -529,7 +529,7 @@ decision**; and a library adopted with its costs on screen rather than hidden.
 
 **The library is a stated exception to the deferral rule**, not the rule bending. Episode 21 refused
 `Asp.Versioning` because it solves a problem this service does not have; FluentValidation solves one
-that is on screen, has two more validators scheduled in episodes 26 and 27, and is standard
+that is on screen, has two more validators scheduled in episodes 27 and 28, and is standard
 equipment a course cannot honestly skip. **The exception is argued on camera, and so is its price:**
 `ToDictionary()` names errors after C# properties, so the first green turns red again on
 `SetNumber` versus `setNumber`, and the fix is a mutable global static.
@@ -581,7 +581,7 @@ obvious implementation queries before inserting; the obvious implementation is a
 not remove the failure path — it makes it rare, which is worse, because a bug that happens on one
 deployment in fifty is one nobody can reproduce. **The database is the only participant that sees
 both transactions.** Also: why the `when` filter naming one constraint matters, since a bare
-`catch (DbUpdateException)` starts lying the moment episode 27 adds a second unique index.
+`catch (DbUpdateException)` starts lying the moment episode 28 adds a second unique index.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`. Notes: [`episode-24.md`](episode-24.md).
 
@@ -589,28 +589,72 @@ both transactions.** Also: why the `when` filter naming one constraint matters, 
 
 ### Episode 25 — Talking to Rebrickable
 
-**Builds:** the Rebrickable client — typed `HttpClient`, resilience, and its tests.
+**Builds:** the Rebrickable client — a typed `HttpClient`, its resilience pipeline, and the tests
+that drive both.
 
-**Teaches:** `Microsoft.Extensions.Http.Resilience` — timeout, retry with backoff, circuit
-breaker — and what each one is actually protecting against, because retry without a circuit
-breaker turns a slow dependency into a self-inflicted outage.
+**Teaches:** `Microsoft.Extensions.Http.Resilience` — rate limiter, total timeout, retry with
+backoff, circuit breaker, attempt timeout — and what each one is actually protecting against,
+because **retry without a circuit breaker turns a slow dependency into a self-inflicted outage**:
+every caller retrying multiplies load onto the service least able to absorb it.
 
-**Testing an outbound call** without hitting the real service: a stub behind the same interface,
-so tests run offline and do not burn a rate-limited key. This matters more than it sounds when
-a class of students is sharing one API quota.
+**Testing an outbound call** without hitting the real service: the tests start a stub HTTP server
+on loopback and point the *real* client at it through the *real* registration, so configuration is
+the only thing that differs from production. No fake handler, no swapped interface — the socket,
+the JSON, the auth header and the resilience pipeline are all genuinely exercised, offline, without
+burning a rate-limited key. That last part matters when a class of students shares one quota.
 
-**Key Vault appears here**, because this is the first genuine secret in the system — the
-Rebrickable API key. Introduced at the moment of need rather than as a security module bolted
-on at the end.
+**And two honest notes the episode has to make:** a 404 is an answer, not a failure — the most
+likely outcome of a staff typo must not look like an outage — and the circuit breaker is *not*
+under test, because the standard pipeline samples over 30 seconds with a 100-request minimum
+throughput, so a test that trips it would be a test about Polly's defaults rather than about
+BrickShare's code.
 
-**And the blast radius is narrow by design:** registering more copies of an already-catalogued
-set makes no external call, because the facts were fetched once and stored. During a Rebrickable
+**The blast radius is narrow by design:** registering more copies of an already-catalogued set
+makes no external call, because the facts were fetched once and stored. During a Rebrickable
 outage the shop can still register stock, retire copies and regrade — only cataloguing a
-never-stocked set fails. Caching is what keeps the consequence that small.
+never-stocked set fails. That is also why Rebrickable gets **no readiness check**: an outage
+must not evict an instance that can still serve every other endpoint.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`,
+`Directory.Packages.props`. Notes: [`episode-25.md`](episode-25.md).
 
-### Episode 26 — Two endpoints, for a security reason
+**Done when:** the client fetches a set over real HTTP against the stub, returns `null` for a set
+number Rebrickable has never heard of, and survives two consecutive `500`s because of one line of
+registration.
+
+### Episode 26 — The first real secret
+
+**Builds:** Key Vault — the Terraform, the role assignment, and the configuration provider that
+reads the Rebrickable API key at startup.
+
+**Teaches:** secret management at the moment there is finally a secret to manage. **Every
+credential in this system so far has been a managed identity** — Entra auth to Postgres in episode
+18, `AcrPull` for the registry in episode 8 — and that streak was the point. It ends here, because
+a third party's API key is a real secret with nowhere else to go: Rebrickable will not federate
+with our tenant.
+
+**Why not App Service application settings**, which would work and cost nothing: the value would
+sit in Terraform state, be readable in the portal by anyone with Contributor, and appear in a
+`terraform plan` diff. Key Vault makes it a resource with its own access control and its own audit
+trail, and the app reads it as **managed identity → Key Vault → configuration**, so no credential
+exists to leak.
+
+**And the local story is a different mechanism on purpose:** `dotnet user-secrets` for a developer
+machine, Key Vault for Azure, the same configuration key from the code's point of view. A course
+that teaches one mechanism for both teaches either a shared production secret or a Key Vault every
+student has to provision before episode 1.
+
+**The close call, stated:** a secret fetched once at startup does not rotate until a restart. The
+alternative — refreshing the configuration provider on an interval — is named, with the reason it
+is not worth it here, and the reason it would be for a credential that expires.
+
+**Lands in:** `infra/`, `src/Catalog/BrickShare.Catalog.Api/Program.cs`,
+`Directory.Packages.props`, `.github/workflows/`
+
+**Done when:** the deployed API reaches Rebrickable with a key that appears in no repository, no
+app setting and no Terraform output, and the local build still works with nothing but user secrets.
+
+### Episode 27 — Two endpoints, for a security reason
 
 **Builds:** the split flow — `POST /catalog/lookups` fetches and stores the Rebrickable payload
 server-side; `POST /catalog/sets` references it and carries only the staff-typed fields.
@@ -632,7 +676,7 @@ true, since create cannot be reached without a successful lookup.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 27 — Registering and retiring copies
+### Episode 28 — Registering and retiring copies
 
 **Builds:** copy registration, individually and in batch, and retirement.
 
@@ -657,7 +701,7 @@ gets the `MaxLength` treatment episode 22 gave `SetNumber`.
 
 ---
 
-### Episode 28 — What this API says about itself
+### Episode 29 — What this API says about itself
 
 **Builds:** the OpenAPI document, from the built-in `Microsoft.AspNetCore.OpenApi`.
 
@@ -680,7 +724,7 @@ even though the document is not.**
 **And why it is mapped in every environment**, unlike the `dotnet new` template's
 `IsDevelopment()` guard: the document describes routes that are already reachable, so hiding it is
 not a security control — it is an inconvenience for the people integrating with you and no
-obstacle to anyone probing the service. Security here is episode 33's job, and it is
+obstacle to anyone probing the service. Security here is episode 34's job, and it is
 authorization, not obscurity. The counter-argument is real and stated: in some organisations
 publishing an attack-surface map is a compliance question, and the guard is one line.
 
@@ -692,7 +736,7 @@ web page is not.
 
 # Part 6 — the read API
 
-### Episode 29 — Browse, search and filter
+### Episode 30 — Browse, search and filter
 
 **Builds:** the public catalog endpoints — search by name and set number, filters on theme,
 piece count, age rating, price and availability, with paging.
@@ -708,7 +752,7 @@ to keep in sync with nothing paying for the sync.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 30 — Set detail, and the rules that are easy to break
+### Episode 31 — Set detail, and the rules that are easy to break
 
 **Builds:** the set detail endpoint and the per-set aggregates.
 
@@ -735,7 +779,7 @@ cheapest **available** copy so the page never advertises a price nobody can act 
 
 # Part 7 — files and identity
 
-### Episode 31 — Uploading photographs
+### Episode 32 — Uploading photographs
 
 **Builds:** Azurite in Compose, the staff upload endpoint, and its storage in Terraform.
 
@@ -750,7 +794,7 @@ naming it now makes the switch a decision rather than a rewrite.**
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`, `infra/`
 
-### Episode 32 — SAS, and a privacy rule in code
+### Episode 33 — SAS, and a privacy rule in code
 
 **Builds:** short-lived user-delegation SAS minting, and the published/evidence split.
 
@@ -774,7 +818,7 @@ un-publishing something is not.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 33 — Entra ID: protecting the staff endpoints
+### Episode 34 — Entra ID: protecting the staff endpoints
 
 **Builds:** authentication and authorization — app roles, policies, and tests that run as each
 role.
@@ -805,7 +849,7 @@ to an identity provider.**
 
 # Part 8 — production readiness
 
-### Episode 34 — Observability
+### Episode 35 — Observability
 
 **Builds:** OpenTelemetry wired to Application Insights — traces, metrics, structured logs.
 
@@ -819,7 +863,7 @@ control than the database, and it is usually the one that leaks.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 35 — Hardening the pipeline
+### Episode 36 — Hardening the pipeline
 
 **Builds:** the finished delivery pipeline.
 
@@ -846,7 +890,7 @@ one makes it safe to let it.
 
 ## Compressing the course
 
-Thirty-five episodes is the honest count once each holds a single idea, and each one fits a
+Thirty-six episodes is the honest count once each holds a single idea, and each one fits a
 ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos are wanted:
 
 | Merge | Gives |
@@ -854,8 +898,9 @@ ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos
 | **10 + 11** | One "quality gates" episode, config and enforcement together |
 | **20 + 21** | One "the set and its endpoint" episode |
 | **23 + 24** | One "refusing a well-formed request" episode, domain and database together |
-| **29 + 30** | One "read API" episode |
-| **31 + 32** | One "photographs" episode covering upload and access together |
+| **25 + 26** | One "the third-party call and its secret" episode |
+| **30 + 31** | One "read API" episode |
+| **32 + 33** | One "photographs" episode covering upload and access together |
 
 Nothing else merges without an episode doing two unrelated things. In particular **4 and 5 do
 not merge** — testing and containerisation share nothing, and the seam between them is where a

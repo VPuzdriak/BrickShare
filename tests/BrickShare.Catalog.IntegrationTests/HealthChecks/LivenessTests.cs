@@ -1,17 +1,17 @@
 using System.Net;
 
-using Microsoft.AspNetCore.Mvc.Testing;
-
 namespace BrickShare.Catalog.IntegrationTests.HealthChecks;
 
-public class LivenessTests(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
+public class LivenessTests
 {
     [Fact]
     public async Task Live_returns_ok()
     {
-        var client = factory.CreateClient();
+        await using CatalogApiFactory api = new(connectionString: null);
 
-        var response = await client.GetAsync("/health/live");
+        HttpClient client = api.CreateClient();
+
+        HttpResponseMessage response = await client.GetAsync("/health/live");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }

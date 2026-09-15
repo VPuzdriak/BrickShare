@@ -7,6 +7,7 @@ using Azure.Identity;
 using BrickShare.Catalog.Api;
 using BrickShare.Catalog.Api.Endpoints;
 using BrickShare.Catalog.Api.Persistence;
+using BrickShare.Catalog.Api.Rebrickable;
 
 using FluentValidation;
 
@@ -56,6 +57,8 @@ builder.Services.AddSingleton(_ =>
 
 builder.Services.AddDbContext<CatalogDbContext>((sp, options) =>
     options.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
+
+builder.Services.AddRebrickable(builder.Configuration);
 
 builder.Services.AddExceptionHandler<DomainRuleViolationExceptionHandler>();
 

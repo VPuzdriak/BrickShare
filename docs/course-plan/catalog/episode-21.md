@@ -32,7 +32,7 @@ Keep the architecture document's *API surface* table on screen while step 1 runs
 ## Step 1 — `/api/v1`, and a group with one endpoint in it
 
 `Program.cs` currently maps three things by hand — `/`, `/health/live`, `/health/ready`. Adding a
-fourth line there would work today and be the wrong habit by episode 30, so the shape goes in first.
+fourth line there would work today and be the wrong habit by episode 31, so the shape goes in first.
 
 `src/Catalog/BrickShare.Catalog.Api/Endpoints/CatalogSetEndpoints.cs`:
 
@@ -197,7 +197,7 @@ and the two contracts, in the same file because they exist only for this endpoin
 ```csharp
 /// <summary>
 /// What staff send to catalogue a set. Every product fact in here is client-supplied, which is
-/// a security problem episode 26 exists to fix.
+/// a security problem episode 27 exists to fix.
 /// </summary>
 public sealed record CatalogueSetRequest(
     string SetNumber,
@@ -257,13 +257,13 @@ client stops working.
 
 **And the counter-argument, honestly:** at this size the two are identical and the mapping is pure
 overhead. The reason to pay it is that the divergence arrives on a date this course can name —
-episode 30 adds available copy count and a starting price to the read model, numbers that are
+episode 31 adds available copy count and a starting price to the read model, numbers that are
 computed, live on no entity, and belong on the wire.
 
 ### `Created`, and a `Location` that does not work yet
 
 `TypedResults.Created($"/api/v1/sets/{set.Id}", …)` sets a `Location` header pointing at
-`GET /api/v1/sets/{id}` — **and that route does not exist until episode 30**, so following it right
+`GET /api/v1/sets/{id}` — **and that route does not exist until episode 31**, so following it right
 now returns 404.
 
 That is a real wart, chosen over the alternatives on purpose. Returning `Created` without a
@@ -315,7 +315,7 @@ And then the sobering half, in the same breath:
 curl -X POST "https://app-brickshare-catalog-dev.azurewebsites.net/api/v1/catalog/sets" …
 ```
 
-**That works, and it should not.** Nothing in this service knows what a staff member is. Episode 33
+**That works, and it should not.** Nothing in this service knows what a staff member is. Episode 34
 is the fix, it is twelve episodes away, and the reason it is not today is that authorization on one
 endpoint teaches almost nothing — the interesting version of that episode needs a surface with roles
 that genuinely differ. Until then this is a `dev` resource group with a `dev` database and a URL
@@ -333,7 +333,7 @@ all currently produce the same empty 500. Episodes 22, 23 and 24 take those one 
 
 **No authorization**, as step 4 said out loud.
 
-**No OpenAPI document.** The endpoint exists and nothing describes it. That waits until episode 28,
+**No OpenAPI document.** The endpoint exists and nothing describes it. That waits until episode 29,
 when there are three endpoint groups and a document is a document rather than a list of one.
 
 ## Verification
@@ -343,7 +343,7 @@ when there are three endpoint groups and a document is a document rather than a 
 | `dotnet build` | 0 warnings |
 | `dotnet test` | Green, including `A_catalogued_set_comes_back_created` |
 | `POST /api/v1/catalog/sets`, valid body | `201`, `Location: /api/v1/sets/{id}`, a row in `catalog_sets` |
-| Following that `Location` | **`404` until episode 30.** Expected, and the reason is in step 3 |
+| Following that `Location` | **`404` until episode 31.** Expected, and the reason is in step 3 |
 | `POST` with `{}` | `500` with an empty body. **Expected today** — episode 22 |
 | `GET /health/live`, `/health/ready` | Still 200. The new group changed no existing route |
 | The same `POST` against the Azure URL | `201`, no terminal touched to get there |

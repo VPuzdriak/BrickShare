@@ -1303,7 +1303,7 @@ would double the running cost to demonstrate a problem nobody has.
 
 **No Key Vault.** Still nothing to put in one — which is the nicest thing this episode can say about
 itself. Episode 25 introduces the first genuine secret in the system, the Rebrickable API key, and
-Key Vault arrives there because something needs it.
+Key Vault arrives in episode 26 because something finally needs it.
 
 **No local change at all.** Compose still uses `Username=brickshare;Password=brickshare`, and that is
 not a double standard. That password guards a container on a laptop that is destroyed with

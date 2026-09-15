@@ -49,7 +49,7 @@ app.MapGet("/", () => new { service = "BrickShare Catalog API" });
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
 
 // Readiness: can this instance serve traffic? Runs every check tagged "ready".
-// Nothing is tagged yet — Postgres arrives in episode 16, Blob Storage in episode 31.
+// Nothing is tagged yet — Postgres arrives in episode 16, Blob Storage in episode 32.
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("ready")
@@ -118,7 +118,7 @@ belongs behind authentication, if it is wanted at all.
 
 **Health endpoints will need excluding from request logging.** A probe hitting two endpoints
 every few seconds produces more log entries than real traffic does. That is dealt with in
-episode 34, when logging is configured properly, and is noted here so it does not look
+episode 35, when logging is configured properly, and is noted here so it does not look
 forgotten.
 
 **No `/health` aggregate endpoint.** A third route that means "one of the above" invites
@@ -131,8 +131,8 @@ pointing a probe at the wrong one. Two endpoints, two purposes, no ambiguity.
 | 6 | The App Service health probe is pointed at `/health/ready` in the portal |
 | 7 | The same setting, in Terraform |
 | 15 | Postgres registers a check tagged `ready` |
-| 25 | Blob Storage registers one too |
-| 29 | The post-deploy smoke test calls `/health/ready` before the deployment is declared good |
+| 32 | Blob Storage registers one too |
+| 36 | The post-deploy smoke test calls `/health/ready` before the deployment is declared good |
 
 ## Verification
 
