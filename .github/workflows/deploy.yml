@@ -144,6 +144,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       TF_VAR_postgres_admin_object_id: ${{ vars.POSTGRES_ADMIN_OBJECT_ID }}
       TF_VAR_postgres_admin_name: ${{ vars.POSTGRES_ADMIN_NAME }}
+      TF_VAR_secret_admin_object_id: ${{ vars.SECRET_ADMIN_OBJECT_ID }}
     defaults:
       run:
         working-directory: infra

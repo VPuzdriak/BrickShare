@@ -44,6 +44,11 @@ variable "developer_ip" {
   default     = null
 }
 
+variable "secret_admin_object_id" {
+  description = "Object id of the Entra group allowed to write secrets into the catalog vault. Not the application, which only reads."
+  type        = string
+}
+
 locals {
   catalog_app_name = "app-brickshare-catalog-dev"
 }
@@ -59,6 +64,22 @@ resource "azurerm_container_registry" "main" {
   location            = azurerm_resource_group.main.location
   sku                 = "Basic"
   admin_enabled       = false
+}
+
+resource "azurerm_key_vault" "main" {
+  name                = "kv-brickshare-dev"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  sku_name            = "standard"
+
+  # The data plane is governed by Azure RBAC — the same role assignments, the same `az role
+  # assignment list`, the same audit trail as every other resource in this file.
+  rbac_authorization_enabled = true
+
+  # Seven days is the floor. Purge protection is the ceiling, and it is off — see below.
+  soft_delete_retention_days = 7
+  purge_protection_enabled   = false
 }
 
 resource "azurerm_postgresql_flexible_server" "catalog" {
@@ -143,6 +164,7 @@ resource "azurerm_linux_web_app" "catalog" {
     WEBSITES_PORT              = "8080"
     ASPNETCORE_ENVIRONMENT     = "Production"
     ConnectionStrings__Catalog = "Host=${azurerm_postgresql_flexible_server.catalog.fqdn};Port=5432;Database=${azurerm_postgresql_flexible_server_database.catalog.name};Username=${local.catalog_app_name};SSL Mode=Require"
+    KeyVault__Uri              = azurerm_key_vault.main.vault_uri
   }
 }
 
@@ -150,6 +172,22 @@ resource "azurerm_role_assignment" "acr_pull" {
   scope                = azurerm_container_registry.main.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_linux_web_app.catalog.identity[0].principal_id
+}
+
+# The application. Read a secret's value; that is the entire list.
+resource "azurerm_role_assignment" "secrets_read" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_linux_web_app.catalog.identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+# The humans. Write a secret's value, which the application must never be able to do.
+resource "azurerm_role_assignment" "secrets_write" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = var.secret_admin_object_id
+  principal_type       = "Group"
 }
 
 output "postgres_fqdn" {

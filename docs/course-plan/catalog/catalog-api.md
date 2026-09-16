@@ -648,8 +648,9 @@ student has to provision before episode 1.
 alternative — refreshing the configuration provider on an interval — is named, with the reason it
 is not worth it here, and the reason it would be for a credential that expires.
 
-**Lands in:** `infra/`, `src/Catalog/BrickShare.Catalog.Api/Program.cs`,
-`Directory.Packages.props`, `.github/workflows/`
+**Lands in:** `infra/main.tf`, `infra/terraform.tfvars`,
+`src/Catalog/BrickShare.Catalog.Api/Program.cs`, `Directory.Packages.props`,
+`.github/workflows/deploy.yml`. Notes: [`episode-26.md`](episode-26.md).
 
 **Done when:** the deployed API reaches Rebrickable with a key that appears in no repository, no
 app setting and no Terraform output, and the local build still works with nothing but user secrets.

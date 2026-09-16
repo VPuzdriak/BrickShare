@@ -18,6 +18,18 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
+/*
+ Azure only, and driven by whether the setting exists rather than by which environment this is.
+ With no KeyVault:Uri the provider is never added, so a laptop keeps reading `dotnet user-secrets`
+ and Compose keeps reading the environment — episode 25, step 6, unchanged.
+*/
+if (builder.Configuration["KeyVault:Uri"] is { Length: > 0 } keyVaultUri)
+{
+    // Added last, so it wins. Nothing in appsettings.json sets Rebrickable:ApiKey today, and this
+    // ordering is what keeps the answer obvious if anything ever does.
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
+}
+
 // FluentValidation names errors after C# properties. The wire is camelCase, so the two have to be
 // reconciled somewhere, and this is the only place FluentValidation offers.
 ValidatorOptions.Global.PropertyNameResolver = (_, member, _) =>
