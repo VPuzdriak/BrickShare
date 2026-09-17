@@ -96,7 +96,7 @@ something forces them* — and here is one arriving for a single validator.
 Two reasons this is an exception rather than the rule quietly bending. **`Asp.Versioning` solves a
 problem this service does not have** — two live versions — while FluentValidation solves one that is
 on screen now, and has two more scheduled: the lookup in episode 27 and batch registration in
-episode 28, where `RuleForEach` is what a pile of `if` statements handles worst. And **it is standard
+episode 29, where `RuleForEach` is what a pile of `if` statements handles worst. And **it is standard
 equipment** — a course that never shows it leaves a gap that hand-rolled `if`s do not fill.
 
 One package, not two: `FluentValidation.DependencyInjectionExtensions` only scans assemblies, and
@@ -158,7 +158,7 @@ builder.Services.AddScoped<IValidator<CatalogueSetRequest>, CatalogueSetRequestV
 
 **Not `AddValidatorsFromAssemblyContaining<Program>()`**, the line every tutorial uses. With one
 validator, scanning replaces a line you can read with a line you have to trust, and `CLAUDE.md` is
-explicit about preferring the first. Scanning is right at three validators; episode 28 swaps it in.
+explicit about preferring the first. Scanning is right at three validators; episode 29 swaps it in.
 
 ### Calling it
 
@@ -220,7 +220,7 @@ builder.Services.AddProblemDetails(options =>
         context.ProblemDetails.Instance ??= context.HttpContext.Request.Path;
 
         // One id in the response and in the logs, so a screenshot from a staff member is enough
-        // to find the request. Episode 35 wires the other end of this.
+        // to find the request. Episode 37 wires the other end of this.
         context.ProblemDetails.Extensions["traceId"] =
             Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
     });
@@ -327,7 +327,7 @@ that it compiles.
 
 **The trade-off, stated:** this widens a domain type's public surface so an error message can quote
 it. The alternative is a vaguer sentence that can never go stale and helps nobody. `LabelCode` has
-the identical shape and wants the same treatment when episode 28 validates a label.
+the identical shape and wants the same treatment when episode 29 validates a label.
 
 ---
 
@@ -397,7 +397,7 @@ this validator without a custom attribute — and the moment you write one, you 
 `IValidator<T>`.
 
 **No endpoint filter, no assembly scanning, no `FluentValidation.TestHelper`.** All three are right
-refactors waiting for episode 28, where three validators make them earn their place.
+refactors waiting for episode 29, where three validators make them earn their place.
 
 **No async or DI rules.** FluentValidation can query a database inside a rule — *"is this already
 catalogued?"* — and episode 24 is about why that check must not live there. A capability worth
@@ -408,7 +408,7 @@ still a 500 — now with a tidy RFC 9457 body claiming the server failed. That i
 is a better episode for having this one's table already on the wall.
 
 **No `traceId` in the logs yet.** The extension is on the response and nothing correlates it to a
-log line. Episode 35.
+log line. Episode 37.
 
 ## Verification
 

@@ -358,7 +358,7 @@ does not know the reader's culture and should not pretend to.
 
 **No `+`, no `-`, no `IComparable`.** `*` and `/` exist because cycles 4 and 5 demanded them.
 Nothing in the catalog service adds or compares money yet — the cheapest-available-copy query
-arrives in episode 31, and *that* is when ordering gets written.
+arrives in episode 33, and *that* is when ordering gets written.
 
 This is not pedantry, and there is a receipt for it. Adding `IComparable<Money>` with a `CompareTo`
 and nothing else fails the build immediately:
@@ -372,7 +372,7 @@ Money.cs(5,31): error S1210:  When implementing IComparable<T>, you should also 
 
 Two analyzers, both correct, both saying the same thing: **a half-implemented comparison is worse
 than none**, because `a < b` compiling while `a.CompareTo(b)` exists is how you get two orderings
-that disagree. Episode 31 adds the interface *and* the four operators together, when something
+that disagree. Episode 33 adds the interface *and* the four operators together, when something
 needs sorting. Today it would be four operators nobody calls, written to satisfy a rule triggered
 by an interface nobody needed.
 
@@ -908,7 +908,7 @@ namespace BrickShare.Catalog.Api;
 /// The identity BrickShare issues to a physical box: "BRK-" plus six characters.
 ///
 /// LEGO boxes carry no per-unit serial number, so a copy's identity has to be invented by
-/// the shop and stuck on the outside (UC-1.2). Minting happens in episode 28; this type is
+/// the shop and stuck on the outside (UC-1.2). Minting happens in episode 29; this type is
 /// only the format.
 /// </summary>
 public sealed partial record LabelCode
@@ -1137,7 +1137,7 @@ the fourth episode running. Open the pull request, watch the checks, merge, and 
 - **No validation attributes and no FluentValidation.** `TryParse` is the seam; episode 22 decides
   what an invalid request *looks like* over HTTP.
 - **No label code minting.** Generating them — uniquely, without collisions, at batch registration
-  — is episode 28's problem. This is the format only.
+  — is episode 29's problem. This is the format only.
 
 ## Verification
 

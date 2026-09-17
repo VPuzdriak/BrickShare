@@ -67,8 +67,7 @@ public static class CatalogSetEndpoints
 }
 
 /// <summary>
-/// What staff send to catalogue a set. Every product fact in here is client-supplied, which is
-/// a security problem episode 26 exists to fix.
+/// What staff send to catalogue a set. Every product fact in here is client-supplied, which is a security problem
 /// </summary>
 public sealed record CatalogueSetRequest(
     string SetNumber,

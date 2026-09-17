@@ -529,7 +529,7 @@ decision**; and a library adopted with its costs on screen rather than hidden.
 
 **The library is a stated exception to the deferral rule**, not the rule bending. Episode 21 refused
 `Asp.Versioning` because it solves a problem this service does not have; FluentValidation solves one
-that is on screen, has two more validators scheduled in episodes 27 and 28, and is standard
+that is on screen, has three more validators scheduled in episodes 27 to 29, and is standard
 equipment a course cannot honestly skip. **The exception is argued on camera, and so is its price:**
 `ToDictionary()` names errors after C# properties, so the first green turns red again on
 `SetNumber` versus `setNumber`, and the fix is a mutable global static.
@@ -581,7 +581,7 @@ obvious implementation queries before inserting; the obvious implementation is a
 not remove the failure path — it makes it rare, which is worse, because a bug that happens on one
 deployment in fifty is one nobody can reproduce. **The database is the only participant that sees
 both transactions.** Also: why the `when` filter naming one constraint matters, since a bare
-`catch (DbUpdateException)` starts lying the moment episode 28 adds a second unique index.
+`catch (DbUpdateException)` starts lying the moment episode 29 adds a second unique index.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`. Notes: [`episode-24.md`](episode-24.md).
 
@@ -655,29 +655,61 @@ is not worth it here, and the reason it would be for a credential that expires.
 **Done when:** the deployed API reaches Rebrickable with a key that appears in no repository, no
 app setting and no Terraform output, and the local build still works with nothing but user secrets.
 
-### Episode 27 — Two endpoints, for a security reason
+### Episode 27 — The lookup that owns the facts
 
-**Builds:** the split flow — `POST /catalog/lookups` fetches and stores the Rebrickable payload
-server-side; `POST /catalog/sets` references it and carries only the staff-typed fields.
+**Builds:** `POST /catalog/lookups` — the Rebrickable client's first caller, the
+`rebrickable_snapshots` table it writes to, and the second Rebrickable call that turns a
+`theme_id` into a theme name.
 
-**Teaches:** an authorization bug that looks like an API design choice.
+**Teaches:** the question the next two episodes are an answer to — *whose data is this?*, asked
+field by field down a request body. Five of the nine fields `POST /catalog/sets` accepts are
+LEGO's facts, not the shop's, and every validator episode 22 wrote passes on a four-piece
+Titanic because **every one of those values is well-formed.** Validation asks whether a value is
+sensible; it cannot ask whether the sender was entitled to choose it.
 
-If create accepted `name`, `pieceCount` and `theme` in its request body, anyone holding a staff
-token could invent a product — a set Rebrickable has never heard of, with whatever facts they
-liked. Persisting the snapshot at lookup time makes **the server the only source of the facts
-it stores**, and the create call carries only the four fields staff are actually entitled to
-decide: retail price, base rental price, minimum rental duration, age rating.
+Persisting what Rebrickable said, server-side, is what makes the answer available to episode 28.
 
-**The general lesson:** *whose data is this?* — asked of every field in every request body. A
-field the client should not be able to choose must not be a field the client can send. This is
-one of the most transferable ideas in the course and it costs one extra endpoint.
+**Also:** why the snapshot is not a domain type — the domain does not know a third party exists,
+and an adapter's record of someone else's claim is infrastructure. And **a `404`, not a `502`
+and not a `422`**, for a set number Rebrickable has never heard of: the most likely event at this
+endpoint is a staff typo, and a typo that reads as an outage sends somebody to check a status
+page. The theme call failing is the opposite case, and gets the `502`.
+
+**The close call, deferred on purpose:** a snapshot has no expiry and no single-use flag.
+`fetched_at` is stored so episode 28 can change its mind.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`,
+`tests/BrickShare.Catalog.IntegrationTests/`. Notes: [`episode-27.md`](episode-27.md).
+
+**Done when:** a lookup returns a prefilled draft with a `lookupId`, the row behind it holds
+facts no client sent, and an unknown set number is a `404` rather than an outage.
+
+### Episode 28 — The request body that loses its facts
+
+**Builds:** `POST /catalog/sets` rewritten to `{ lookupId, retailPrice, baseRentalPrice,
+minimumRentalDays, minimumAge }` — the snapshot read server-side, five fields deleted from the
+request record, the validator shrunk to match, and episodes 21 to 24's tests reworked around the
+new shape.
+
+**Teaches:** the fix, and why it is an authorization fix rather than an API design preference.
+**A field the client should not be able to choose must not be a field the client can send** —
+not a field that is checked, or defaulted, or overwritten later, because each of those leaves a
+code path where the client's value wins. Deleting it from the type is the only version that
+cannot regress.
 
 It also makes `docs/IDEA.md`'s rule — cataloguing blocks until the lookup succeeds — trivially
-true, since create cannot be reached without a successful lookup.
+true: create cannot be reached without a successful lookup.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
+**And the new failure to give a status code:** a `lookupId` that does not exist. The reasoning
+runs through episode 23's ladder again, and the answer is not the same one.
 
-### Episode 28 — Registering and retiring copies
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`,
+`tests/BrickShare.Catalog.IntegrationTests/`.
+
+**Done when:** the fake four-piece Titanic from episode 27's opening `curl` is not expressible,
+and a set catalogued through the two-call flow carries facts the client never sent.
+
+### Episode 29 — Registering and retiring copies
 
 **Builds:** copy registration, individually and in batch, and retirement.
 
@@ -702,7 +734,7 @@ gets the `MaxLength` treatment episode 22 gave `SetNumber`.
 
 ---
 
-### Episode 29 — What this API says about itself
+### Episode 30 — What this API says about itself
 
 **Builds:** the OpenAPI document, from the built-in `Microsoft.AspNetCore.OpenApi`.
 
@@ -725,7 +757,7 @@ even though the document is not.**
 **And why it is mapped in every environment**, unlike the `dotnet new` template's
 `IsDevelopment()` guard: the document describes routes that are already reachable, so hiding it is
 not a security control — it is an inconvenience for the people integrating with you and no
-obstacle to anyone probing the service. Security here is episode 34's job, and it is
+obstacle to anyone probing the service. Security here is episode 36's job, and it is
 authorization, not obscurity. The counter-argument is real and stated: in some organisations
 publishing an attack-surface map is a compliance question, and the guard is one line.
 
@@ -737,7 +769,28 @@ web page is not.
 
 # Part 6 — the read API
 
-### Episode 30 — Browse, search and filter
+### Episode 31 — Themes of our own
+
+**Builds:** a `themes` table, `catalog_sets.theme_id` as a foreign key, and the migration that
+backfills it from the text column episode 27 started writing.
+
+**Teaches:** a data migration with real data in it — the first in this course that is not just a
+`CreateTable`. Read the distinct values out, insert them as rows, map the column, drop the text,
+and do it in an order that is safe to run against a database somebody is using. Also **why a
+foreign key rather than free text**, which the next episode makes concrete: filtering a public
+catalog on a string means a theme that renames upstream splits into two, and a theme nobody can
+enumerate cannot become a filter list in a UI.
+
+**And the nesting question episode 27 deferred:** Rebrickable themes have parents, so "Icons" may
+be the parent of the theme a set actually belongs to. Which level BrickShare stores is a product
+decision, not a mapping decision, and this is where it gets made.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `src/Catalog/BrickShare.Catalog.Domain/`.
+
+**Done when:** `catalog_sets` carries a theme id, no theme name is stored twice, and the
+migration runs green against a database that already holds sets.
+
+### Episode 32 — Browse, search and filter
 
 **Builds:** the public catalog endpoints — search by name and set number, filters on theme,
 piece count, age rating, price and availability, with paging.
@@ -753,7 +806,7 @@ to keep in sync with nothing paying for the sync.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 31 — Set detail, and the rules that are easy to break
+### Episode 33 — Set detail, and the rules that are easy to break
 
 **Builds:** the set detail endpoint and the per-set aggregates.
 
@@ -780,7 +833,7 @@ cheapest **available** copy so the page never advertises a price nobody can act 
 
 # Part 7 — files and identity
 
-### Episode 32 — Uploading photographs
+### Episode 34 — Uploading photographs
 
 **Builds:** Azurite in Compose, the staff upload endpoint, and its storage in Terraform.
 
@@ -795,7 +848,7 @@ naming it now makes the switch a decision rather than a rewrite.**
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`, `infra/`
 
-### Episode 33 — SAS, and a privacy rule in code
+### Episode 35 — SAS, and a privacy rule in code
 
 **Builds:** short-lived user-delegation SAS minting, and the published/evidence split.
 
@@ -819,7 +872,7 @@ un-publishing something is not.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 34 — Entra ID: protecting the staff endpoints
+### Episode 36 — Entra ID: protecting the staff endpoints
 
 **Builds:** authentication and authorization — app roles, policies, and tests that run as each
 role.
@@ -850,7 +903,7 @@ to an identity provider.**
 
 # Part 8 — production readiness
 
-### Episode 35 — Observability
+### Episode 37 — Observability
 
 **Builds:** OpenTelemetry wired to Application Insights — traces, metrics, structured logs.
 
@@ -864,7 +917,7 @@ control than the database, and it is usually the one that leaks.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 36 — Hardening the pipeline
+### Episode 38 — Hardening the pipeline
 
 **Builds:** the finished delivery pipeline.
 
@@ -891,7 +944,7 @@ one makes it safe to let it.
 
 ## Compressing the course
 
-Thirty-six episodes is the honest count once each holds a single idea, and each one fits a
+Thirty-eight episodes is the honest count once each holds a single idea, and each one fits a
 ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos are wanted:
 
 | Merge | Gives |
@@ -900,8 +953,9 @@ ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos
 | **20 + 21** | One "the set and its endpoint" episode |
 | **23 + 24** | One "refusing a well-formed request" episode, domain and database together |
 | **25 + 26** | One "the third-party call and its secret" episode |
-| **30 + 31** | One "read API" episode |
-| **32 + 33** | One "photographs" episode covering upload and access together |
+| **27 + 28** | One "two endpoints, for a security reason" episode — at about twenty-five minutes |
+| **32 + 33** | One "read API" episode |
+| **34 + 35** | One "photographs" episode covering upload and access together |
 
 Nothing else merges without an episode doing two unrelated things. In particular **4 and 5 do
 not merge** — testing and containerisation share nothing, and the seam between them is where a

@@ -1,4 +1,5 @@
 using BrickShare.Catalog.Api.Persistence;
+using BrickShare.Catalog.IntegrationTests.Rebrickable;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,8 @@ public sealed class CatalogDatabase : IAsyncLifetime
     private Respawner _respawner = null!;
 
     public CatalogApiFactory Api { get; private set; } = null!;
+    public RebrickableStub Rebrickable { get; private set; } = null!;
+
     public string ConnectionString => _postgres.GetConnectionString();
 
     public async Task InitializeAsync()
@@ -47,7 +50,8 @@ public sealed class CatalogDatabase : IAsyncLifetime
             TablesToIgnore = ["__EFMigrationsHistory"]
         });
 
-        Api = new CatalogApiFactory(ConnectionString);
+        Rebrickable = await RebrickableStub.StartAsync();
+        Api = new CatalogApiFactory(ConnectionString, Rebrickable.BaseAddress);
     }
 
     /// <summary>
@@ -73,6 +77,7 @@ public sealed class CatalogDatabase : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await Api.DisposeAsync();
+        await Rebrickable.DisposeAsync();
         await _postgres.DisposeAsync();
     }
 }

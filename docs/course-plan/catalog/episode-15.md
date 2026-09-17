@@ -1083,7 +1083,7 @@ decides what happened. Three consequences, and they are the same three as last t
    back to inspecting the previous status to work out which message to send.
 3. **Every caller can name any state.** Retirement, write-off and collection are all one method
    away from anyone holding a `Copy`, and the only thing standing between a caller and a status
-   they had no business setting is a pair in a set. Authorization in episode 34 has to attach to
+   they had no business setting is a pair in a set. Authorization in episode 36 has to attach to
    *operations*; there would be one operation to attach it to.
 
 The private helper keeps the deduplication. The public methods keep the vocabulary. **The
@@ -1104,7 +1104,7 @@ API is a **wire format** and has to accept a serialisable value — another serv
 method call. The endpoint receives a requested status and maps it to the named operation:
 
 ```csharp
-// Episode 28, roughly.
+// Episode 29, roughly.
 CopyStatus.OnRent  => copy.Collect(),
 CopyStatus.Lost    => copy.WriteOffAsLost(),
 ```
@@ -1158,13 +1158,13 @@ somewhere to put it, and episode 16 opens `docker-compose.yml` for the first tim
 - **No join between grade and status.** `RaiseGradeAfterRepair` is still callable on a copy sitting
   on the shelf, which UC-10.5 does not allow — a repair raises a grade, and a copy that was never
   in repair was never repaired. That is a real gap, it is left open on purpose to keep this episode
-  about one idea, and episode 28 closes it when the two rules meet behind an endpoint.
+  about one idea, and episode 29 closes it when the two rules meet behind an endpoint.
 - **No reservation clock.** `ReleaseReservation` models the transition; deciding *when* a
   reservation has expired belongs to whoever owns reservations.
 - **No damage log** (UC-10.3), **no baseline weight check** — both are things an inspection
   *records*, not moves a copy *makes*.
 - **No endpoint and no authorization.** Retiring is staff-only and recovering from *Lost* is
-  manager-only, and both are policies attached to operations in episode 34 — not `if` statements in
+  manager-only, and both are policies attached to operations in episode 36 — not `if` statements in
   the domain.
 - **No domain exception type** — see step 9.
 

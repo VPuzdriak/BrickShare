@@ -7,7 +7,7 @@ public class LivenessTests
     [Fact]
     public async Task Live_returns_ok()
     {
-        await using CatalogApiFactory api = new(connectionString: null);
+        await using CatalogApiFactory api = new(connectionString: null, rebrickableBaseAddress: "http://localhost");
 
         HttpClient client = api.CreateClient();
 

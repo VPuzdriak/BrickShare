@@ -36,6 +36,9 @@ ValidatorOptions.Global.PropertyNameResolver = (_, member, _) =>
     member is null ? null : JsonNamingPolicy.CamelCase.ConvertName(member.Name);
 
 builder.Services.AddScoped<IValidator<CatalogueSetRequest>, CatalogueSetRequestValidator>();
+builder.Services.AddScoped<IValidator<LookupRequest>, LookupRequestValidator>();
+
+builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddSingleton(_ =>
 {
@@ -107,6 +110,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check 
 RouteGroupBuilder v1 = app.MapGroup("/api/v1");
 
 v1.MapCatalogSets();
+v1.MapCatalogLookups();
 
 await app.RunAsync();
 

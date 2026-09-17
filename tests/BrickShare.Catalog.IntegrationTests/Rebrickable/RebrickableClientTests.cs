@@ -61,6 +61,21 @@ public sealed class RebrickableClientTests
         Assert.Equal(3, rebrickable.Requests);
     }
 
+    [Fact]
+    public async Task A_theme_id_resolves_to_the_name_staff_will_see()
+    {
+        await using RebrickableStub rebrickable = await RebrickableStub.StartAsync();
+        rebrickable.Themes[252] = new { id = 252, name = "Icons", parent_id = (int?)null };
+
+        await using ServiceProvider services = Services(rebrickable);
+        var catalog = services.GetRequiredService<IRebrickableCatalog>();
+
+        RebrickableTheme? theme = await catalog.FindThemeAsync(252, CancellationToken.None);
+
+        Assert.NotNull(theme);
+        Assert.Equal("Icons", theme.Name);
+    }
+
     private static ServiceProvider Services(RebrickableStub rebrickable) =>
         new ServiceCollection()
             .AddRebrickable(new ConfigurationBuilder()

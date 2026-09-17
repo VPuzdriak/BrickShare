@@ -1,5 +1,6 @@
 using System.Reflection;
 
+using BrickShare.Catalog.Api.Rebrickable;
 using BrickShare.Catalog.Domain;
 
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +10,8 @@ namespace BrickShare.Catalog.Api.Persistence;
 public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
 {
     public DbSet<CatalogSet> Sets => Set<CatalogSet>();
-
     public DbSet<Copy> Copies => Set<Copy>();
+    public DbSet<RebrickableSnapshot> Snapshots => Set<RebrickableSnapshot>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

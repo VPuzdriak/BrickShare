@@ -865,7 +865,7 @@ production without anyone touching a workflow file.
 - **No persistence.** The multiplier table is four rows in Postgres from episode 16. Today it is
   a constructor parameter, which is all the domain ever needs to know about it.
 - **No endpoint.** Pricing surfaces through the read API in part 6, and the admin two-phase edit
-  in episode 34. A rule with no caller is fine for one episode.
+  in episode 36. A rule with no caller is fine for one episode.
 - **No mocking library, and no assertion library.** There is nothing to mock — that is why this
   rule was chosen — and `Assert.Equal` is enough. Worth one sentence: comparing `decimal`s with
   `Assert.Equal` is **exact**, with no tolerance parameter, which is a small preview of why

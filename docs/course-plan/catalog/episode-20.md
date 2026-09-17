@@ -422,7 +422,7 @@ separation is deliberate: the type and its rules are worth understanding before 
 status code to argue about.
 
 **No `set_id` on `copies`.** A copy plainly belongs to a set, and the foreign key is not here. It
-arrives in episode 28, with the endpoint that registers copies *against* a set — the first moment
+arrives in episode 29, with the endpoint that registers copies *against* a set — the first moment
 anything can write it. A nullable column with nothing populating it lies for seven episodes, and
 every read written in the meantime has to handle a case that exists only because it shipped early.
 

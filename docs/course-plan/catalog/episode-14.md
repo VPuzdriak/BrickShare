@@ -622,7 +622,7 @@ and no configuration — the domain grows and the delivery pipeline does not not
 - **No persistence, no entity identity.** Episode 16 gives `Copy` a key and an `Equals` worth
   writing. Today reference equality is correct because there is nowhere for a second instance of
   the same copy to come from.
-- **No endpoint**, and **no authorization**. Who is allowed to regrade is episode 34's question,
+- **No endpoint**, and **no authorization**. Who is allowed to regrade is episode 36's question,
   and the answer there is a policy — not an `if` inside the domain.
 - **No domain exception type** — see step 7.
 

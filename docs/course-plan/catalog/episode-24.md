@@ -105,7 +105,7 @@ HTTP/1.1 409 Conflict
 ```
 
 **No new handler, no new status code, no new anything.** One exception type, three causes now — a
-domain rule, a database constraint, and whatever episode 28 adds next. That is what a well-chosen
+domain rule, a database constraint, and whatever episode 29 adds next. That is what a well-chosen
 seam looks like from the far side.
 
 ### Why not check first
@@ -141,7 +141,7 @@ Two things worth adding while the code is on screen:
   never instead of it.
 - **The `when` filter is doing real work.** `catch (DbUpdateException)` alone would report *any*
   write failure as "already catalogued": a foreign key violation, a check constraint, a concurrency
-  conflict. Episode 28 adds a second unique constraint to this service and that catch block would
+  conflict. Episode 29 adds a second unique constraint to this service and that catch block would
   start lying about it. Naming the constraint keeps the claim as narrow as the evidence.
 
 ---
@@ -222,10 +222,10 @@ is where that becomes a real test.
 That is the opposite of the concurrency conflict episode 16 mapped, where retrying *is* the answer —
 and the two arriving as different status codes is what lets a client tell them apart.
 
-**No OpenAPI document.** Three status codes now exist and nothing describes them. Episode 29, once
+**No OpenAPI document.** Three status codes now exist and nothing describes them. Episode 30, once
 there are enough endpoint groups for a document to be worth generating.
 
-**Still no authorization.** Five episodes in, the endpoint is open. Episode 34.
+**Still no authorization.** Five episodes in, the endpoint is open. Episode 36.
 
 ## Verification
 

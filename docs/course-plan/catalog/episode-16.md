@@ -453,7 +453,7 @@ becomes the better shape. One operation is not that moment.
 **And to correct episode 15 slightly**, which called `retired_at` "a database concern with a
 database default": it is not. A `DEFAULT now()` on the column records **when the row was written**,
 which is a different fact — it drifts by however long the transaction took, and it is simply wrong
-if the retirement is ever recorded after the fact. The endpoint in episode 28 passes the instant in,
+if the retirement is ever recorded after the fact. The endpoint in episode 29 passes the instant in,
 and the domain records what it was told.
 
 ---
@@ -692,7 +692,7 @@ support tool nobody remembered to put the check in. **It is the same principle e
 step on — put the enforcement where the data is — arriving as a schema line instead of a domain
 guard.**
 
-The application check is still worth having, in episode 28, for the message: a `409` explaining
+The application check is still worth having, in episode 29, for the message: a `409` explaining
 which label is taken reads better than a wrapped `23505`. **But it is a nicety over a guarantee, and
 that ordering matters** — a nicety implemented as if it were the guarantee is how databases end up
 with duplicates.
@@ -743,7 +743,7 @@ finds it.
 With a concurrency token, EF adds the token to the `WHERE` clause and checks how many rows it
 changed. Zero rows means somebody else got there first, and `DbUpdateConcurrencyException` is
 thrown. Episode 23 builds the `ProblemDetails` mapping that turns a refusal into a `409`, and
-episode 28 is where a copy write path exists to raise this one — a staff member reloads and sees the
+episode 29 is where a copy write path exists to raise this one — a staff member reloads and sees the
 repair rather than silently erasing it.
 
 **`xmin` is the elegant part and it is Postgres-specific.** Every row already carries a hidden
@@ -971,10 +971,10 @@ and the comment episode 3 left behind gets corrected on camera. It reads:
 ```
 
 Both numbers are stale, because the plan moved after the comment was written — Postgres landed
-here, in 16, and photographs are now episode 32:
+here, in 16, and photographs are now episode 34:
 
 ```csharp
-// Postgres, as of this episode. Blob Storage joins it in episode 32.
+// Postgres, as of this episode. Blob Storage joins it in episode 34.
 ```
 
 **A comment that names a future episode is a comment that goes stale**, and this one is a small
@@ -1058,10 +1058,10 @@ withholding it until it would pass.
   what incremental migrations are for**, and it is why the second one being routine matters more
   than the first one being complete.
 - **No checklist items, photographs, grade multipliers, Rebrickable snapshots or outbox.** All five
-  are in the architecture's schema; none has code that writes to it. Photographs are episodes 32 and
+  are in the architecture's schema; none has code that writes to it. Photographs are episodes 34 and
   28, the checklist and snapshots are episode 27, and the outbox belongs to the messaging module by
   the course plan's staging rule — an outbox with no subscriber is a table nobody reads.
-- **No `baseline_weight_grams`.** It is recorded at registration, which is episode 28, and it is a
+- **No `baseline_weight_grams`.** It is recorded at registration, which is episode 29, and it is a
   column with no domain property yet.
 - **No repository, no unit of work.** `DbContext` is both — it tracks changes and commits them
   atomically — and wrapping it in an interface that exposes the same methods with different names
@@ -1069,7 +1069,7 @@ withholding it until it would pass.
   Postgres, so the usual reason for the abstraction, faking the database, is one this course
   deliberately does not want.
 - **No query, no endpoint, nothing that reads a copy back.** Not one `SaveChanges` runs in this
-  episode. Registration through HTTP is episode 28.
+  episode. Registration through HTTP is episode 29.
 - **No test that touches a database** — episode 17, with Testcontainers, and it collects every claim
   step 7 made.
 - **No Postgres in Azure** (18) and **no migration in the pipeline** (19).

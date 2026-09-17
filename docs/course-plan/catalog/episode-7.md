@@ -86,7 +86,7 @@ is the actual right size for what this episode deploys.
 **This grows later, for concrete reasons, not on a schedule:** a second service that wants the
 same App-Service-for-Containers shape is what earns a module — there's nothing to reuse with
 one caller. `main.tf` genuinely getting hard to read once Postgres (episode 16), Storage
-(episode 32) and Key Vault (episode 26) all land in it is what earns a split into multiple
+(episode 34) and Key Vault (episode 26) all land in it is what earns a split into multiple
 files. Both are named here so that whoever adds the fourth resource to this file knows exactly
 what signal they're watching for, rather than restructuring on a feeling.
 
@@ -386,9 +386,9 @@ nothing is left for Terraform to reconcile. State and reality agree.
 
 No Postgres, no Storage, no Key Vault, no Application Insights — every one of those is in
 `docs/architecture/catalog.md`'s infrastructure list, and every one of them arrives in the
-episode that gives it a reason: Postgres in episode 16, Blob Storage in episode 32, Key Vault in
+episode that gives it a reason: Postgres in episode 16, Blob Storage in episode 34, Key Vault in
 episode 26 once episode 25's Rebrickable API key needs somewhere to live, and Application Insights
-in episode 35.
+in episode 37.
 Building any of them now, before the feature that needs them exists, would be the exact
 structure-ahead-of-need mistake episode 2 spent its whole first half refusing to make.
 

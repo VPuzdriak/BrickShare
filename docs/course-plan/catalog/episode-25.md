@@ -493,7 +493,7 @@ public class LivenessTests(WebApplicationFactory<Program> factory) : IClassFixtu
 That is the defect, and it is worth naming before the fix, because the tempting repair — a second
 `["Rebrickable:ApiKey"]` literal, in a second place — leaves the defect exactly where it is, waiting
 for the next setting to find it. There will be more configuration: a vault URI in episode 26, a
-storage account in episode 32, an Entra tenant in episode 34. The first of those that the application
+storage account in episode 34, an Entra tenant in episode 36. The first of those that the application
 refuses to start without would find this same gap again, in the same place, for the same reason.
 
 **Episode 4 was not wrong**, and this is the distinction to draw carefully. That test was written to
@@ -822,7 +822,7 @@ Two more details worth thirty seconds each:
 **The circuit breaker.** Tripping it needs 100 requests inside a 30-second window, so a test that
 opens it would either rewrite those defaults into something meaningless or spend half a minute
 proving that Polly works. **That is a test about the library, not about BrickShare.** The defaults
-go on screen instead, and the breaker's real proof arrives in episode 35, when the traces show it
+go on screen instead, and the breaker's real proof arrives in episode 37, when the traces show it
 opening.
 
 Both halves of that are worth saying plainly: a test that pins a third party's defaults is noise,

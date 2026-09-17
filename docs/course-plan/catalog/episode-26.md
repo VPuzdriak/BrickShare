@@ -89,7 +89,7 @@ and reported success; it does not wait to find out whether the container it star
 `health_check_path` set in episode 18 will evict an unhealthy instance, which on a one-instance plan
 means restarting it forever. So: a green deploy, a dead service, and nobody told.
 
-That gap is real and it is not this episode's job — **episode 36 makes the pipeline wait for the
+That gap is real and it is not this episode's job — **episode 38 makes the pipeline wait for the
 health probe** and fail if it never goes green. Naming it now is the point, because the instinct when
 you see a crash-looping app is to assume the pipeline lied, and it did not. It was never asked.
 
@@ -746,15 +746,17 @@ guessing about**, and it takes ninety seconds to stop guessing.
 
 ## Next
 
-[Episode 27 — Two endpoints, for a security reason](catalog-api.md#episode-27--two-endpoints-for-a-security-reason):
-the Rebrickable client finally gets a caller, and the request body episodes 20 to 24 built loses most
-of its fields.
+[Episode 27 — The lookup that owns the facts](catalog-api.md#episode-27--the-lookup-that-owns-the-facts):
+the Rebrickable client finally gets a caller — `POST /catalog/lookups`, which asks Rebrickable
+about a set number, stores what it said, and hands back a prefilled draft.
 
-The reason is an authorization bug that reads as an API design choice. If create accepts `name`,
-`pieceCount` and `theme`, anyone with a staff token can invent a product — a set Rebrickable has
-never heard of, with whatever facts they like. Splitting the flow so that `POST /catalog/lookups`
-fetches and stores the snapshot server-side makes **the server the only source of the facts it
-stores**, and leaves create carrying only the four fields staff are entitled to decide.
+The reason it exists is an authorization bug that reads as an API design choice. `POST
+/catalog/sets` accepts nine fields and five of them are LEGO's facts rather than the shop's, so
+anyone who can call it can invent a product — a four-piece Titanic that passes every validator
+episode 22 wrote, because every one of those values is well-formed. Storing the facts server-side
+at lookup time makes **the server the only source of the facts it stores**.
 
-The question that generalises out of it — *whose data is this?*, asked of every field in every request
-body — is one of the most transferable ideas in the course, and it costs one extra endpoint.
+The question that generalises out of it — *whose data is this?*, asked of every field in every
+request body — is one of the most transferable ideas in the course. Episode 27 builds the half
+that fetches; [episode 28](catalog-api.md#episode-28--the-request-body-that-loses-its-facts) is
+the half that takes the five fields away, and it costs one extra endpoint.
