@@ -984,7 +984,7 @@ absence of a change, and an absence is not visible on screen unless you go and s
 
 ## Next
 
-[Episode 28 — The request body that loses its facts](catalog-api.md#episode-28--the-request-body-that-loses-its-facts):
+[Episode 28 — The request body that loses its facts](episode-28.md):
 create is rewritten to take a `lookupId` and the four fields staff are entitled to decide — retail
 price, base rental price, minimum rental duration, age rating. Five fields leave the request record,
 the validator shrinks, and step 1's fake Titanic stops being possible.

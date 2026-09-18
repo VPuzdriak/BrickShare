@@ -704,7 +704,7 @@ true: create cannot be reached without a successful lookup.
 runs through episode 23's ladder again, and the answer is not the same one.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`,
-`tests/BrickShare.Catalog.IntegrationTests/`.
+`tests/BrickShare.Catalog.IntegrationTests/`. Notes: [`episode-28.md`](episode-28.md).
 
 **Done when:** the fake four-piece Titanic from episode 27's opening `curl` is not expressible,
 and a set catalogued through the two-call flow carries facts the client never sent.

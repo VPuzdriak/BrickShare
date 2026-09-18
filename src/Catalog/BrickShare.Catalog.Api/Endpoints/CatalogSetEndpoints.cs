@@ -1,4 +1,5 @@
 using BrickShare.Catalog.Api.Persistence;
+using BrickShare.Catalog.Api.Rebrickable;
 using BrickShare.Catalog.Domain;
 
 using FluentValidation;
@@ -23,11 +24,12 @@ public static class CatalogSetEndpoints
         return group;
     }
 
-    private static async Task<Results<Created<CatalogSetResponse>, ValidationProblem>> CatalogueAsync(
-        CatalogueSetRequest request,
-        IValidator<CatalogueSetRequest> validator,
-        CatalogDbContext database,
-        CancellationToken cancellationToken)
+    private static async Task<Results<Created<CatalogSetResponse>, ValidationProblem, ProblemHttpResult>>
+        CatalogueAsync(
+            CatalogueSetRequest request,
+            IValidator<CatalogueSetRequest> validator,
+            CatalogDbContext database,
+            CancellationToken cancellationToken)
     {
         ValidationResult validation = await validator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
@@ -35,12 +37,25 @@ public static class CatalogSetEndpoints
             return TypedResults.ValidationProblem(validation.ToDictionary());
         }
 
+        RebrickableSnapshot? snapshot =
+            await database.Snapshots.FindAsync([request.LookupId], cancellationToken);
+
+        if (snapshot is null)
+        {
+            // Not a 404: /catalog/sets exists. Not a 409: there is no state to conflict with. The
+            // request was understood in full and cannot be carried out. See episode 28, step 4.
+            return TypedResults.Problem(
+                title: "No such lookup",
+                detail: $"Lookup {request.LookupId} does not exist. Look the set up first at /api/v1/catalog/lookups.",
+                statusCode: StatusCodes.Status422UnprocessableEntity);
+        }
+
         CatalogSet catalogSet = CatalogSet.Catalogue(
-            SetNumber.Parse(request.SetNumber),
-            request.Name,
-            request.Theme,
-            request.Year,
-            request.PieceCount,
+            snapshot.Number,
+            snapshot.Name,
+            snapshot.ThemeName,
+            snapshot.Year,
+            snapshot.PieceCount,
             new Money(request.RetailPrice),
             new Money(request.BaseRentalPrice),
             request.MinimumRentalDays,
@@ -53,7 +68,7 @@ public static class CatalogSetEndpoints
         }
         catch (DbUpdateException ex) when (IsAlreadyCatalogued(ex))
         {
-            throw new DomainRuleViolationException($"Set {request.SetNumber} is already catalogued.", ex);
+            throw new DomainRuleViolationException($"Set {snapshot.Number} is already catalogued.", ex);
         }
 
         return TypedResults.Created($"/api/v1/sets/{catalogSet.Id}", CatalogSetResponse.From(catalogSet));
@@ -70,11 +85,7 @@ public static class CatalogSetEndpoints
 /// What staff send to catalogue a set. Every product fact in here is client-supplied, which is a security problem
 /// </summary>
 public sealed record CatalogueSetRequest(
-    string SetNumber,
-    string Name,
-    string Theme,
-    int Year,
-    int PieceCount,
+    Guid LookupId,
     decimal RetailPrice,
     decimal BaseRentalPrice,
     int MinimumRentalDays,

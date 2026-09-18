@@ -1,5 +1,3 @@
-using BrickShare.Catalog.Domain;
-
 using FluentValidation;
 
 namespace BrickShare.Catalog.Api.Endpoints;
@@ -8,23 +6,8 @@ public sealed class CatalogueSetRequestValidator : AbstractValidator<CatalogueSe
 {
     public CatalogueSetRequestValidator()
     {
-        // Delegated: the domain owns what a set number is. This asks it. See below.
-        RuleFor(request => request.SetNumber)
-            .Must(value => SetNumber.TryParse(value, out _))
-            .WithMessage($"A set number is required, and cannot be longer than {SetNumber.MaxLength} characters.");
-
-        RuleFor(request => request.Name).NotEmpty()
-            .WithMessage("A name is required.");
-
-        RuleFor(request => request.Theme).NotEmpty()
-            .WithMessage("A theme is required.");
-
-        // LEGO's first plastic brick shipped in 1949. Anything earlier is a typo.
-        RuleFor(request => request.Year).GreaterThanOrEqualTo(1949)
-            .WithMessage("A year is required, and LEGO has not existed since before 1949.");
-
-        RuleFor(request => request.PieceCount).GreaterThanOrEqualTo(1)
-            .WithMessage("A set has at least one piece.");
+        RuleFor(request => request.LookupId).NotEmpty()
+            .WithMessage("A lookupId is required. Look the set up first: POST /api/v1/catalog/lookups.");
 
         RuleFor(request => request.RetailPrice).GreaterThanOrEqualTo(0m)
             .WithMessage("A retail price cannot be negative.");
