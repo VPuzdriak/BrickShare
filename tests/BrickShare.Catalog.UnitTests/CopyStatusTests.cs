@@ -7,7 +7,7 @@ public class CopyStatusTests
     [Fact]
     public void A_newly_registered_copy_is_available()
     {
-        Copy copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.New);
+        Copy copy = ACopy.Graded(ConditionGrade.New);
 
         Assert.Equal(CopyStatus.Available, copy.Status);
     }
@@ -199,11 +199,11 @@ public class CopyStatusTests
         new(2026, 3, 14, 9, 30, 0, TimeSpan.Zero);
 
     private static Copy Available() =>
-        Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.New);
+        ACopy.Graded(ConditionGrade.New);
 
     private static Copy OnRent()
     {
-        var copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.New);
+        var copy = ACopy.Graded(ConditionGrade.New);
         copy.Reserve();
         copy.Collect();
 
@@ -212,7 +212,7 @@ public class CopyStatusTests
 
     private static Copy InInspection()
     {
-        var copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.New);
+        var copy = ACopy.Graded(ConditionGrade.New);
         copy.Reserve();
         copy.Collect();
         copy.Return();
@@ -223,7 +223,7 @@ public class CopyStatusTests
 
     private static Copy InRepair()
     {
-        var copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.New);
+        var copy = ACopy.Graded(ConditionGrade.New);
         copy.Reserve();
         copy.Collect();
         copy.Return();

@@ -6,19 +6,25 @@ namespace BrickShare.Catalog.Domain;
 /// </summary>
 public sealed class Copy
 {
-    private Copy(LabelCode label, ConditionGrade grade)
+    private Copy(Guid catalogSetId, LabelCode label, ConditionGrade grade, int baselineWeightInGrams)
     {
         Id = Guid.CreateVersion7();
+        CatalogSetId = catalogSetId;
         Label = label;
         Grade = grade;
+        BaselineWeightInGrams = baselineWeightInGrams;
         Status = CopyStatus.Available;
     }
 
     public Guid Id { get; }
 
+    public Guid CatalogSetId { get; }
+
     public LabelCode Label { get; }
 
     public ConditionGrade Grade { get; private set; }
+
+    public int BaselineWeightInGrams { get; }
 
     public CopyStatus Status { get; private set; }
     public DateTimeOffset? RetiredAt { get; private set; }
@@ -61,11 +67,18 @@ public sealed class Copy
 
     #endregion
 
-    public static Copy Register(LabelCode label, ConditionGrade startingGrade)
+    public static Copy Register(Guid catalogSetId, LabelCode label, ConditionGrade startingGrade,
+        int baselineWeightInGrams)
     {
         ArgumentNullException.ThrowIfNull(label);
 
-        return new Copy(label, startingGrade);
+        if (catalogSetId == Guid.Empty)
+        {
+            throw new ArgumentException("A copy is a copy of something", nameof(catalogSetId));
+        }
+
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(baselineWeightInGrams);
+        return new Copy(catalogSetId, label, startingGrade, baselineWeightInGrams);
     }
 
     #region Status

@@ -47,4 +47,37 @@ public class LabelCodeTests
         // counter is about to start mis-keying codes.
         Assert.False(LabelCode.TryParse("BRK-7F3K2O", out _));
     }
+
+    [Fact]
+    public void A_minted_label_is_a_label()
+    {
+        LabelCode minted = LabelCode.Mint();
+
+        Assert.True(LabelCode.TryParse(minted.Value, out _));
+    }
+
+    [Fact]
+    public void Two_minted_labels_are_different()
+    {
+        Assert.NotEqual(LabelCode.Mint(), LabelCode.Mint());
+    }
+
+    [Theory]
+    [MemberData(nameof(EveryCharacterTheMinterCanEmit))]
+    public void Every_character_the_minter_can_emit_is_one_the_parser_accepts(char character)
+    {
+        Assert.True(LabelCode.TryParse($"BRK-{new string(character, 6)}", out _));
+    }
+
+    public static TheoryData<char> EveryCharacterTheMinterCanEmit()
+    {
+        TheoryData<char> characters = new();
+
+        foreach (char character in LabelCode.Alphabet)
+        {
+            characters.Add(character);
+        }
+
+        return characters;
+    }
 }

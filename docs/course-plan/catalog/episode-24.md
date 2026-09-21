@@ -222,10 +222,10 @@ is where that becomes a real test.
 That is the opposite of the concurrency conflict episode 16 mapped, where retrying *is* the answer —
 and the two arriving as different status codes is what lets a client tell them apart.
 
-**No OpenAPI document.** Three status codes now exist and nothing describes them. Episode 30, once
+**No OpenAPI document.** Three status codes now exist and nothing describes them. Episode 32, once
 there are enough endpoint groups for a document to be worth generating.
 
-**Still no authorization.** Five episodes in, the endpoint is open. Episode 36.
+**Still no authorization.** Five episodes in, the endpoint is open. Episode 38.
 
 ## Verification
 

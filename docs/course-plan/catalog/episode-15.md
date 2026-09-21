@@ -1083,7 +1083,7 @@ decides what happened. Three consequences, and they are the same three as last t
    back to inspecting the previous status to work out which message to send.
 3. **Every caller can name any state.** Retirement, write-off and collection are all one method
    away from anyone holding a `Copy`, and the only thing standing between a caller and a status
-   they had no business setting is a pair in a set. Authorization in episode 36 has to attach to
+   they had no business setting is a pair in a set. Authorization in episode 38 has to attach to
    *operations*; there would be one operation to attach it to.
 
 The private helper keeps the deduplication. The public methods keep the vocabulary. **The
@@ -1164,7 +1164,7 @@ somewhere to put it, and episode 16 opens `docker-compose.yml` for the first tim
 - **No damage log** (UC-10.3), **no baseline weight check** — both are things an inspection
   *records*, not moves a copy *makes*.
 - **No endpoint and no authorization.** Retiring is staff-only and recovering from *Lost* is
-  manager-only, and both are policies attached to operations in episode 36 — not `if` statements in
+  manager-only, and both are policies attached to operations in episode 38 — not `if` statements in
   the domain.
 - **No domain exception type** — see step 9.
 

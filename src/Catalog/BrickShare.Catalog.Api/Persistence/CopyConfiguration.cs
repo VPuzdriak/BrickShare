@@ -14,6 +14,23 @@ public sealed class CopyConfiguration : IEntityTypeConfiguration<Copy>
         builder.HasKey(copy => copy.Id);
         builder.Property(copy => copy.Id).HasColumnName("id");
 
+        builder.Property(copy => copy.CatalogSetId)
+            .HasColumnName("catalog_set_id")
+            .IsRequired();
+
+        // Deleting the set should not delete the copies.
+        // Deleting the set should not happen in principle, but if it does - database should refuse it
+        builder.HasOne<CatalogSet>()
+            .WithMany()
+            .HasForeignKey(copy => copy.CatalogSetId)
+            .HasConstraintName("fk_copies_catalog_set_id")
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // EF would index the foreign key by convention. Naming it keeps every index in this
+        // database spelled the way the rest of the schema is spelled.
+        builder.HasIndex(copy => copy.CatalogSetId)
+            .HasDatabaseName("ix_copies_catalog_set_id");
+
         builder.Property(copy => copy.Label)
             .HasColumnName("label_code")
             .HasConversion(label => label.Value, value => LabelCode.Parse(value))
@@ -34,6 +51,10 @@ public sealed class CopyConfiguration : IEntityTypeConfiguration<Copy>
             .HasColumnName("grade")
             .HasConversion<string>()
             .HasMaxLength(16)
+            .IsRequired();
+
+        builder.Property(copy => copy.BaselineWeightInGrams)
+            .HasColumnName("baseline_weight_grams")
             .IsRequired();
 
         builder.Property(copy => copy.RetiredAt)

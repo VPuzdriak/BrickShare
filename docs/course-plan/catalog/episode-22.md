@@ -220,7 +220,7 @@ builder.Services.AddProblemDetails(options =>
         context.ProblemDetails.Instance ??= context.HttpContext.Request.Path;
 
         // One id in the response and in the logs, so a screenshot from a staff member is enough
-        // to find the request. Episode 37 wires the other end of this.
+        // to find the request. Episode 39 wires the other end of this.
         context.ProblemDetails.Extensions["traceId"] =
             Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
     });
@@ -408,7 +408,7 @@ still a 500 — now with a tidy RFC 9457 body claiming the server failed. That i
 is a better episode for having this one's table already on the wall.
 
 **No `traceId` in the logs yet.** The extension is on the response and nothing correlates it to a
-log line. Episode 37.
+log line. Episode 39.
 
 ## Verification
 

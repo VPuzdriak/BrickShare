@@ -16,7 +16,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
     public async Task A_catalogued_set_comes_back_created()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid lookupId = await LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpTitanicAsync(client);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             "/api/v1/catalog/sets", ValidRequest(lookupId));
@@ -49,7 +49,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
     public async Task A_minimum_rental_period_the_shop_cannot_honour_is_refused()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid lookupId = await LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpTitanicAsync(client);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             "/api/v1/catalog/sets", ValidRequest(lookupId, minimumRentalDays: 30));
@@ -66,7 +66,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
     public async Task A_set_that_is_already_catalogued_cannot_be_catalogued_again()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid lookupId = await LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpTitanicAsync(client);
 
         HttpResponseMessage first = await client.PostAsJsonAsync(
             "/api/v1/catalog/sets", ValidRequest(lookupId));
@@ -101,7 +101,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
     public async Task A_client_cannot_invent_a_product()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid lookupId = await LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpTitanicAsync(client);
 
         HttpResponseMessage response = await client.PostAsJsonAsync("/api/v1/catalog/sets",
             new
@@ -143,34 +143,4 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
         minimumRentalDays,
         minimumAge = 18
     };
-
-    /// <summary>
-    /// The first half of the two-call flow. Every create test needs one, because a lookupId is the
-    /// only way left to name a set and only episode 27's endpoint issues one.
-    /// </summary>
-    private async Task<Guid> LookUpTitanicAsync(HttpClient client)
-    {
-        Database.Rebrickable.Sets["10294-1"] = new
-        {
-            set_num = "10294-1",
-            name = "Titanic",
-            year = 2021,
-            theme_id = 252,
-            num_parts = 9092,
-            set_img_url = "https://cdn.rebrickable.com/media/sets/10294-1.jpg"
-        };
-
-        Database.Rebrickable.Themes[252] = new { id = 252, name = "Icons", parent_id = (int?)null };
-
-        HttpResponseMessage response = await client.PostAsJsonAsync(
-            "/api/v1/catalog/lookups", new { setNumber = "10294-1" });
-
-        response.EnsureSuccessStatusCode();
-
-        LookupResponse? draft = await response.Content.ReadFromJsonAsync<LookupResponse>();
-
-        Assert.NotNull(draft);
-
-        return draft.LookupId;
-    }
 }

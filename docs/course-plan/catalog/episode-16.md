@@ -971,10 +971,10 @@ and the comment episode 3 left behind gets corrected on camera. It reads:
 ```
 
 Both numbers are stale, because the plan moved after the comment was written — Postgres landed
-here, in 16, and photographs are now episode 34:
+here, in 16, and photographs are now episode 36:
 
 ```csharp
-// Postgres, as of this episode. Blob Storage joins it in episode 34.
+// Postgres, as of this episode. Blob Storage joins it in episode 36.
 ```
 
 **A comment that names a future episode is a comment that goes stale**, and this one is a small
@@ -1058,8 +1058,8 @@ withholding it until it would pass.
   what incremental migrations are for**, and it is why the second one being routine matters more
   than the first one being complete.
 - **No checklist items, photographs, grade multipliers, Rebrickable snapshots or outbox.** All five
-  are in the architecture's schema; none has code that writes to it. Photographs are episodes 34 and
-  28, the checklist and snapshots are episode 27, and the outbox belongs to the messaging module by
+  are in the architecture's schema; none has code that writes to it. Photographs are episodes 36 and
+  37, the checklist and snapshots are episode 27, and the outbox belongs to the messaging module by
   the course plan's staging rule — an outbox with no subscriber is a table nobody reads.
 - **No `baseline_weight_grams`.** It is recorded at registration, which is episode 29, and it is a
   column with no domain property yet.

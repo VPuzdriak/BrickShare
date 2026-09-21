@@ -105,7 +105,7 @@ And then:
 - **`decimal` is not exact.** EF warns about this on every model with a `decimal` in it, because
   SQLite's storage classes have no fixed-point type. Episode 13's entire opening argument evaporates.
 - **Different collation.** SQLite's `LIKE` is case-insensitive for ASCII by default; Postgres's is
-  not. That is a test that passes and a search endpoint that does not, and episode 32 is where it
+  not. That is a test that passes and a search endpoint that does not, and episode 34 is where it
   would be discovered.
 - **No `xmin`**, so claim two is untestable.
 - **And the decisive one: the migration will not run.** `20260821222411_InitialCatalog` was generated
@@ -525,7 +525,7 @@ first and it finds no tables, resets nothing, and every test after the first inh
 one's rows — which presents as an assertion failure in a test that is individually green.
 
 **`SchemasToInclude = ["public"]`** is narrower than the default and says what it means. There is one
-schema in this database, and naming it means a future extension schema — `pg_trgm` in episode 32
+schema in this database, and naming it means a future extension schema — `pg_trgm` in episode 34
 installs into one — is opted into rather than swept.
 
 **Read the package rather than trusting it.** Respawn's Postgres adapter issues a single
@@ -551,7 +551,7 @@ This was the closest call in the episode and it deserves the table.
 | Strategy | Why not here |
 | --- | --- |
 | **A transaction per test, rolled back** | The fastest option, and genuinely tempting — no deletes at all. It breaks as soon as the code under test opens its own transaction, which episode 29's batch registration does by design. And it does not reach across connections, so the moment a test goes through `WebApplicationFactory` (step 9) the app is on a different connection and sees none of the test's setup. |
-| **A database per test class** | Perfect isolation, and the classes could run in parallel again. It pays the migration run once per class, and that bill grows with every migration this course adds between here and episode 38 — the cost lands later, on the people least able to see where it came from. |
+| **A database per test class** | Perfect isolation, and the classes could run in parallel again. It pays the migration run once per class, and that bill grows with every migration this course adds between here and episode 40 — the cost lands later, on the people least able to see where it came from. |
 | **A hand-written `TRUNCATE`** | About ten lines, no package, and correct today. |
 
 **The last one is the close call, and it should be said out loud rather than waved past**, because a
@@ -561,7 +561,7 @@ behind a scaffolder*, and a ten-line `ResetAsync` that truncates every table in
 and it very nearly wins.
 
 What decides it is the schema this repository is about to grow. Episode 20 brings `catalog_sets`,
-episode 29 a foreign key from `copies`; episodes 34 and 35 bring `photographs`; the messaging module
+episode 29 a foreign key from `copies`; episodes 36 and 37 bring `photographs`; the messaging module
 brings an outbox. From that point, "empty every table" is a graph-ordering problem, and the hand-written
 version either grows a topological sort or grows a `CASCADE` that is quietly deleting more than the
 author checked. **Respawn is the ten lines, already written, already handling the case that arrives
@@ -1027,7 +1027,7 @@ protected override void ConfigureWebHost(IWebHostBuilder builder) =>
 
 It works. And it has **deleted the registration from `Program.cs` and put a different one in its
 place** — so whatever the test then proves, it proves about the test's registration. Any mistake in
-the real one, any option set alongside it, any interceptor or logging filter added in episode 37, is
+the real one, any option set alongside it, any interceptor or logging filter added in episode 39, is
 now outside the test's reach and the test stays green regardless.
 
 The version above changes **one configuration key**. `Program.cs` reads

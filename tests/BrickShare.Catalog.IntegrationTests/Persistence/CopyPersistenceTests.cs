@@ -12,7 +12,8 @@ public class CopyPersistenceTests(CatalogDatabase database) : DatabaseTest(datab
     [Fact]
     public async Task A_registered_copy_comes_back_as_the_copy_that_was_registered()
     {
-        Copy registered = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.Good);
+        Guid setId = await ACataloguedSetAsync();
+        Copy registered = Copy.Register(setId, LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.Good, 9200);
 
         await using (CatalogDbContext writing = Database.NewDbContext())
         {
@@ -23,9 +24,11 @@ public class CopyPersistenceTests(CatalogDatabase database) : DatabaseTest(datab
         await using CatalogDbContext reading = Database.NewDbContext();
         Copy read = await reading.Copies.SingleAsync();
 
+        Assert.Equal(setId, read.CatalogSetId);
         Assert.Equal(registered.Id, read.Id);
         Assert.Equal(LabelCode.Parse("BRK-7F3K2Q"), read.Label);
         Assert.Equal(ConditionGrade.Good, read.Grade);
+        Assert.Equal(9200, read.BaselineWeightInGrams);
         Assert.Equal(CopyStatus.Available, read.Status);
         Assert.Null(read.RetiredAt);
     }
@@ -33,11 +36,12 @@ public class CopyPersistenceTests(CatalogDatabase database) : DatabaseTest(datab
     [Fact]
     public async Task Two_copies_cannot_carry_the_same_label_code()
     {
+        Guid setId = await ACataloguedSetAsync();
         LabelCode label = LabelCode.Parse("BRK-7F3K2Q");
 
         await using CatalogDbContext context = Database.NewDbContext();
-        context.Copies.Add(Copy.Register(label, ConditionGrade.New));
-        context.Copies.Add(Copy.Register(label, ConditionGrade.Good));
+        context.Copies.Add(Copy.Register(setId, label, ConditionGrade.New, 9200));
+        context.Copies.Add(Copy.Register(setId, label, ConditionGrade.Good, 9200));
 
         DbUpdateException error =
             await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
@@ -50,7 +54,8 @@ public class CopyPersistenceTests(CatalogDatabase database) : DatabaseTest(datab
     [Fact]
     public async Task The_second_of_two_people_writing_to_the_same_copy_is_refused()
     {
-        Copy copy = Copy.Register(LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.Good);
+        Guid setId = await ACataloguedSetAsync();
+        Copy copy = Copy.Register(setId, LabelCode.Parse("BRK-7F3K2Q"), ConditionGrade.Good, 9200);
         copy.Reserve();
         copy.Collect();
         copy.Return();
@@ -75,5 +80,18 @@ public class CopyPersistenceTests(CatalogDatabase database) : DatabaseTest(datab
         asColleagueSeesIt.Shelve();
 
         await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => colleague.SaveChangesAsync());
+    }
+
+    private async Task<Guid> ACataloguedSetAsync()
+    {
+        CatalogSet set = CatalogSet.Catalogue(
+            SetNumber.Parse("10294-1"), "Titanic", "Icons", 2021, 9092,
+            new Money(629.99m), new Money(60.00m), 7, 18);
+
+        await using CatalogDbContext context = Database.NewDbContext();
+        context.Sets.Add(set);
+        await context.SaveChangesAsync();
+
+        return set.Id;
     }
 }

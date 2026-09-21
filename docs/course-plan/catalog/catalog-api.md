@@ -709,32 +709,81 @@ runs through episode 23's ladder again, and the answer is not the same one.
 **Done when:** the fake four-piece Titanic from episode 27's opening `curl` is not expressible,
 and a set catalogued through the two-call flow carries facts the client never sent.
 
-### Episode 29 — Registering and retiring copies
+### Episode 29 — A copy belongs to a set
 
-**Builds:** copy registration, individually and in batch, and retirement.
+**Builds:** the domain change that makes a copy a copy *of something*, label-code minting, and
+`POST /catalog/sets/{setId}/copies` registering **one** box.
 
-**Teaches:** a batch as one transaction — three copies or none; minting label codes, since LEGO
-boxes carry no per-unit serial and identity has to be issued by BrickShare; baseline weight
-recorded per copy while it is known complete, and why it is per copy rather than per set (a
-replacement manual shifts the number, and a shared reference would make that copy read as short
-on every future return).
+**Teaches:** why `Copy` has waited since episode 15 with no set and no weight — there was no
+`catalog_sets` table to point a foreign key at until episode 24 — and **minting**, since LEGO boxes
+carry no per-unit serial and identity has to be issued by BrickShare. The label is drawn at random
+from a thirty-character alphabet rather than issued in sequence: neighbouring boxes one character
+apart is the worst property a scanned identifier can have, because one mis-read becomes a valid
+other box.
 
-**Retire is a state change, never a delete.** Rental history has to survive it, and a deleted
-row takes its history with it. The endpoint sets a timestamp and the copy stops being rentable.
+**Baseline weight is recorded per copy, at registration, while the box is known complete** — and
+per copy rather than per set because a replacement manual shifts the number, and a shared reference
+would make that copy read as short on every future return. This episode closes the architecture
+document's open question by requiring the weight up front, and says what that costs: staff weigh
+before they type.
 
-The episode-15 rule now runs end to end through HTTP: retiring a copy that is out on rent is
-refused, and the test proves it.
+**And a status code that is not the one episode 28 chose.** An unknown `lookupId` in a body was a
+`422`; an unknown set id in the **path** is a `404`. Same ladder, different rung, and the contrast
+is the cheapest way to show that the ladder is reasoning rather than a lookup table.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Domain/`, `src/Catalog/BrickShare.Catalog.Api/`,
+`tests/BrickShare.Catalog.UnitTests/`, `tests/BrickShare.Catalog.IntegrationTests/`.
+Notes: [`episode-29.md`](episode-29.md).
+
+**Done when:** a copy comes back with a label the client never chose, a weight somebody put on a
+scale, and a foreign key that refuses a copy of a set nobody catalogued.
+
+### Episode 30 — All of them or none of them
+
+**Builds:** episode 29's endpoint refactored to register a list of copies of **any** length in one
+transaction, and the validation refactor that arrives with it.
+
+**Teaches:** a batch as one unit of work — all of them or none of them. The shop that bought four
+Titanics calls the one-copy endpoint four times, the third call fails, and two boxes are on the
+shelf with no rows. That is the problem on screen before the fix, which is why the batch is a
+**refactor of a working endpoint** rather than a second endpoint designed up front.
 
 **And the validation story scales up here**, which is what episode 22 said it was waiting for: a
 batch is `RuleForEach` over a collection, three validators make `AddValidatorsFromAssemblyContaining`
-worth the loss of explicitness, and the handler-level call gives way to an endpoint filter. `LabelCode`
-gets the `MaxLength` treatment episode 22 gave `SetNumber`.
+worth the loss of explicitness, and the handler-level call gives way to an endpoint filter.
+`LabelCode` gets the `MaxLength` treatment episode 22 gave `SetNumber`.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
+**Also:** the mint collision episode 29 could not reach from a test becomes reachable, because a
+batch mints several labels inside one transaction.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `src/Catalog/BrickShare.Catalog.Domain/`,
+`tests/BrickShare.Catalog.IntegrationTests/`
+
+**Done when:** one request registers seventeen copies, a request with one bad weight in it
+registers none of them, and no handler in the service calls a validator by hand.
+
+### Episode 31 — Retire is not delete
+
+**Builds:** `POST /catalog/copies/{id}/retirement`, and the first endpoint addressed by copy rather
+than by set.
+
+**Teaches:** **retire is a state change, never a delete.** Rental history has to survive it, and a
+deleted row takes its history with it. The endpoint sets a timestamp and the copy stops being
+rentable — which is also why episode 29's foreign key is `Restrict` rather than the `Cascade` a
+required relationship gets by convention.
+
+The episode-15 rule now runs end to end through HTTP: retiring a copy that is out on rent is
+refused, and the test proves it. Episode 23's `DomainRuleViolationException` handler turns it into a
+`409` with nothing added to the endpoint, which is the payoff for having built the handler once.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`,
+`tests/BrickShare.Catalog.IntegrationTests/`
+
+**Done when:** a retired copy is still a row, still has its label, and cannot be retired twice.
 
 ---
 
-### Episode 30 — What this API says about itself
+### Episode 32 — What this API says about itself
 
 **Builds:** the OpenAPI document, from the built-in `Microsoft.AspNetCore.OpenApi`.
 
@@ -745,8 +794,8 @@ reference document and a list.
 
 **Why here and not with the first endpoint.** Episodes 20–24 built one endpoint group, and a
 document describing one group is a worse version of the `.http` file that already exists. By now
-there are three — lookups, sets, copies — and eleven endpoints, so the argument for tags is
-something on screen rather than something asserted.
+there are three — lookups, sets, copies — and four endpoints spread across them, so the argument
+for tags is something on screen rather than something asserted.
 
 **The honest note this episode has to make:** `ProducesProblem(409)` is a hand-maintained claim
 that nothing verifies. Delete the handler and the document keeps advertising the 409. That is the
@@ -757,7 +806,7 @@ even though the document is not.**
 **And why it is mapped in every environment**, unlike the `dotnet new` template's
 `IsDevelopment()` guard: the document describes routes that are already reachable, so hiding it is
 not a security control — it is an inconvenience for the people integrating with you and no
-obstacle to anyone probing the service. Security here is episode 36's job, and it is
+obstacle to anyone probing the service. Security here is episode 38's job, and it is
 authorization, not obscurity. The counter-argument is real and stated: in some organisations
 publishing an attack-surface map is a compliance question, and the guard is one line.
 
@@ -769,7 +818,7 @@ web page is not.
 
 # Part 6 — the read API
 
-### Episode 31 — Themes of our own
+### Episode 33 — Themes of our own
 
 **Builds:** a `themes` table, `catalog_sets.theme_id` as a foreign key, and the migration that
 backfills it from the text column episode 27 started writing.
@@ -790,7 +839,7 @@ decision, not a mapping decision, and this is where it gets made.
 **Done when:** `catalog_sets` carries a theme id, no theme name is stored twice, and the
 migration runs green against a database that already holds sets.
 
-### Episode 32 — Browse, search and filter
+### Episode 34 — Browse, search and filter
 
 **Builds:** the public catalog endpoints — search by name and set number, filters on theme,
 piece count, age rating, price and availability, with paging.
@@ -806,7 +855,7 @@ to keep in sync with nothing paying for the sync.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
-### Episode 33 — Set detail, and the rules that are easy to break
+### Episode 35 — Set detail, and the rules that are easy to break
 
 **Builds:** the set detail endpoint and the per-set aggregates.
 
@@ -833,7 +882,7 @@ cheapest **available** copy so the page never advertises a price nobody can act 
 
 # Part 7 — files and identity
 
-### Episode 34 — Uploading photographs
+### Episode 36 — Uploading photographs
 
 **Builds:** Azurite in Compose, the staff upload endpoint, and its storage in Terraform.
 
@@ -848,7 +897,7 @@ naming it now makes the switch a decision rather than a rewrite.**
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`, `infra/`
 
-### Episode 35 — SAS, and a privacy rule in code
+### Episode 37 — SAS, and a privacy rule in code
 
 **Builds:** short-lived user-delegation SAS minting, and the published/evidence split.
 
@@ -872,7 +921,7 @@ un-publishing something is not.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 36 — Entra ID: protecting the staff endpoints
+### Episode 38 — Entra ID: protecting the staff endpoints
 
 **Builds:** authentication and authorization — app roles, policies, and tests that run as each
 role.
@@ -903,7 +952,7 @@ to an identity provider.**
 
 # Part 8 — production readiness
 
-### Episode 37 — Observability
+### Episode 39 — Observability
 
 **Builds:** OpenTelemetry wired to Application Insights — traces, metrics, structured logs.
 
@@ -917,7 +966,7 @@ control than the database, and it is usually the one that leaks.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 38 — Hardening the pipeline
+### Episode 40 — Hardening the pipeline
 
 **Builds:** the finished delivery pipeline.
 

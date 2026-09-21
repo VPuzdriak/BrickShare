@@ -434,7 +434,7 @@ The handler's return type grows the third case, exactly as episode 27's lookup d
 ```
 
 Green. And the `Results<>` union earning its keep is worth five seconds: the signature now lists
-every response this endpoint can produce, the compiler enforces that list, and episode 30's OpenAPI
+every response this endpoint can produce, the compiler enforces that list, and episode 32's OpenAPI
 document is generated from it rather than from a comment.
 
 ---
@@ -501,7 +501,7 @@ kinder than silently ignoring them. It is not taken, for two reasons. It is a gl
 setting, so it changes the contract of every endpoint in the service to fix one endpoint's error
 message; and the security property does not depend on it either way — ignoring an unmapped member
 is already safe, and a stricter setting would make the API louder, not safer. It goes on the list
-for episode 30, where the API's self-description is the subject.
+for episode 32, where the API's self-description is the subject.
 
 ### The three that had to move
 
@@ -683,14 +683,14 @@ episode 27's reason: a foreign key from a domain table to an infrastructure tabl
 outbox or an audit log, not in the aggregate.
 
 **No authorization.** Every endpoint in this service is still open to anybody who can reach it,
-until **episode 36**. That is exactly why this fix had to come first: an authenticated caller who
+until **episode 38**. That is exactly why this fix had to come first: an authenticated caller who
 can still invent a product is an authenticated attacker, and adding Entra ID on top of a nine-field
 create body would have shipped a login screen in front of an open door.
 
 **No stricter JSON.** See step 5's close call. The extra members are ignored, not refused.
 
 **No `GET /catalog/sets/{id}`.** `TypedResults.Created` still points at a route that does not exist
-yet. Left exactly as it is: it becomes real in **episode 33**, and inventing it here to make a
+yet. Left exactly as it is: it becomes real in **episode 35**, and inventing it here to make a
 header look tidy would be building a feature to satisfy a string.
 
 ## Verification
@@ -713,12 +713,12 @@ is proved by two values sitting in a table that no request body contained.
 
 ## Next
 
-[Episode 29 — Registering and retiring copies](catalog-api.md#episode-29--registering-and-retiring-copies):
-the sets exist, so the boxes on the shelf can be registered against them — individually and in
-batches of three, with label codes BrickShare mints itself because a LEGO box carries no serial
-number. Retire becomes a state change rather than a delete, episode 15's "a copy on rent cannot be
-retired" rule finally runs end to end over HTTP, and the validation story scales up to
-`RuleForEach` and an endpoint filter.
+[Episode 29 — A copy belongs to a set](episode-29.md): the sets exist, so the boxes on the shelf
+can be registered against them — one at a time, with a label code BrickShare mints itself because a
+LEGO box carries no serial number, and a baseline weight recorded while the box is known complete.
+Episode 30 turns that endpoint into a batch of any size in one transaction and scales validation up
+to `RuleForEach` and an endpoint filter; episode 31 makes retirement a state change rather than a
+delete, and episode 15's "a copy on rent cannot be retired" rule finally runs end to end over HTTP.
 
 Two episodes, one question, and it is the thing to carry forward: **whose data is this?**, asked of
 every field in every request body. A field the client should not be able to choose must not be a

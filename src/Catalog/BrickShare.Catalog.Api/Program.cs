@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Azure.Core;
 using Azure.Identity;
@@ -37,6 +38,14 @@ ValidatorOptions.Global.PropertyNameResolver = (_, member, _) =>
 
 builder.Services.AddScoped<IValidator<CatalogueSetRequest>, CatalogueSetRequestValidator>();
 builder.Services.AddScoped<IValidator<LookupRequest>, LookupRequestValidator>();
+builder.Services.AddScoped<IValidator<RegisterCopyRequest>, RegisterCopyRequestValidator>();
+
+// Grades and statuses cross the wire as "New" and "Available", never as 0 and 1. An ordinal is a
+// position in a C# declaration: insert a grade between Excellent and Good and every client in the
+// world silently changes its mind about what it is asking for. The database already made this
+// call — CopyConfiguration stores both columns as strings — and the wire now agrees with it.
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddSingleton(TimeProvider.System);
 
@@ -111,6 +120,7 @@ RouteGroupBuilder v1 = app.MapGroup("/api/v1");
 
 v1.MapCatalogSets();
 v1.MapCatalogLookups();
+v1.MapCopies();
 
 await app.RunAsync();
 

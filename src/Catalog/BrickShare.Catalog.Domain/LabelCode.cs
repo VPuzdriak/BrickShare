@@ -1,17 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace BrickShare.Catalog.Domain;
 
-/// <summary>
-/// The identity BrickShare issues to a physical box: "BRK-" plus six characters.
-///
-/// LEGO boxes carry no per-unit serial number, so a copy's identity has to be invented by
-/// the shop and stuck on the outside (UC-1.2). Minting happens in episode 23; this type is
-/// only the format.
-/// </summary>
 public sealed partial record LabelCode
 {
+    public const string Alphabet = "23456789ABCDEFGHJKMNPQRSTVWXYZ";
+    public const int Length = 6;
+
     private LabelCode(string value)
     {
         Value = value;
@@ -48,6 +45,9 @@ public sealed partial record LabelCode
         labelCode = new LabelCode(normalized);
         return true;
     }
+
+    public static LabelCode Mint() =>
+        new($"BRK-{RandomNumberGenerator.GetString(Alphabet, Length)}");
 
     public override string ToString()
     {

@@ -89,7 +89,7 @@ and reported success; it does not wait to find out whether the container it star
 `health_check_path` set in episode 18 will evict an unhealthy instance, which on a one-instance plan
 means restarting it forever. So: a green deploy, a dead service, and nobody told.
 
-That gap is real and it is not this episode's job — **episode 38 makes the pipeline wait for the
+That gap is real and it is not this episode's job — **episode 40 makes the pipeline wait for the
 health probe** and fail if it never goes green. Naming it now is the point, because the instinct when
 you see a crash-looping app is to assume the pipeline lied, and it did not. It was never asked.
 

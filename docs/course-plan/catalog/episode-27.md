@@ -87,7 +87,7 @@ episode — the fix landed in 26 in the original plan, then this material split 
 **episode 28**. Fix the number while it is on screen; a comment pointing at the wrong episode is how
 a reader concludes the whole file is untrustworthy. There is a second one of these, and the same
 thirty seconds fixes it: `Program.cs` says "Episode 34 wires the other end of this" about the
-`traceId` extension, and observability is now **episode 37**.
+`traceId` extension, and observability is now **episode 39**.
 
 The second is the actual point. Run this against a running API:
 
@@ -376,7 +376,7 @@ Rebrickable does not return a theme. It returns a `theme_id`:
 { "set_num": "10294-1", "name": "Titanic", "year": 2021, "theme_id": 252, "num_parts": 9092 }
 ```
 
-`CatalogSet.Theme` is a non-empty string, and episode 32 filters the public catalog on it. `252` is
+`CatalogSet.Theme` is a non-empty string, and episode 34 filters the public catalog on it. `252` is
 not a theme anybody wants to filter by, so somebody has to turn the id into "Icons". There are three
 candidates and only one of them is honest: ship a hard-coded id→name table in C# (rots silently,
 and nobody will ever notice the day Rebrickable renames a theme), store the number and pretend
@@ -429,7 +429,7 @@ internal sealed record RebrickableThemePayload(
 Two types for one concept, exactly as episode 25 argued for sets: the payload is Rebrickable's
 shape and may change under us, the record is ours. `ParentId` is read and not yet used — Rebrickable
 nests themes, so "Icons" may be the parent of the theme a set actually belongs to. Deliberately not
-resolved here; it is part of what **episode 31** takes on when BrickShare grows theme ids of its own.
+resolved here; it is part of what **episode 33** takes on when BrickShare grows theme ids of its own.
 
 ```csharp
 // src/Catalog/BrickShare.Catalog.Api/Rebrickable/IRebrickableCatalog.cs — add below FindSetAsync
@@ -950,10 +950,10 @@ episode. **Say that at the end rather than letting the split hide it.**
 **No image copied into Blob.** `docs/architecture/catalog.md` wants the set image pulled into our
 own storage during the lookup, while staff are waiting on a network call anyway, so that BrickShare
 stops depending on a third party's CDN. Right, and it needs a storage account, a container, a
-client and a failure policy — that is **episode 34**. The snapshot stores the URL until then.
+client and a failure policy — that is **episode 36**. The snapshot stores the URL until then.
 
-**No theme entity.** `theme_name` is text, copied from Rebrickable, and episode 32 will filter the
-public catalog on it. Free text is a bad thing to filter on, and **episode 31** replaces it with a
+**No theme entity.** `theme_name` is text, copied from Rebrickable, and episode 34 will filter the
+public catalog on it. Free text is a bad thing to filter on, and **episode 33** replaces it with a
 `themes` table, a foreign key and a migration that backfills from the column this episode writes.
 The nested-theme question — `parent_id` — belongs to that episode too.
 
@@ -962,7 +962,7 @@ a set is a rare, human-paced operation, and a cache here would be a second sourc
 facts this episode exists to make single-sourced.
 
 **No authorization.** "Anyone holding a staff token" is still literally anyone: these endpoints are
-open until **episode 36**. The design work has to happen first regardless — an authenticated caller
+open until **episode 38**. The design work has to happen first regardless — an authenticated caller
 who can still invent a product is an authenticated attacker.
 
 ## Verification
