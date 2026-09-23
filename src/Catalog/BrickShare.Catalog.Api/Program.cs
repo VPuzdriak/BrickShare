@@ -18,6 +18,8 @@ using Microsoft.EntityFrameworkCore;
 
 using Npgsql;
 
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 /*
@@ -85,6 +87,19 @@ builder.Services.AddDbContext<CatalogDbContext>((sp, options) =>
 
 builder.Services.AddRebrickable(builder.Configuration);
 
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, _, _) =>
+    {
+        document.Info.Title = "BrickShare Catalog API";
+        document.Info.Version = "v1";
+        document.Info.Description =
+            "Staff-facing catalog service: look a set up, catalogue it, register copies of it, retire a copy.";
+
+        return Task.CompletedTask;
+    });
+});
+
 builder.Services.AddExceptionHandler<DomainRuleViolationExceptionHandler>();
 
 // Turns any unhandled failure into RFC 9457 instead of an empty body.
@@ -106,7 +121,11 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
-app.MapGet("/", () => new { service = "BrickShare Catalog API" });
+app.MapOpenApi();
+app.MapScalarApiReference();
+
+app.MapGet("/", () => new { service = "BrickShare Catalog API" })
+    .ExcludeFromDescription();
 
 // Liveness: is this process alive? Runs no checks at all — the only correct response to a
 // failure here is to restart the instance, so it must never depend on anything external.

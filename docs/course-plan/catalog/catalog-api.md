@@ -816,11 +816,23 @@ obstacle to anyone probing the service. Security here is episode 38's job, and i
 authorization, not obscurity. The counter-argument is real and stated: in some organisations
 publishing an attack-surface map is a compliance question, and the guard is one line.
 
-**No Swagger UI.** A human-browsable page is a separate dependency serving a separate purpose, and
-the `.http` file from episode 24 is what exploration looks like here — version controlled, which a
-web page is not.
+**And a page on top of it, chosen by comparison rather than by habit.** Swagger UI and Scalar are
+both wired on camera against the same generated document and judged on three questions — do the tags
+become navigation, does the hand-written metadata survive, and do the OpenAPI 3.1 constructs this
+service actually emits get rendered honestly. **Scalar wins**, decisively on the last one and on a
+detail specific to this service: it maps as an endpoint, so episode 38 secures it with the same
+`RequireAuthorization()` as every other route, where `UseSwaggerUI` is middleware with nothing to
+hang that on. The runner-up is deleted on camera, and why it is deleted rather than kept alongside
+is part of the lesson.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `Directory.Packages.props`
+**The `.http` file is not replaced by it.** Version controlled, diffable and runnable from the
+editor, it stays what *we* drive the service with; the page is for people who do not have the repo.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `Directory.Packages.props`.
+Notes: [`episode-32.md`](episode-32.md).
+
+**Done when:** four operations are described under three tags, every status code the service can
+answer with is in the document, and nothing in it is a claim the service does not honour.
 
 # Part 6 — the read API
 

@@ -20,7 +20,13 @@ public static class CopyEndpoints
             .WithTags("Copies");
 
         group.MapPost("/", RegisterAsync)
-            .AddEndpointFilter<ValidationFilter<RegisterCopiesRequest>>();
+            .AddEndpointFilter<ValidationFilter<RegisterCopiesRequest>>()
+            .WithSummary("Register copies of a catalogued set")
+            .WithDescription(
+                "Registers 1 to 100 physical boxes in one transaction: all of them or none of them. "
+                + "Each copy is minted a label code. Weights are in grams, 1 to 50000.")
+            .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;
     }
@@ -35,7 +41,13 @@ public static class CopyEndpoints
         // No validation filter: there is no request body to validate. The whole request is a
         // route parameter, and the route constraint has already rejected anything that is not a
         // Guid before the handler is reached.
-        group.MapPost("/{copyId:guid}/retirement", RetireAsync);
+        group.MapPost("/{copyId:guid}/retirement", RetireAsync)
+            .WithSummary("Retire a copy")
+            .WithDescription(
+                "Takes a copy out of service without deleting it: the row, its label and its "
+                + "history stay. Not idempotent — retiring a retired copy is a 409.")
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
         return group;
     }

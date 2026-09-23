@@ -707,7 +707,7 @@ there is no delete anywhere in the service, and there never was one to remove.
 
 ## Next
 
-[Episode 32 — What this API says about itself](catalog-api.md#episode-32--what-this-api-says-about-itself):
+[Episode 32 — What this API says about itself](episode-32.md):
 the OpenAPI document, generated from the C# types rather than hand-written and immediately stale.
 Every endpoint built since episode 21 is about to be described by a document that nobody wrote — and
 the places where the types cannot express the truth, including the `409` this episode never typed

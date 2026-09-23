@@ -16,7 +16,14 @@ public static class CatalogLookupEndpoints
             .WithTags("Catalog lookups");
 
         group.MapPost("/", LookUpAsync)
-            .AddEndpointFilter<ValidationFilter<LookupRequest>>();
+            .AddEndpointFilter<ValidationFilter<LookupRequest>>()
+            .WithSummary("Look a set up on Rebrickable")
+            .WithDescription(
+                "Stores the product facts for a set number as a snapshot and returns its lookupId. "
+                + "setNumber is at most 32 characters and usually ends in -1.")
+            .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status502BadGateway);
 
         return group;
     }

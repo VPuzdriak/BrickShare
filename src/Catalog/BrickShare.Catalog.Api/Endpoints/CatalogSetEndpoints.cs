@@ -17,7 +17,15 @@ public static class CatalogSetEndpoints
             .WithTags("Catalog sets");
 
         group.MapPost("/", CatalogueAsync)
-            .AddEndpointFilter<ValidationFilter<CatalogueSetRequest>>();
+            .AddEndpointFilter<ValidationFilter<CatalogueSetRequest>>()
+            .WithSummary("Catalogue a set the shop will rent out")
+            .WithDescription(
+                "Turns a lookup into a catalogued set. Prices are not negative, minimumRentalDays "
+                + "is at least 1, and minimumAge is between 0 and 18 — none of which the schema "
+                + "below can say, because those rules live in CatalogueSetRequestValidator.")
+            .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
 
         return group;
     }
@@ -73,8 +81,9 @@ public static class CatalogSetEndpoints
 }
 
 /// <summary>
-/// What staff send to catalogue a set. Every product fact in here is client-supplied, which is a security problem
+/// What staff send to catalogue a set: the id of an earlier lookup, and the commercial terms.
 /// </summary>
+/// Every product fact behind that lookup is client-supplied, which is a security problem
 public sealed record CatalogueSetRequest(
     Guid LookupId,
     decimal RetailPrice,
