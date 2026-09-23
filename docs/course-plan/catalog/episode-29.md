@@ -1282,7 +1282,7 @@ in a handler somebody can delete.
 
 ## Next
 
-[Episode 30 — All of them or none of them](catalog-api.md#episode-30--all-of-them-or-none-of-them):
+[Episode 30 — All of them or none of them](episode-30.md):
 the shop buys four Titanics and calls this endpoint four times, and the fourth call fails. The
 endpoint is refactored to take a list of any length in one transaction — `RuleForEach` over a
 collection is the case episode 22 said validation was waiting for, three validators finally make

@@ -6,8 +6,11 @@ namespace BrickShare.Catalog.Domain;
 
 public sealed partial record LabelCode
 {
+    public const string Prefix = "BRK-";
     public const string Alphabet = "23456789ABCDEFGHJKMNPQRSTVWXYZ";
     public const int Length = 6;
+
+    public static readonly int MaxLength = Prefix.Length + Length;
 
     private LabelCode(string value)
     {
@@ -47,7 +50,7 @@ public sealed partial record LabelCode
     }
 
     public static LabelCode Mint() =>
-        new($"BRK-{RandomNumberGenerator.GetString(Alphabet, Length)}");
+        new($"{Prefix}{RandomNumberGenerator.GetString(Alphabet, Length)}");
 
     public override string ToString()
     {

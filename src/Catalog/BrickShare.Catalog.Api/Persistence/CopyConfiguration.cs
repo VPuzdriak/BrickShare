@@ -34,7 +34,7 @@ public sealed class CopyConfiguration : IEntityTypeConfiguration<Copy>
         builder.Property(copy => copy.Label)
             .HasColumnName("label_code")
             .HasConversion(label => label.Value, value => LabelCode.Parse(value))
-            .HasMaxLength(10)
+            .HasMaxLength(LabelCode.MaxLength)
             .IsRequired();
 
         builder.HasIndex(copy => copy.Label)

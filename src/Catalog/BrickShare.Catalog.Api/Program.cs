@@ -9,6 +9,7 @@ using BrickShare.Catalog.Api;
 using BrickShare.Catalog.Api.Endpoints;
 using BrickShare.Catalog.Api.Persistence;
 using BrickShare.Catalog.Api.Rebrickable;
+using BrickShare.Catalog.Domain;
 
 using FluentValidation;
 
@@ -36,9 +37,7 @@ if (builder.Configuration["KeyVault:Uri"] is { Length: > 0 } keyVaultUri)
 ValidatorOptions.Global.PropertyNameResolver = (_, member, _) =>
     member is null ? null : JsonNamingPolicy.CamelCase.ConvertName(member.Name);
 
-builder.Services.AddScoped<IValidator<CatalogueSetRequest>, CatalogueSetRequestValidator>();
-builder.Services.AddScoped<IValidator<LookupRequest>, LookupRequestValidator>();
-builder.Services.AddScoped<IValidator<RegisterCopyRequest>, RegisterCopyRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Scoped);
 
 // Grades and statuses cross the wire as "New" and "Available", never as 0 and 1. An ordinal is a
 // position in a C# declaration: insert a grade between Excellent and Good and every client in the
@@ -48,6 +47,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddSingleton(TimeProvider.System);
+
+builder.Services.AddSingleton<ILabelCodeMinter, RandomLabelCodeMinter>();
 
 builder.Services.AddSingleton(_ =>
 {

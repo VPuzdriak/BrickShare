@@ -2,9 +2,6 @@ using BrickShare.Catalog.Api.Persistence;
 using BrickShare.Catalog.Api.Rebrickable;
 using BrickShare.Catalog.Domain;
 
-using FluentValidation;
-using FluentValidation.Results;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,24 +16,18 @@ public static class CatalogSetEndpoints
         RouteGroupBuilder group = routes.MapGroup("/catalog/sets")
             .WithTags("Catalog sets");
 
-        group.MapPost("/", CatalogueAsync);
+        group.MapPost("/", CatalogueAsync)
+            .AddEndpointFilter<ValidationFilter<CatalogueSetRequest>>();
 
         return group;
     }
 
-    private static async Task<Results<Created<CatalogSetResponse>, ValidationProblem, ProblemHttpResult>>
+    private static async Task<Results<Created<CatalogSetResponse>, ProblemHttpResult>>
         CatalogueAsync(
             CatalogueSetRequest request,
-            IValidator<CatalogueSetRequest> validator,
             CatalogDbContext database,
             CancellationToken cancellationToken)
     {
-        ValidationResult validation = await validator.ValidateAsync(request, cancellationToken);
-        if (!validation.IsValid)
-        {
-            return TypedResults.ValidationProblem(validation.ToDictionary());
-        }
-
         RebrickableSnapshot? snapshot =
             await database.Snapshots.FindAsync([request.LookupId], cancellationToken);
 

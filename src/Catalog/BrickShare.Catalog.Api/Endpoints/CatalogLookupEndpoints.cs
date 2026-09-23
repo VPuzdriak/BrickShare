@@ -4,9 +4,6 @@ using BrickShare.Catalog.Api.Persistence;
 using BrickShare.Catalog.Api.Rebrickable;
 using BrickShare.Catalog.Domain;
 
-using FluentValidation;
-using FluentValidation.Results;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace BrickShare.Catalog.Api.Endpoints;
@@ -18,25 +15,19 @@ public static class CatalogLookupEndpoints
         RouteGroupBuilder group = routes.MapGroup("/catalog/lookups")
             .WithTags("Catalog lookups");
 
-        group.MapPost("/", LookUpAsync);
+        group.MapPost("/", LookUpAsync)
+            .AddEndpointFilter<ValidationFilter<LookupRequest>>();
 
         return group;
     }
 
-    private static async Task<Results<Created<LookupResponse>, ValidationProblem, ProblemHttpResult>> LookUpAsync(
+    private static async Task<Results<Created<LookupResponse>, ProblemHttpResult>> LookUpAsync(
         LookupRequest request,
-        IValidator<LookupRequest> validator,
         IRebrickableCatalog rebrickable,
         CatalogDbContext database,
         TimeProvider clock,
         CancellationToken cancellationToken)
     {
-        ValidationResult validation = await validator.ValidateAsync(request, cancellationToken);
-        if (!validation.IsValid)
-        {
-            return TypedResults.ValidationProblem(validation.ToDictionary());
-        }
-
         SetNumber number = SetNumber.Parse(request.SetNumber);
 
         RebrickableSet? set = await rebrickable.FindSetAsync(number, cancellationToken);

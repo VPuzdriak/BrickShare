@@ -3,9 +3,6 @@ using System.Diagnostics;
 using BrickShare.Catalog.Api.Persistence;
 using BrickShare.Catalog.Domain;
 
-using FluentValidation;
-using FluentValidation.Results;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,25 +19,20 @@ public static class CopyEndpoints
         RouteGroupBuilder group = routes.MapGroup("/catalog/sets/{setId:guid}/copies")
             .WithTags("Copies");
 
-        group.MapPost("/", RegisterAsync);
+        group.MapPost("/", RegisterAsync)
+            .AddEndpointFilter<ValidationFilter<RegisterCopiesRequest>>();
 
         return group;
     }
 
-    private static async Task<Results<Created<CopyResponse>, ValidationProblem, ProblemHttpResult>>
+    private static async Task<Results<Created<RegisterCopiesResponse>, ProblemHttpResult>>
         RegisterAsync(
             Guid setId,
-            RegisterCopyRequest request,
-            IValidator<RegisterCopyRequest> validator,
+            RegisterCopiesRequest request,
+            ILabelCodeMinter minter,
             CatalogDbContext database,
             CancellationToken cancellationToken)
     {
-        ValidationResult validation = await validator.ValidateAsync(request, cancellationToken);
-        if (!validation.IsValid)
-        {
-            return TypedResults.ValidationProblem(validation.ToDictionary());
-        }
-
         bool setExists = await database.Sets.AnyAsync(set => set.Id == setId, cancellationToken);
         if (!setExists)
         {
@@ -50,34 +42,42 @@ public static class CopyEndpoints
                 statusCode: StatusCodes.Status404NotFound);
         }
 
-        Copy copy = await RegisterWithAMintedLabelAsync(setId, request, database, cancellationToken);
+        IReadOnlyList<Copy> copies =
+            await RegisterWithMintedLabelsAsync(setId, request, minter, database, cancellationToken);
 
-        return TypedResults.Created($"/api/v1/catalog/copies/{copy.Id}", CopyResponse.From(copy));
+        return TypedResults.Created(
+            $"/api/v1/catalog/sets/{setId}/copies",
+            new RegisterCopiesResponse([.. copies.Select(CopyResponse.From)]));
     }
 
-    private static async Task<Copy> RegisterWithAMintedLabelAsync(
-        Guid setId,
-        RegisterCopyRequest request,
+    private static async Task<IReadOnlyList<Copy>> RegisterWithMintedLabelsAsync(Guid setId,
+        RegisterCopiesRequest request,
+        ILabelCodeMinter minter,
         CatalogDbContext database,
         CancellationToken cancellationToken)
     {
         for (int attempt = 1; attempt <= MintAttempts; attempt++)
         {
-            Copy copy = Copy.Register(
-                setId, LabelCode.Mint(), request.Grade, request.BaselineWeightInGrams);
+            List<Copy> copies =
+            [
+                .. request.Copies.Select(copy =>
+                    Copy.Register(setId, minter.Mint(), copy.Grade, copy.BaselineWeightInGrams))
+            ];
 
-            database.Copies.Add(copy);
+            database.Copies.AddRange(copies);
 
             try
             {
                 await database.SaveChangesAsync(cancellationToken);
-                return copy;
+                return copies;
             }
             catch (DbUpdateException ex) when (IsLabelAlreadyTaken(ex) && attempt < MintAttempts)
             {
-                // A failed SaveChanges leaves the entity Added. Without this the retry writes two
-                // rows, one of which still carries the label that just collided.
-                database.Entry(copy).State = EntityState.Detached;
+                // Step 4 has something to say about this line.
+                foreach (Copy copy in copies)
+                {
+                    database.Entry(copy).State = EntityState.Detached;
+                }
             }
         }
 
@@ -94,7 +94,11 @@ public static class CopyEndpoints
         };
 }
 
-public sealed record RegisterCopyRequest(ConditionGrade Grade, int BaselineWeightInGrams);
+public sealed record RegisterCopiesRequest(IReadOnlyList<CopyToRegister> Copies);
+
+public sealed record CopyToRegister(ConditionGrade Grade, int BaselineWeightInGrams);
+
+public sealed record RegisterCopiesResponse(IReadOnlyList<CopyResponse> Copies);
 
 public sealed record CopyResponse(
     Guid Id,

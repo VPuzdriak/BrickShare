@@ -753,11 +753,17 @@ batch is `RuleForEach` over a collection, three validators make `AddValidatorsFr
 worth the loss of explicitness, and the handler-level call gives way to an endpoint filter.
 `LabelCode` gets the `MaxLength` treatment episode 22 gave `SetNumber`.
 
-**Also:** the mint collision episode 29 could not reach from a test becomes reachable, because a
-batch mints several labels inside one transaction.
+**Also:** the mint collision episode 29 could not reach from a test becomes reachable — and the
+arithmetic is done on camera, because a batch alone does not do it. 30⁶ is 729 million, so a request
+would need around forty thousand copies before it were likely to collide with itself. A batch makes
+the branch **more probable**; the `ILabelCodeMinter` seam episode 29 refused is what makes it
+**reachable**, and what the batch actually buys is the reason to accept that seam — the recovery
+branch now holds a decision (*which* copies get re-minted: all of them) rather than three readable
+lines.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `src/Catalog/BrickShare.Catalog.Domain/`,
-`tests/BrickShare.Catalog.IntegrationTests/`
+`tests/BrickShare.Catalog.IntegrationTests/`, `Directory.Packages.props`.
+Notes: [`episode-30.md`](episode-30.md).
 
 **Done when:** one request registers seventeen copies, a request with one bad weight in it
 registers none of them, and no handler in the service calls a validator by hand.
@@ -1009,6 +1015,12 @@ ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos
 Nothing else merges without an episode doing two unrelated things. In particular **4 and 5 do
 not merge** — testing and containerisation share nothing, and the seam between them is where a
 student who is stuck will stop and rewatch.
+
+**One episode splits rather than merges.** Episode 30 carries two subjects — the batch transaction
+and the validation refactor — and scripts at about seventeen minutes. The cut is marked in place in
+[`episode-30.md`](episode-30.md): **30a** is the batch (steps 1–5), **30b** is validation
+(steps 6–9). Record it as one or as two; the script reads correctly either way, and the numbering of
+episodes 31 onward does not move.
 
 ## What comes after
 
