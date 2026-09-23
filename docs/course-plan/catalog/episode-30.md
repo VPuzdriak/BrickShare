@@ -1191,7 +1191,7 @@ missing `BEGIN`. It was four of them.
 
 ## Next
 
-[Episode 31 — Retire is not delete](catalog-api.md#episode-31--retire-is-not-delete): the first
+[Episode 31 — Retire is not delete](episode-31.md): the first
 endpoint addressed by copy rather than by set, and the first that changes a copy instead of creating
 one. Retiring a copy that is out on rent is refused by a rule written in episode 15, turned into a
 `409` by a handler written in episode 23, with nothing added to the endpoint to make either happen —

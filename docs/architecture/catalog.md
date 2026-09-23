@@ -444,7 +444,7 @@ REST over JSON, minimal APIs grouped by resource, versioned under `/api/v1`, err
 | **Staff** | `POST /catalog/lookups` | Staff |
 | | `POST /catalog/sets` · `PATCH /catalog/sets/{id}` | Staff |
 | | `POST /catalog/sets/{id}/copies` (single or batch) | Staff |
-| | `POST /copies/{id}/retire` | Staff |
+| | `POST /catalog/copies/{id}/retirement` | Staff |
 | | `POST /copies/{id}/grade` · `POST /copies/{id}/grade-after-repair` | Staff |
 | | `POST /copies/{id}/photos` | Staff |
 | | `GET /copies/by-label/{code}` — the scan endpoint | Staff |

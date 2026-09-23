@@ -783,7 +783,7 @@ refused, and the test proves it. Episode 23's `DomainRuleViolationException` han
 `409` with nothing added to the endpoint, which is the payoff for having built the handler once.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`,
-`tests/BrickShare.Catalog.IntegrationTests/`
+`tests/BrickShare.Catalog.IntegrationTests/`. Notes: [`episode-31.md`](episode-31.md).
 
 **Done when:** a retired copy is still a row, still has its label, and cannot be retired twice.
 

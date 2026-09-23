@@ -122,6 +122,7 @@ RouteGroupBuilder v1 = app.MapGroup("/api/v1");
 v1.MapCatalogSets();
 v1.MapCatalogLookups();
 v1.MapCopies();
+v1.MapCopyRetirements();
 
 await app.RunAsync();
 
