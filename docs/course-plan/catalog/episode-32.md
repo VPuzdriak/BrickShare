@@ -918,7 +918,7 @@ that had nothing to do with documentation.
 
 ## Next
 
-[Episode 33 — Themes of our own](catalog-api.md#episode-33--themes-of-our-own): a `themes` table, a
+[Episode 33 — Themes of our own](episode-33.md): a `themes` table, a
 foreign key, and the first data migration in this course that moves real rows rather than creating
 an empty table — plus the nesting question episode 27 deferred, which is a product decision wearing a
 mapping decision's clothes.

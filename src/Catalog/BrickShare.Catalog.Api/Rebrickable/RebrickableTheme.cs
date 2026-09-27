@@ -1,3 +1,3 @@
 namespace BrickShare.Catalog.Api.Rebrickable;
 
-public sealed record RebrickableTheme(int Id, string Name);
+public sealed record RebrickableTheme(int Id, string Name, int? ParentId);

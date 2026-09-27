@@ -71,6 +71,65 @@ public class LookupTests(CatalogDatabase database) : DatabaseTest(database)
         Assert.Equal(2, await dbContext.Snapshots.CountAsync());
     }
 
+    // tests/BrickShare.Catalog.IntegrationTests/CatalogSets/LookupTests.cs — add above the private Titanic helper
+    [Fact]
+    public async Task A_nested_theme_is_stored_as_the_one_customers_browse_by()
+    {
+        Database.Rebrickable.Sets["75192-1"] = MillenniumFalcon();
+        Database.Rebrickable.Themes[171] =
+            new { id = 171, name = "Ultimate Collector Series", parent_id = (int?)158 };
+        Database.Rebrickable.Themes[158] = new { id = 158, name = "Star Wars", parent_id = (int?)null };
+
+        HttpClient client = Database.Api.CreateClient();
+
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            "/api/v1/catalog/lookups", new { setNumber = "75192-1" });
+
+        LookupResponse? draft = await response.Content.ReadFromJsonAsync<LookupResponse>();
+
+        Assert.NotNull(draft);
+        Assert.Equal("Star Wars", draft.Theme);
+    }
+
+    [Fact]
+    public async Task A_top_level_theme_costs_one_call_and_not_two()
+    {
+        Database.Rebrickable.Sets["10294-1"] = Titanic();
+        Database.Rebrickable.Themes[252] = Icons();
+
+        HttpClient client = Database.Api.CreateClient();
+
+        await client.PostAsJsonAsync("/api/v1/catalog/lookups", new { setNumber = "10294-1" });
+
+        // One for the set, one for its theme. A parentless theme must not provoke a third.
+        Assert.Equal(2, Database.Rebrickable.Requests);
+    }
+
+    [Fact]
+    public async Task A_cycle_in_the_theme_tree_does_not_hang_the_lookup()
+    {
+        Database.Rebrickable.Sets["10294-1"] = Titanic();
+        Database.Rebrickable.Themes[252] = new { id = 252, name = "Icons", parent_id = (int?)900 };
+        Database.Rebrickable.Themes[900] = new { id = 900, name = "Loop", parent_id = (int?)252 };
+
+        HttpClient client = Database.Api.CreateClient();
+
+        HttpResponseMessage response = await client.PostAsJsonAsync(
+            "/api/v1/catalog/lookups", new { setNumber = "10294-1" });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    private static object MillenniumFalcon() => new
+    {
+        set_num = "75192-1",
+        name = "Millennium Falcon",
+        year = 2017,
+        theme_id = 171,
+        num_parts = 7541,
+        set_img_url = "https://cdn.rebrickable.com/media/sets/75192-1.jpg"
+    };
+
     private static object Titanic() => new
     {
         set_num = "10294-1",

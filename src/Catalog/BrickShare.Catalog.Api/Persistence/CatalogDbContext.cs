@@ -10,6 +10,7 @@ namespace BrickShare.Catalog.Api.Persistence;
 public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
 {
     public DbSet<CatalogSet> Sets => Set<CatalogSet>();
+    public DbSet<Theme> Themes => Set<Theme>();
     public DbSet<Copy> Copies => Set<Copy>();
     public DbSet<RebrickableSnapshot> Snapshots => Set<RebrickableSnapshot>();
 

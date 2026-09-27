@@ -44,17 +44,40 @@ public class CatalogSetTests
         Assert.Throws<ArgumentOutOfRangeException>(() => Catalogue(retailPrice: new Money(-1m)));
     }
 
-    private static CatalogSet Catalogue(
-        int minimumRentalDays = 7,
-        Money? retailPrice = null) =>
-        CatalogSet.Catalogue(
+    [Fact]
+    public void A_catalogued_set_points_at_a_theme_rather_than_naming_one()
+    {
+        Theme icons = Theme.Adopt(252, "Icons");
+
+        CatalogSet set = CatalogSet.Catalogue(
             SetNumber.Parse("10294-1"),
             "Titanic",
-            "Icons",
+            icons,
+            2021,
+            9092,
+            new Money(629.99m),
+            new Money(60.00m),
+            7,
+            18);
+
+        Assert.Equal(icons.Id, set.ThemeId);
+    }
+
+
+    private static CatalogSet Catalogue(
+        int minimumRentalDays = 7,
+        Money? retailPrice = null)
+    {
+        Theme theme = Theme.Adopt(252, "Icons");
+        return CatalogSet.Catalogue(
+            SetNumber.Parse("10294-1"),
+            "Titanic",
+            theme,
             2021,
             9092,
             retailPrice ?? new Money(629.99m),
             new Money(60.00m),
             minimumRentalDays,
             18);
+    }
 }

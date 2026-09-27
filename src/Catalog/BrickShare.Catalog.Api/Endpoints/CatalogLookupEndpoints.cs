@@ -10,6 +10,8 @@ namespace BrickShare.Catalog.Api.Endpoints;
 
 public static class CatalogLookupEndpoints
 {
+    private const int MaximumThemeDepth = 10;
+
     public static RouteGroupBuilder MapCatalogLookups(this IEndpointRouteBuilder routes)
     {
         RouteGroupBuilder group = routes.MapGroup("/catalog/lookups")
@@ -46,7 +48,7 @@ public static class CatalogLookupEndpoints
                 statusCode: StatusCodes.Status404NotFound);
         }
 
-        RebrickableTheme? theme = await rebrickable.FindThemeAsync(set.ThemeId, cancellationToken);
+        RebrickableTheme? theme = await FindBrowsableThemeAsync(rebrickable, set.ThemeId, cancellationToken);
         if (theme is null)
         {
             return TypedResults.Problem(
@@ -63,6 +65,28 @@ public static class CatalogLookupEndpoints
 
         return TypedResults.Created(
             $"/api/v1/catalog/lookups/{snapshot.Id}", LookupResponse.From(snapshot));
+    }
+
+    private static async Task<RebrickableTheme?> FindBrowsableThemeAsync(
+        IRebrickableCatalog rebrickable,
+        int themeId,
+        CancellationToken cancellationToken)
+    {
+        RebrickableTheme? theme = await rebrickable.FindThemeAsync(themeId, cancellationToken);
+
+        for (int step = 0; theme?.ParentId is { } parentId && step < MaximumThemeDepth; step++)
+        {
+            RebrickableTheme? parent = await rebrickable.FindThemeAsync(parentId, cancellationToken);
+
+            if (parent is null)
+            {
+                return theme;
+            }
+
+            theme = parent;
+        }
+
+        return theme;
     }
 }
 

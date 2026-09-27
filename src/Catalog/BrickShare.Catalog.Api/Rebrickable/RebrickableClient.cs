@@ -54,6 +54,6 @@ internal sealed class RebrickableClient(HttpClient http) : IRebrickableCatalog
             await response.Content.ReadFromJsonAsync<RebrickableThemePayload>(cancellationToken)
             ?? throw new InvalidOperationException($"Rebrickable sent an empty body for theme {themeId}.");
 
-        return new RebrickableTheme(payload.Id, payload.Name);
+        return new RebrickableTheme(payload.Id, payload.Name, payload.ParentId);
     }
 }

@@ -49,10 +49,12 @@ public static class CatalogSetEndpoints
                 statusCode: StatusCodes.Status422UnprocessableEntity);
         }
 
+        Theme theme = await AdoptThemeAsync(database, snapshot, cancellationToken);
+
         CatalogSet catalogSet = CatalogSet.Catalogue(
             snapshot.Number,
             snapshot.Name,
-            snapshot.ThemeName,
+            theme,
             snapshot.Year,
             snapshot.PieceCount,
             new Money(request.RetailPrice),
@@ -70,8 +72,47 @@ public static class CatalogSetEndpoints
             throw new DomainRuleViolationException($"Set {snapshot.Number} is already catalogued.", ex);
         }
 
-        return TypedResults.Created($"/api/v1/sets/{catalogSet.Id}", CatalogSetResponse.From(catalogSet));
+        return TypedResults.Created($"/api/v1/sets/{catalogSet.Id}", CatalogSetResponse.From(catalogSet, theme));
     }
+
+    private static async Task<Theme> AdoptThemeAsync(
+        CatalogDbContext database,
+        RebrickableSnapshot snapshot,
+        CancellationToken cancellationToken)
+    {
+        Theme? existing = await database.Themes
+            .FirstOrDefaultAsync(theme => theme.RebrickableId == snapshot.ThemeId, cancellationToken);
+
+        if (existing is not null)
+        {
+            return existing;
+        }
+
+        Theme adopted = Theme.Adopt(snapshot.ThemeId, snapshot.ThemeName);
+        database.Themes.Add(adopted);
+
+        try
+        {
+            await database.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex) when (IsThemeAlreadyAdopted(ex))
+        {
+            // Two staff members catalogued two Icons sets in the same second. The other request
+            // won the unique index, which is a fine outcome — this one wants the row they wrote.
+            database.Entry(adopted).State = EntityState.Detached;
+
+            adopted = await database.Themes
+                .SingleAsync(theme => theme.RebrickableId == snapshot.ThemeId, cancellationToken);
+        }
+
+        return adopted;
+    }
+
+    private static bool IsThemeAlreadyAdopted(DbUpdateException ex) =>
+        ex.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation, ConstraintName: "ix_themes_rebrickable_id"
+        };
 
     private static bool IsAlreadyCatalogued(DbUpdateException ex) =>
         ex.InnerException is PostgresException
@@ -103,11 +144,11 @@ public sealed record CatalogSetResponse(
     int MinimumRentalDays,
     int MinimumAge)
 {
-    public static CatalogSetResponse From(CatalogSet set) => new(
+    public static CatalogSetResponse From(CatalogSet set, Theme theme) => new(
         set.Id,
         set.Number.Value,
         set.Name,
-        set.Theme,
+        theme.Name,
         set.Year,
         set.PieceCount,
         set.RetailPrice.Amount,

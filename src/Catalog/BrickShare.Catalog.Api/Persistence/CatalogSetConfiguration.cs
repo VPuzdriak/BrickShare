@@ -31,17 +31,22 @@ public sealed class CatalogSetConfiguration : IEntityTypeConfiguration<CatalogSe
             .HasMaxLength(200)
             .IsRequired();
 
-        builder.Property(set => set.Theme)
-            .HasColumnName("theme")
-            .HasMaxLength(100)
-            .IsRequired();
+        builder.Property(set => set.ThemeId).HasColumnName("theme_id").IsRequired();
+
+        builder.HasOne<Theme>()
+            .WithMany()
+            .HasForeignKey(set => set.ThemeId)
+            .HasConstraintName("fk_catalog_sets_theme_id")
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(set => set.ThemeId)
+            .HasDatabaseName("ix_catalog_sets_theme_id");
 
         builder.Property(set => set.Year).HasColumnName("year").IsRequired();
         builder.Property(set => set.PieceCount).HasColumnName("piece_count").IsRequired();
 
         // No HasColumnType on the two money columns. CatalogDbContext.ConfigureConventions
-        // already says every Money in this model is numeric(10,2), and episode 16 put it there
-        // precisely so this file cannot get it wrong by forgetting.
+        // already says every Money in this model is numeric(10,2)
         builder.Property(set => set.RetailPrice).HasColumnName("retail_price").IsRequired();
         builder.Property(set => set.BaseRentalPrice).HasColumnName("base_rental_price").IsRequired();
 

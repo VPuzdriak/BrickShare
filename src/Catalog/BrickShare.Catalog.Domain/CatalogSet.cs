@@ -16,7 +16,7 @@ public sealed class CatalogSet
     private CatalogSet(
         SetNumber number,
         string name,
-        string theme,
+        Guid themeId,
         int year,
         int pieceCount,
         Money retailPrice,
@@ -27,7 +27,7 @@ public sealed class CatalogSet
         Id = Guid.CreateVersion7();
         Number = number;
         Name = name;
-        Theme = theme;
+        ThemeId = themeId;
         Year = year;
         PieceCount = pieceCount;
         RetailPrice = retailPrice;
@@ -42,7 +42,7 @@ public sealed class CatalogSet
 
     public string Name { get; }
 
-    public string Theme { get; }
+    public Guid ThemeId { get; }
 
     public int Year { get; }
 
@@ -59,7 +59,7 @@ public sealed class CatalogSet
     public static CatalogSet Catalogue(
         SetNumber number,
         string name,
-        string theme,
+        Theme theme,
         int year,
         int pieceCount,
         Money retailPrice,
@@ -69,7 +69,7 @@ public sealed class CatalogSet
     {
         ArgumentNullException.ThrowIfNull(number);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        ArgumentException.ThrowIfNullOrWhiteSpace(theme);
+        ArgumentNullException.ThrowIfNull(theme);
         ArgumentOutOfRangeException.ThrowIfLessThan(pieceCount, 1);
         ArgumentOutOfRangeException.ThrowIfNegative(retailPrice.Amount);
         ArgumentOutOfRangeException.ThrowIfNegative(baseRentalPrice.Amount);
@@ -84,7 +84,7 @@ public sealed class CatalogSet
         }
 
         return new CatalogSet(
-            number, name, theme, year, pieceCount,
+            number, name, theme.Id, year, pieceCount,
             retailPrice, baseRentalPrice, minimumRentalDays, minimumAge);
     }
 }

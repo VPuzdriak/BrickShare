@@ -839,7 +839,8 @@ answer with is in the document, and nothing in it is a claim the service does no
 ### Episode 33 — Themes of our own
 
 **Builds:** a `themes` table, `catalog_sets.theme_id` as a foreign key, and the migration that
-backfills it from the text column episode 27 started writing.
+backfills it — from `rebrickable_snapshots`, which turns out to be the only table holding both the
+upstream theme id and the set number, and that discovery is part of the lesson.
 
 **Teaches:** a data migration with real data in it — the first in this course that is not just a
 `CreateTable`. Read the distinct values out, insert them as rows, map the column, drop the text,
@@ -850,9 +851,13 @@ enumerate cannot become a filter list in a UI.
 
 **And the nesting question episode 27 deferred:** Rebrickable themes have parents, so "Icons" may
 be the parent of the theme a set actually belongs to. Which level BrickShare stores is a product
-decision, not a mapping decision, and this is where it gets made.
+decision, not a mapping decision, and this is where it gets made. **The answer is the root** — the
+level a customer would name out loud — with the upstream ids kept so the decision is reversible.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `src/Catalog/BrickShare.Catalog.Domain/`.
+Notes: [`episode-33.md`](episode-33.md), which **scripts at about 28 minutes and should be recorded
+as two**: 33a is the table, the foreign key and the data migration (steps 1-7), 33b is the nesting
+decision and the walk up the tree (steps 8-10).
 
 **Done when:** `catalog_sets` carries a theme id, no theme name is stored twice, and the
 migration runs green against a database that already holds sets.
@@ -1021,18 +1026,25 @@ ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos
 | **23 + 24** | One "refusing a well-formed request" episode, domain and database together |
 | **25 + 26** | One "the third-party call and its secret" episode |
 | **27 + 28** | One "two endpoints, for a security reason" episode — at about twenty-five minutes |
-| **32 + 33** | One "read API" episode |
+| **~~32 + 33~~** | **Do not.** Episode 33 is itself over budget and splits — see below |
 | **34 + 35** | One "photographs" episode covering upload and access together |
 
 Nothing else merges without an episode doing two unrelated things. In particular **4 and 5 do
 not merge** — testing and containerisation share nothing, and the seam between them is where a
 student who is stuck will stop and rewatch.
 
-**One episode splits rather than merges.** Episode 30 carries two subjects — the batch transaction
+**Two episodes split rather than merge.** Episode 30 carries two subjects — the batch transaction
 and the validation refactor — and scripts at about seventeen minutes. The cut is marked in place in
 [`episode-30.md`](episode-30.md): **30a** is the batch (steps 1–5), **30b** is validation
 (steps 6–9). Record it as one or as two; the script reads correctly either way, and the numbering of
 episodes 31 onward does not move.
+
+Episode 33 is the same situation and less optional: at about twenty-eight minutes it carries a data
+migration and a product decision about theme nesting, which share a table and nothing else. The cut
+is marked in [`episode-33.md`](episode-33.md) between steps 7 and 8 — **33a** the `themes` table and
+the backfill, **33b** the walk up Rebrickable's tree. Episode 32 also runs long at nineteen minutes
+and marks its own seam; the three of them are the only places in the module where the
+ten-to-fifteen-minute target loses.
 
 ## What comes after
 

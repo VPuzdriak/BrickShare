@@ -84,11 +84,14 @@ public class CopyPersistenceTests(CatalogDatabase database) : DatabaseTest(datab
 
     private async Task<Guid> ACataloguedSetAsync()
     {
+        Theme theme = Theme.Adopt(252, "Icons");
+
         CatalogSet set = CatalogSet.Catalogue(
-            SetNumber.Parse("10294-1"), "Titanic", "Icons", 2021, 9092,
+            SetNumber.Parse("10294-1"), "Titanic", theme, 2021, 9092,
             new Money(629.99m), new Money(60.00m), 7, 18);
 
         await using CatalogDbContext context = Database.NewDbContext();
+        context.Themes.Add(theme);
         context.Sets.Add(set);
         await context.SaveChangesAsync();
 
