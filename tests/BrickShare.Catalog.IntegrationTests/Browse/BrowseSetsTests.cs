@@ -1,9 +1,11 @@
+using System.Net;
 using System.Net.Http.Json;
 
 using BrickShare.Catalog.Api.Endpoints;
 using BrickShare.Catalog.Api.Persistence;
 using BrickShare.Catalog.Domain;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace BrickShare.Catalog.IntegrationTests.Browse;
@@ -55,6 +57,79 @@ public class BrowseSetsTests(CatalogDatabase database) : DatabaseTest(database)
         // The Fair copy is still cheaper. It is also in somebody's living room.
         Assert.Equal(1, onlyExcellent.AvailableCount);
         Assert.Equal(51.00m, onlyExcellent.StartingPrice);
+    }
+
+    [Theory]
+    [InlineData("", new[] { "10318-1", "41704-1", "10294-1" })]
+    [InlineData("?minPieces=2000", new[] { "10318-1", "10294-1" })]
+    [InlineData("?maxPieces=2083", new[] { "10318-1", "41704-1" })]
+    [InlineData("?age=8", new[] { "41704-1" })]
+    [InlineData("?availableNow=true", new[] { "10318-1", "10294-1" })]
+    [InlineData("?maxPrice=20", new[] { "10318-1" })]
+    [InlineData("?maxPrice=100", new[] { "10318-1", "10294-1" })]
+    [InlineData("?age=18&minPieces=5000", new[] { "10294-1" })]
+    [InlineData("?limit=1", new[] { "10318-1" })]
+    public async Task Filters_narrow_the_catalog_and_the_order_is_by_name(
+        string query, string[] expectedSetNumbers)
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        BrowseSetsResponse? page = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            $"/api/v1/catalog/sets{query}", Database.Api.Json);
+
+        Assert.NotNull(page);
+        Assert.Equal(expectedSetNumbers, page.Sets.Select(set => set.SetNumber));
+    }
+
+    [Fact]
+    public async Task Filtering_by_theme_uses_the_id_from_the_filter_list()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        ThemesResponse? themes =
+            await client.GetFromJsonAsync<ThemesResponse>("/api/v1/catalog/themes", Database.Api.Json);
+
+        Assert.NotNull(themes);
+
+        Guid icons = themes.Themes.Single(theme => theme.Name == "Icons").Id;
+
+        BrowseSetsResponse? page = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            $"/api/v1/catalog/sets?themeId={icons}", Database.Api.Json);
+
+        Assert.NotNull(page);
+        Assert.Equal(["10318-1", "10294-1"], page.Sets.Select(set => set.SetNumber));
+    }
+
+    [Theory]
+    [InlineData("?minPieces=3000&maxPieces=2000", "maxPieces")]
+    [InlineData("?limit=51", "limit")]
+    [InlineData("?age=19", "age")]
+    [InlineData("?maxPrice=-1", "maxPrice")]
+    public async Task A_filter_that_cannot_match_anything_is_refused(string query, string field)
+    {
+        HttpClient client = Database.Api.CreateClient();
+
+        HttpResponseMessage response = await client.GetAsync($"/api/v1/catalog/sets{query}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        HttpValidationProblemDetails? problem =
+            await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
+
+        Assert.NotNull(problem);
+        Assert.Contains(field, problem.Errors.Keys);
+    }
+
+    private async Task StockTheShelfAsync(HttpClient client)
+    {
+        Guid titanic = await Database.CatalogueAsync(client, StockedSet.Titanic);
+        Guid concorde = await Database.CatalogueAsync(client, StockedSet.Concorde);
+        await Database.CatalogueAsync(client, StockedSet.MainStreetBuilding);
+
+        await Database.RegisterCopyAsync(client, titanic, "New");
+        await Database.RegisterCopyAsync(client, concorde, "Fair");
     }
 
     private async Task<SetListingResponse> GetAvailableSetsAsync(HttpClient client)

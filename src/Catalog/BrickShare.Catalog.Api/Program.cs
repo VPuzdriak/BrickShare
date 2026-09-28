@@ -94,7 +94,8 @@ builder.Services.AddOpenApi(options =>
         document.Info.Title = "BrickShare Catalog API";
         document.Info.Version = "v1";
         document.Info.Description =
-            "Staff-facing catalog service: look a set up, catalogue it, register copies of it, retire a copy.";
+            "The catalog service. Staff look a set up, catalogue it, register and retire copies; "
+            + "customers browse and filter what the shop stocks.";
 
         return Task.CompletedTask;
     });
@@ -109,7 +110,7 @@ builder.Services.AddProblemDetails(options =>
         context.ProblemDetails.Instance ??= context.HttpContext.Request.Path;
 
         // One id that appears in the response and in the logs, so a screenshot from a staff
-        // member is enough to find the request. Episode 34 wires the other end of this.
+        // member is enough to find the request.
         context.ProblemDetails.Extensions["traceId"] =
             Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
     });

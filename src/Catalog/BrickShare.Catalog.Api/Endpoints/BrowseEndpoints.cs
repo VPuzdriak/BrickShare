@@ -15,8 +15,18 @@ public static class BrowseEndpoints
         RouteGroupBuilder group = routes.MapGroup("/catalog")
             .WithTags("Browse");
 
-        group.MapGet("/themes", ListThemesAsync);
-        group.MapGet("/sets", BrowseSetsAsync);
+        group.MapGet("/themes", ListThemesAsync)
+            .WithSummary("List the themes a customer can filter by")
+            .WithDescription("Every theme with at least one catalogued set, by name.");
+
+        group.MapGet("/sets", BrowseSetsAsync)
+            .AddEndpointFilter<ValidationFilter<BrowseQuery>>()
+            .WithSummary("Browse the catalog")
+            .WithDescription(
+                "Sets by name, filtered by theme, piece count, age, price and availability. "
+                + "startingPrice is the cheapest copy available now, and null when none is. "
+                + "maxPrice therefore returns only sets with a copy available.")
+            .ProducesValidationProblem();
 
         return group;
     }
@@ -35,10 +45,48 @@ public static class BrowseEndpoints
     }
 
     private static async Task<Ok<BrowseSetsResponse>> BrowseSetsAsync(
+        [AsParameters] BrowseQuery query,
         CatalogDbContext database,
         CancellationToken cancellationToken)
     {
-        List<SetListingResponse> sets = await database.Listings
+        IQueryable<CatalogSetListing> listings = database.Listings;
+
+        if (query.ThemeId is { } themeId)
+        {
+            listings = listings.Where(listing => listing.ThemeId == themeId);
+        }
+
+        if (query.MinPieces is { } minPieces)
+        {
+            listings = listings.Where(listing => listing.PieceCount >= minPieces);
+        }
+
+        if (query.MaxPieces is { } maxPieces)
+        {
+            listings = listings.Where(listing => listing.PieceCount <= maxPieces);
+        }
+
+        if (query.Age is { } age)
+        {
+            listings = listings.Where(listing => listing.MinimumAge <= age);
+        }
+
+        if (query.MaxPrice is { } maxPrice)
+        {
+            // A null starting price never compares true, so this also keeps only sets with a
+            // copy available. Intended: a price nobody can act on is not a price.
+            listings = listings.Where(listing => listing.StartingPrice <= maxPrice);
+        }
+
+        if (query.AvailableNow is true)
+        {
+            listings = listings.Where(listing => listing.AvailableCount > 0);
+        }
+
+        List<SetListingResponse> sets = await listings
+            .OrderBy(listing => listing.Name)
+            .ThenBy(listing => listing.Id)
+            .Take(query.Limit ?? BrowseQuery.DefaultLimit)
             .Select(listing => new SetListingResponse(
                 listing.Id,
                 listing.SetNumber,
