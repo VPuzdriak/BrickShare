@@ -20,7 +20,7 @@ public class RegisterCopiesTests(CatalogDatabase database) : DatabaseTest(databa
     public async Task One_box_is_a_delivery_of_one()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid setId = await Database.CatalogueTitanicAsync(client);
+        Guid setId = await Database.CatalogueAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             $"/api/v1/catalog/sets/{setId}/copies", new { copies = new[] { Weighing(9200) } });
@@ -47,7 +47,7 @@ public class RegisterCopiesTests(CatalogDatabase database) : DatabaseTest(databa
     public async Task Seventeen_boxes_arrive_in_one_call_and_get_seventeen_labels()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid setId = await Database.CatalogueTitanicAsync(client);
+        Guid setId = await Database.CatalogueAsync(client, StockedSet.Titanic);
 
         // Seventeen different weights, because seventeen boxes are seventeen objects.
         object[] delivery = [.. Enumerable.Range(0, 17).Select(index => Weighing(9200 + index))];
@@ -78,7 +78,7 @@ public class RegisterCopiesTests(CatalogDatabase database) : DatabaseTest(databa
     public async Task One_bad_weight_registers_none_of_them()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid setId = await Database.CatalogueTitanicAsync(client);
+        Guid setId = await Database.CatalogueAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             $"/api/v1/catalog/sets/{setId}/copies",
@@ -103,7 +103,7 @@ public class RegisterCopiesTests(CatalogDatabase database) : DatabaseTest(databa
     public async Task An_empty_delivery_is_not_a_delivery()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid setId = await Database.CatalogueTitanicAsync(client);
+        Guid setId = await Database.CatalogueAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             $"/api/v1/catalog/sets/{setId}/copies", new { copies = Array.Empty<object>() });
@@ -147,7 +147,7 @@ public class RegisterCopiesTests(CatalogDatabase database) : DatabaseTest(databa
                 services.AddSingleton<ILabelCodeMinter>(minter)));
 
         HttpClient client = api.CreateClient();
-        Guid setId = await Database.CatalogueTitanicAsync(client);
+        Guid setId = await Database.CatalogueAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             $"/api/v1/catalog/sets/{setId}/copies",

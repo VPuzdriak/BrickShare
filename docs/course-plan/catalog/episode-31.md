@@ -189,7 +189,7 @@ public class RetireCopyTests(CatalogDatabase database) : DatabaseTest(database)
 
     /// <summary>
     /// One box on the shelf, through the front door. The id comes back in the registration
-    /// response because there is still no GET for a copy — episode 34.
+    /// response because there is still no GET for a copy — episode 36.
     /// </summary>
     private async Task<Guid> RegisterOneCopyAsync(HttpClient client)
     {
@@ -310,7 +310,7 @@ about that. A route that cannot express a contradiction does not need a rule for
 
 Registration is nested because it genuinely is an operation *on a set*: you are adding to the set's
 stock, and the set id is the only id in existence at the time. Retirement is an operation on a copy.
-**The nesting follows the operation, not the table.** Episode 34 adds `GET /catalog/copies/by-label/{code}`
+**The nesting follows the operation, not the table.** Episode 36 adds `GET /catalog/copies/by-label/{code}`
 to this same group, for the same reason.
 
 **Why `clock.GetUtcNow()` and not `DateTimeOffset.UtcNow` inside `Copy.Retire`.** Episode 15 wrote
@@ -322,7 +322,7 @@ and no new wiring. **A domain model that calls `DateTimeOffset.UtcNow` has a hid
 the machine it runs on, and the first test that needs "what happens at midnight" pays for it.**
 
 **Why `204` and what it costs.** No body. The staff member's client gets an empty response and has
-to believe it, because there is no `GET /catalog/copies/{id}` until episode 34 — so *it cannot
+to believe it, because there is no `GET /catalog/copies/{id}` until episode 36 — so *it cannot
 re-read the copy it just retired*. That is a real cost and worth stating plainly rather than
 selling `204` as obviously correct. The alternative is returning the copy, which would mean adding
 `RetiredAt` to `CopyResponse` and shipping a read model out of a write endpoint before anything has
@@ -679,10 +679,10 @@ belongs in the episode where there is a customer-facing list to leave them out o
 
 **No concurrency test.** `CopyConfiguration` maps `xmin` as a row version, so two staff members
 retiring the same box at the same instant produce a `DbUpdateConcurrencyException` and a `500`. The
-mapping is right and the response is not. Episode 40 turns it into a `409`.
+mapping is right and the response is not. Episode 41 turns it into a `409`.
 
 **No authorization.** Anyone who can reach this service can retire any box in the shop by guessing
-a `Guid`, which they cannot, which is not a security control. **Episode 38.**
+a `Guid`, which they cannot, which is not a security control. **Episode 39.**
 
 ## Verification
 

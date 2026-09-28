@@ -13,6 +13,8 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<Theme> Themes => Set<Theme>();
     public DbSet<Copy> Copies => Set<Copy>();
     public DbSet<RebrickableSnapshot> Snapshots => Set<RebrickableSnapshot>();
+    public DbSet<GradeMultiplier> GradeMultipliers => Set<GradeMultiplier>();
+    public DbSet<CatalogSetListing> Listings => Set<CatalogSetListing>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

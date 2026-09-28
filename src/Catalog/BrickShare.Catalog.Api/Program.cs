@@ -142,6 +142,7 @@ v1.MapCatalogSets();
 v1.MapCatalogLookups();
 v1.MapCopies();
 v1.MapCopyRetirements();
+v1.MapBrowse();
 
 await app.RunAsync();
 

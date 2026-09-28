@@ -5,7 +5,6 @@ public abstract class DatabaseTest(CatalogDatabase database) : IAsyncLifetime
 {
     protected CatalogDatabase Database { get; } = database;
 
-    // Reset before, not after. See step 5.
     public Task InitializeAsync()
     {
         Database.Rebrickable.Reset();

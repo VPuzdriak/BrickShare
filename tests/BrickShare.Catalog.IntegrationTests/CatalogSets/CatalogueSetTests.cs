@@ -16,7 +16,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
     public async Task A_catalogued_set_comes_back_created()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid lookupId = await Database.LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             "/api/v1/catalog/sets", ValidRequest(lookupId));
@@ -49,7 +49,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
     public async Task A_minimum_rental_period_the_shop_cannot_honour_is_refused()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid lookupId = await Database.LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             "/api/v1/catalog/sets", ValidRequest(lookupId, minimumRentalDays: 30));
@@ -66,7 +66,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
     public async Task A_set_that_is_already_catalogued_cannot_be_catalogued_again()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid lookupId = await Database.LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage first = await client.PostAsJsonAsync(
             "/api/v1/catalog/sets", ValidRequest(lookupId));
@@ -101,7 +101,7 @@ public class CatalogueSetTests(CatalogDatabase database) : DatabaseTest(database
     public async Task A_client_cannot_invent_a_product()
     {
         HttpClient client = Database.Api.CreateClient();
-        Guid lookupId = await Database.LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync("/api/v1/catalog/sets",
             new

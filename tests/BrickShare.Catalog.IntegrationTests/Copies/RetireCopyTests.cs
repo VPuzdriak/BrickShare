@@ -120,7 +120,7 @@ public class RetireCopyTests(CatalogDatabase database) : DatabaseTest(database)
     /// </summary>
     private async Task<Guid> RegisterOneCopyAsync(HttpClient client)
     {
-        Guid setId = await Database.CatalogueTitanicAsync(client);
+        Guid setId = await Database.CatalogueAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             $"/api/v1/catalog/sets/{setId}/copies",

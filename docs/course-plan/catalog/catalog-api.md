@@ -445,7 +445,7 @@ is finished and there is something worth protecting.
 
 **And the identity stays system-assigned.** The database role is bound to a principal that dies with
 the web app, which is a real hazard — it is named here with its exact trigger, and fixed in episode
-36 alongside deployment slots, which want the same thing for their own reason.
+37 alongside deployment slots, which want the same thing for their own reason.
 
 **Lands in:** `infra/`, `src/Catalog/BrickShare.Catalog.Api/Program.cs`,
 `Directory.Packages.props`, `.github/workflows/deploy.yml`. Notes:
@@ -812,7 +812,7 @@ even though the document is not.**
 **And why it is mapped in every environment**, unlike the `dotnet new` template's
 `IsDevelopment()` guard: the document describes routes that are already reachable, so hiding it is
 not a security control — it is an inconvenience for the people integrating with you and no
-obstacle to anyone probing the service. Security here is episode 38's job, and it is
+obstacle to anyone probing the service. Security here is episode 39's job, and it is
 authorization, not obscurity. The counter-argument is real and stated: in some organisations
 publishing an attack-surface map is a compliance question, and the guard is one line.
 
@@ -820,7 +820,7 @@ publishing an attack-surface map is a compliance question, and the guard is one 
 both wired on camera against the same generated document and judged on three questions — do the tags
 become navigation, does the hand-written metadata survive, and do the OpenAPI 3.1 constructs this
 service actually emits get rendered honestly. **Scalar wins**, decisively on the last one and on a
-detail specific to this service: it maps as an endpoint, so episode 38 secures it with the same
+detail specific to this service: it maps as an endpoint, so episode 39 secures it with the same
 `RequireAuthorization()` as every other route, where `UseSwaggerUI` is middleware with nothing to
 hang that on. The runner-up is deleted on camera, and why it is deleted rather than kept alongside
 is part of the lesson.
@@ -862,13 +862,52 @@ decision and the walk up the tree (steps 8-10).
 **Done when:** `catalog_sets` carries a theme id, no theme name is stored twice, and the
 migration runs green against a database that already holds sets.
 
-### Episode 34 — Browse, search and filter
+### Episode 34 — Browse and filter
 
-**Builds:** the public catalog endpoints — search by name and set number, filters on theme,
-piece count, age rating, price and availability, with paging.
+**Builds:** the public catalog listing — `GET /catalog/themes` for the filter list and
+`GET /catalog/sets` filtered by theme, piece count, age, price and availability — plus the
+`grade_multipliers` table the starting price needs.
 
-**Teaches:** indexing for the filters, `pg_trgm` for fuzzy name matching, and keyset paging over
-offset paging once the catalog is large enough for it to matter.
+**Teaches:** a **read model as a view**. The starting price is `base_rental_price × multiplier`
+for the cheapest **available** copy. That is an aggregate no table stores, and `Money`'s value
+converter keeps LINQ from doing arithmetic on it. The view computes the available count and the
+starting price once, in SQL, and every filter is then an ordinary `Where` over a plain column.
+Its cost is stated on screen: the pricing formula now lives in `PriceCalculator` *and* in the
+view, and an integration test pins them together.
+
+**And three things that only show up with real data in the room:**
+
+- The multipliers leave the unit-test helper for a seeded table.
+- Respawn wipes that seed before the first test, which teaches reference data versus test data.
+- `EXPLAIN ANALYZE` makes the case against the B-tree indexes a reflex would add. The planner
+  declines them at this size, and the two aggregate filters cannot use an index at all.
+
+The public routes get **their own route group**, separate from the staff groups. The reason is
+episode 39: it secures a whole group with one line, and browse stays anonymous.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`.
+Notes: [`episode-34.md`](episode-34.md), which scripts at about 17 minutes. It marks a seam after
+step 5 for recording it as two.
+
+**Done when:** a set with no copies still shows with `startingPrice: null`, and the starting price
+ignores a cheaper copy that is out on rent.
+
+### Episode 35 — Search, and page two
+
+**Builds:** search by name and set number on `GET /catalog/sets`, and keyset paging over the
+listing episode 34 built.
+
+**Teaches:** `pg_trgm` for fuzzy name matching, installed by a migration, with a GIN index on
+`catalog_sets.name`. The collation trap episode 17 predicted also appears here: plain `LIKE` is
+case-sensitive in Postgres. And **keyset paging over offset paging**. `?page=40` makes Postgres
+read and discard the first thousand rows, and it shifts under the reader when a set is
+catalogued mid-scroll. A `(name, id)` cursor does neither, and episode 34 already made that order
+total.
+
+**The trade-off to state:** search *filters* on trigram similarity but keeps the name order, so the
+keyset stays stable. Ranking results by similarity would give better relevance and break the cursor.
+For a shop's catalog, where a search returns a handful of sets, the stable page wins. Say so
+rather than pretending relevance does not matter.
 
 **And why there is no search service.** The reflex is *search feature ⇒ search service*, and
 resisting it is more useful than another resource in the diagram. Azure AI Search earns its
@@ -876,9 +915,9 @@ place with relevance tuning, faceting over large corpora, synonyms and typo tole
 A single shop's catalog has none of those problems, and adding it would mean a second data store
 to keep in sync with nothing paying for the sync.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`
 
-### Episode 35 — Set detail, and the rules that are easy to break
+### Episode 36 — Set detail, and the rules that are easy to break
 
 **Builds:** the set detail endpoint and the per-set aggregates.
 
@@ -896,8 +935,11 @@ to keep in sync with nothing paying for the sync.
 **The idea that ties them together:** *available* controls what can be **acted on**, never what
 is **shown**. Writing that sentence down prevents all three bugs.
 
-Also here: available count and starting price as aggregates, the starting price being the
-cheapest **available** copy so the page never advertises a price nobody can act on.
+Also here: the available count and starting price, read from **episode 34's view** rather than
+computed a second time. The detail page and the listing then cannot disagree about a price. And
+the staff scan endpoint, `GET /catalog/copies/by-label/{code}`, belongs here too. It is the other
+read of a copy, and the `Location` headers episodes 28–30 left pointing at nothing become real in
+this episode.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
 
@@ -905,7 +947,7 @@ cheapest **available** copy so the page never advertises a price nobody can act 
 
 # Part 7 — files and identity
 
-### Episode 36 — Uploading photographs
+### Episode 37 — Uploading photographs
 
 **Builds:** Azurite in Compose, the staff upload endpoint, and its storage in Terraform.
 
@@ -920,7 +962,7 @@ naming it now makes the switch a decision rather than a rewrite.**
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`, `infra/`
 
-### Episode 37 — SAS, and a privacy rule in code
+### Episode 38 — SAS, and a privacy rule in code
 
 **Builds:** short-lived user-delegation SAS minting, and the published/evidence split.
 
@@ -944,7 +986,7 @@ un-publishing something is not.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 38 — Entra ID: protecting the staff endpoints
+### Episode 39 — Entra ID: protecting the staff endpoints
 
 **Builds:** authentication and authorization — app roles, policies, and tests that run as each
 role.
@@ -959,8 +1001,9 @@ endpoints.
 | `Manager` | As staff — the exceptional decisions managers own live in later services |
 | `Admin` | Edit the grade multipliers |
 
-**Multiplier edits are Admin-only, and two-phase**: a preview returns how many copies change
-price and by how much, then apply carries the preview's token. UC-1.5 asks that the scope be
+**Multiplier edits are Admin-only, and two-phase.** They write to the `grade_multipliers` table
+episode 34 seeded. A preview returns how many copies change price and by how much, then apply
+carries the preview's token. UC-1.5 asks that the scope be
 stated before it is applied, and an admin should never learn the blast radius afterwards.
 
 **Customer browse stays anonymous.** UC-7 has no rule requiring a signed-in customer to look at
@@ -975,7 +1018,7 @@ to an identity provider.**
 
 # Part 8 — production readiness
 
-### Episode 39 — Observability
+### Episode 40 — Observability
 
 **Builds:** OpenTelemetry wired to Application Insights — traces, metrics, structured logs.
 
@@ -989,7 +1032,7 @@ control than the database, and it is usually the one that leaks.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 40 — Hardening the pipeline
+### Episode 41 — Hardening the pipeline
 
 **Builds:** the finished delivery pipeline.
 
@@ -1016,7 +1059,7 @@ one makes it safe to let it.
 
 ## Compressing the course
 
-Thirty-eight episodes is the honest count once each holds a single idea, and each one fits a
+Forty-one episodes is the honest count once each holds a single idea, and each one fits a
 ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos are wanted:
 
 | Merge | Gives |
@@ -1027,7 +1070,7 @@ ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos
 | **25 + 26** | One "the third-party call and its secret" episode |
 | **27 + 28** | One "two endpoints, for a security reason" episode — at about twenty-five minutes |
 | **~~32 + 33~~** | **Do not.** Episode 33 is itself over budget and splits — see below |
-| **34 + 35** | One "photographs" episode covering upload and access together |
+| **37 + 38** | One "photographs" episode covering upload and access together |
 
 Nothing else merges without an episode doing two unrelated things. In particular **4 and 5 do
 not merge** — testing and containerisation share nothing, and the seam between them is where a
@@ -1043,7 +1086,12 @@ Episode 33 is the same situation and less optional: at about twenty-eight minute
 migration and a product decision about theme nesting, which share a table and nothing else. The cut
 is marked in [`episode-33.md`](episode-33.md) between steps 7 and 8 — **33a** the `themes` table and
 the backfill, **33b** the walk up Rebrickable's tree. Episode 32 also runs long at nineteen minutes
-and marks its own seam; the three of them are the only places in the module where the
+and marks its own seam.
+
+Episode 34 was planned as one episode, with search, filters and paging together. At over thirty
+minutes it became two, and **the numbering from 35 on moved by one**: 35 is search and paging,
+and set detail is now 36. Even after the split, episode 34 scripts at about seventeen minutes and
+marks a seam after step 5. Episodes 32, 33 and 34 are the only places in the module where the
 ten-to-fifteen-minute target loses.
 
 ## What comes after

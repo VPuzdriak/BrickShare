@@ -683,14 +683,14 @@ episode 27's reason: a foreign key from a domain table to an infrastructure tabl
 outbox or an audit log, not in the aggregate.
 
 **No authorization.** Every endpoint in this service is still open to anybody who can reach it,
-until **episode 38**. That is exactly why this fix had to come first: an authenticated caller who
+until **episode 39**. That is exactly why this fix had to come first: an authenticated caller who
 can still invent a product is an authenticated attacker, and adding Entra ID on top of a nine-field
 create body would have shipped a login screen in front of an open door.
 
 **No stricter JSON.** See step 5's close call. The extra members are ignored, not refused.
 
 **No `GET /catalog/sets/{id}`.** `TypedResults.Created` still points at a route that does not exist
-yet. Left exactly as it is: it becomes real in **episode 35**, and inventing it here to make a
+yet. Left exactly as it is: it becomes real in **episode 36**, and inventing it here to make a
 header look tidy would be building a feature to satisfy a string.
 
 ## Verification

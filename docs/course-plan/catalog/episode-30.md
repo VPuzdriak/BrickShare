@@ -98,7 +98,7 @@ a different operation — it was this operation with the collection flattened ou
 exactly the mistake episode 29 said it was making on purpose.
 
 The cost is real and worth saying: this breaks every existing client. There are no existing clients,
-because episode 38 has not added authentication and there is nothing in front of this service yet.
+because episode 39 has not added authentication and there is nothing in front of this service yet.
 **That is the cheapest moment an API shape will ever be wrong, and it is now.**
 
 ---
@@ -326,7 +326,7 @@ closing brace:
             await RegisterWithMintedLabelsAsync(setId, request, database, cancellationToken);
 
         // Seventeen copies have no single location. This points at the collection they are now in —
-        // a GET that arrives in episode 34. Episodes 28 and 29 made the same deferral for the same
+        // a GET that arrives in episode 36. Episodes 28 and 29 made the same deferral for the same
         // reason: inventing an endpoint to make a header true is building a feature to satisfy a
         // string.
         return TypedResults.Created(
@@ -1055,7 +1055,7 @@ true, and that is the trade.**
 
 **The filter is attached per endpoint, not to the group.** `group.AddEndpointFilter<…>()` would apply
 it to every route in the group, which is one route today and is tempting. It is wrong the moment
-episode 34 adds `GET /catalog/sets/{setId}/copies` — a `GET` with no body, and a filter that throws
+episode 36 adds `GET /catalog/sets/{setId}/copies` — a `GET` with no body, and a filter that throws
 `InvalidOperationException` because there is no `RegisterCopiesRequest` in the argument list.
 **The filter is typed to a request, so it belongs where that request does.**
 
@@ -1156,7 +1156,7 @@ Real, and thin; an `Idempotency-Key` header belongs with the payments module, wh
 of a double submit is money.
 
 **No `GET`.** Still nothing lists the copies of a set, which is why request 7's `Location` header
-points at a route that does not exist. Episode 34.
+points at a route that does not exist. Episode 36.
 
 **No retire.** `Copy.Retire` has been unit-tested since episode 15 and still has no HTTP in front of
 it. Next episode.
@@ -1166,7 +1166,7 @@ still looks up one number. Neither has a delivery behind it — a shop catalogue
 so batching them would be symmetry for its own sake.
 
 **No authorization.** Anybody who can reach this service can register a hundred copies at a time
-now, which is a slightly larger version of the same hole episode 21 named. **Episode 38.**
+now, which is a slightly larger version of the same hole episode 21 named. **Episode 39.**
 
 ## Verification
 

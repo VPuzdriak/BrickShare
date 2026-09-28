@@ -14,7 +14,7 @@ public class ThemeTests(CatalogDatabase database) : DatabaseTest(database)
     {
         HttpClient client = Database.Api.CreateClient();
 
-        await Database.CatalogueTitanicAsync(client);
+        await Database.CatalogueAsync(client, StockedSet.Titanic);
         await CatalogueConcordeAsync(client);
 
         await using CatalogDbContext dbContext = Database.NewDbContext();
@@ -33,7 +33,7 @@ public class ThemeTests(CatalogDatabase database) : DatabaseTest(database)
     {
         HttpClient client = Database.Api.CreateClient();
 
-        Guid lookupId = await Database.LookUpTitanicAsync(client);
+        Guid lookupId = await Database.LookUpAsync(client, StockedSet.Titanic);
 
         HttpResponseMessage response = await client.PostAsJsonAsync("/api/v1/catalog/sets",
             new

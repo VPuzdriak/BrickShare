@@ -358,7 +358,7 @@ does not know the reader's culture and should not pretend to.
 
 **No `+`, no `-`, no `IComparable`.** `*` and `/` exist because cycles 4 and 5 demanded them.
 Nothing in the catalog service adds or compares money yet — the cheapest-available-copy query
-arrives in episode 35, and *that* is when ordering gets written.
+arrives in episode 34, and it does its comparing in SQL, so `Money` still needs no ordering.
 
 This is not pedantry, and there is a receipt for it. Adding `IComparable<Money>` with a `CompareTo`
 and nothing else fails the build immediately:
@@ -372,8 +372,8 @@ Money.cs(5,31): error S1210:  When implementing IComparable<T>, you should also 
 
 Two analyzers, both correct, both saying the same thing: **a half-implemented comparison is worse
 than none**, because `a < b` compiling while `a.CompareTo(b)` exists is how you get two orderings
-that disagree. Episode 35 adds the interface *and* the four operators together, when something
-needs sorting. Today it would be four operators nobody calls, written to satisfy a rule triggered
+that disagree. Whenever something in C# first needs to sort money, the interface *and* the four operators arrive
+together. Today it would be four operators nobody calls, written to satisfy a rule triggered
 by an interface nobody needed.
 
 **No negative check either**, and that one is an altitude decision worth stating: a *price* cannot

@@ -1405,7 +1405,7 @@ one. If cataloguing ever becomes a bulk import — a hundred sets at a time — 
 and a per-request memo is worth ten lines. It is not a hundred sets at a time.
 
 **No authorization.** These endpoints are still open to anyone who can reach the service, exactly as
-they were in episode 27. **Episode 38.**
+they were in episode 27. **Episode 39.**
 
 ## Verification
 
@@ -1432,9 +1432,10 @@ you rewrote still describes the model everyone else compiles against.
 
 ## Next
 
-[Episode 34 — Browse, search and filter](catalog-api.md#episode-34--browse-search-and-filter): the
-public catalog endpoints, with the filter this episode made possible — plus `pg_trgm` for fuzzy name
-matching, keyset paging, and the argument for **not** adding a search service.
+[Episode 34 — Browse and filter](episode-34.md): the public catalog listing, with the filter
+this episode made possible. The themes list becomes a real endpoint, the grade multipliers get a
+table of their own, and a view computes the one number a customer browses by that no table
+stores: the starting price.
 
 The sentence to carry out of this one: **a schema change and a contract change are different
 events, and the day you cannot tell them apart is the day you stop being able to fix your own

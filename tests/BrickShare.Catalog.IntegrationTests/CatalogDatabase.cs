@@ -47,7 +47,7 @@ public sealed class CatalogDatabase : IAsyncLifetime
 
             // Clear this and the database forgets it has a schema, so the next `dotnet ef`
             // command tries to apply InitialCatalog to a database that already has the table.
-            TablesToIgnore = ["__EFMigrationsHistory"]
+            TablesToIgnore = ["__EFMigrationsHistory", "grade_multipliers"]
         });
 
         Rebrickable = await RebrickableStub.StartAsync();
