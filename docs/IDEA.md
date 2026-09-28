@@ -744,6 +744,11 @@ right now.
 Each result shows the set, **how many copies are available**, and a **starting price** — the
 cheapest copy anyone could reserve right now.
 
+Next to each theme, the customer sees **how many sets choosing it would show**, given everything
+else they have already narrowed by. With a price limit set, a theme counts only its sets within
+that limit. A theme with nothing left still appears, with **zero**, so the list does not shift
+under the customer as they change the other filters.
+
 **UC-7.3 — View a set.** Product facts (name, year, theme, piece count, image, age rating),
 the minimum rental duration, and **every copy the shop owns** — not only the free ones.
 

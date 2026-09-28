@@ -445,7 +445,7 @@ is finished and there is something worth protecting.
 
 **And the identity stays system-assigned.** The database role is bound to a principal that dies with
 the web app, which is a real hazard — it is named here with its exact trigger, and fixed in episode
-37 alongside deployment slots, which want the same thing for their own reason.
+38 alongside deployment slots, which want the same thing for their own reason.
 
 **Lands in:** `infra/`, `src/Catalog/BrickShare.Catalog.Api/Program.cs`,
 `Directory.Packages.props`, `.github/workflows/deploy.yml`. Notes:
@@ -812,7 +812,7 @@ even though the document is not.**
 **And why it is mapped in every environment**, unlike the `dotnet new` template's
 `IsDevelopment()` guard: the document describes routes that are already reachable, so hiding it is
 not a security control — it is an inconvenience for the people integrating with you and no
-obstacle to anyone probing the service. Security here is episode 39's job, and it is
+obstacle to anyone probing the service. Security here is episode 40's job, and it is
 authorization, not obscurity. The counter-argument is real and stated: in some organisations
 publishing an attack-surface map is a compliance question, and the guard is one line.
 
@@ -820,7 +820,7 @@ publishing an attack-surface map is a compliance question, and the guard is one 
 both wired on camera against the same generated document and judged on three questions — do the tags
 become navigation, does the hand-written metadata survive, and do the OpenAPI 3.1 constructs this
 service actually emits get rendered honestly. **Scalar wins**, decisively on the last one and on a
-detail specific to this service: it maps as an endpoint, so episode 39 secures it with the same
+detail specific to this service: it maps as an endpoint, so episode 40 secures it with the same
 `RequireAuthorization()` as every other route, where `UseSwaggerUI` is middleware with nothing to
 hang that on. The runner-up is deleted on camera, and why it is deleted rather than kept alongside
 is part of the lesson.
@@ -883,7 +883,7 @@ view, and an integration test pins them together.
   declines them at this size, and the two aggregate filters cannot use an index at all.
 
 The public routes get **their own route group**, separate from the staff groups. The reason is
-episode 39: it secures a whole group with one line, and browse stays anonymous.
+episode 40: it secures a whole group with one line, and browse stays anonymous.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`.
 Notes: [`episode-34.md`](episode-34.md), which scripts at about 17 minutes. It marks a seam after
@@ -892,7 +892,46 @@ step 5 for recording it as two.
 **Done when:** a set with no copies still shows with `startingPrice: null`, and the starting price
 ignores a cheaper copy that is out on rent.
 
-### Episode 35 — Search, and page two
+### Episode 35 — How many sets behind each theme
+
+**Builds:** a `themes` block on the `GET /catalog/sets` response. Each theme that has a set lists
+how many sets choosing it would return, **given every other filter already applied**.
+
+**Teaches:** **a facet count applies every filter except its own.** A customer who has chosen
+Icons and a price cap of 20 still needs Friends to say how many Friends sets are under 20. A count
+that also applied `themeId = Icons` would show 0 for every other theme, and the customer could
+never switch themes from the results page. This bug is what the obvious first implementation
+produces, so it is the red test the episode is built around. The fix is structural rather than
+clever. The `Where` chain from episode 34 becomes one method that applies every filter except the
+theme, and the results and the counts both start from it. A filter added to one query and not the other then
+cannot happen.
+
+**And two decisions, stated as decisions:**
+
+- **Themes only.** Piece count and price are free ranges, and age is a single number, so none of
+  them has options to hang a count on. Counts there would need fixed bands, and choosing the
+  band edges is a product decision nobody has made. That is a judgement call, and it is named
+  as one.
+- **A theme with no matches stays in the list, showing 0.** This deliberately relaxes episode 34's
+  rule that an option returning nothing is a bug. That rule was about a list that could not
+  explain itself. The 0 explains itself, and a list that reshuffles every time the price cap moves
+  is worse than a list that says *none*.
+
+**Why this still needs no search service.** Azure AI Search earns its place with faceting over
+*large corpora*. This is one facet over a few thousand rows: one count per theme over the view episode 34
+already built. What decides it is corpus size and the number of facets, not whether faceting
+exists. The cost is also stated: every browse request now runs two queries, one for the page and
+one for the counts. That is cheap at this size, and the `EXPLAIN ANALYZE` from episode 34 shows
+why.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`.
+Notes: [`episode-35.md`](episode-35.md).
+
+**Done when:** with Icons and a price cap chosen, Icons' count equals the number of results,
+Friends shows its own count under the cap rather than 0, and a theme with nothing under the cap
+shows 0.
+
+### Episode 36 — Search, and page two
 
 **Builds:** search by name and set number on `GET /catalog/sets`, and keyset paging over the
 listing episode 34 built.
@@ -909,15 +948,21 @@ keyset stays stable. Ranking results by similarity would give better relevance a
 For a shop's catalog, where a search returns a handful of sets, the stable page wins. Say so
 rather than pretending relevance does not matter.
 
+**Two rules inherited from episode 35.** Search is a filter, so its predicate goes into the shared
+filter method and narrows the theme counts too. A customer who searches *"Titanic"* sees one set
+under Icons and zero elsewhere. The cursor is **not** a filter. It narrows the page and never the
+counts, because a count that shrinks as the customer scrolls is counting the wrong thing.
+
 **And why there is no search service.** The reflex is *search feature ⇒ search service*, and
 resisting it is more useful than another resource in the diagram. Azure AI Search earns its
 place with relevance tuning, faceting over large corpora, synonyms and typo tolerance at scale.
-A single shop's catalog has none of those problems, and adding it would mean a second data store
+A single shop's catalog has none of those problems (episode 35 already did its one facet in SQL),
+and adding it would mean a second data store
 to keep in sync with nothing paying for the sync.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`
 
-### Episode 36 — Set detail, and the rules that are easy to break
+### Episode 37 — Set detail, and the rules that are easy to break
 
 **Builds:** the set detail endpoint and the per-set aggregates.
 
@@ -947,7 +992,7 @@ this episode.
 
 # Part 7 — files and identity
 
-### Episode 37 — Uploading photographs
+### Episode 38 — Uploading photographs
 
 **Builds:** Azurite in Compose, the staff upload endpoint, and its storage in Terraform.
 
@@ -962,7 +1007,7 @@ naming it now makes the switch a decision rather than a rewrite.**
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `docker-compose.yml`, `infra/`
 
-### Episode 38 — SAS, and a privacy rule in code
+### Episode 39 — SAS, and a privacy rule in code
 
 **Builds:** short-lived user-delegation SAS minting, and the published/evidence split.
 
@@ -986,7 +1031,7 @@ un-publishing something is not.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 39 — Entra ID: protecting the staff endpoints
+### Episode 40 — Entra ID: protecting the staff endpoints
 
 **Builds:** authentication and authorization — app roles, policies, and tests that run as each
 role.
@@ -1018,7 +1063,7 @@ to an identity provider.**
 
 # Part 8 — production readiness
 
-### Episode 40 — Observability
+### Episode 41 — Observability
 
 **Builds:** OpenTelemetry wired to Application Insights — traces, metrics, structured logs.
 
@@ -1032,7 +1077,7 @@ control than the database, and it is usually the one that leaks.
 
 **Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `infra/`
 
-### Episode 41 — Hardening the pipeline
+### Episode 42 — Hardening the pipeline
 
 **Builds:** the finished delivery pipeline.
 
@@ -1059,7 +1104,7 @@ one makes it safe to let it.
 
 ## Compressing the course
 
-Forty-one episodes is the honest count once each holds a single idea, and each one fits a
+Forty-two episodes is the honest count once each holds a single idea, and each one fits a
 ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos are wanted:
 
 | Merge | Gives |
@@ -1070,7 +1115,7 @@ ten-to-fifteen minute video. Several pairs merge cleanly if fewer, longer videos
 | **25 + 26** | One "the third-party call and its secret" episode |
 | **27 + 28** | One "two endpoints, for a security reason" episode — at about twenty-five minutes |
 | **~~32 + 33~~** | **Do not.** Episode 33 is itself over budget and splits — see below |
-| **37 + 38** | One "photographs" episode covering upload and access together |
+| **38 + 39** | One "photographs" episode covering upload and access together |
 
 Nothing else merges without an episode doing two unrelated things. In particular **4 and 5 do
 not merge** — testing and containerisation share nothing, and the seam between them is where a
@@ -1089,8 +1134,10 @@ the backfill, **33b** the walk up Rebrickable's tree. Episode 32 also runs long 
 and marks its own seam.
 
 Episode 34 was planned as one episode, with search, filters and paging together. At over thirty
-minutes it became two, and **the numbering from 35 on moved by one**: 35 is search and paging,
-and set detail is now 36. Even after the split, episode 34 scripts at about seventeen minutes and
+minutes it became two, and the numbering after it moved by one. It moved again when the theme
+counts got **episode 35** of their own, so search and paging is now 36 and set detail is 37. The
+counts do not fold back into 34: at seventeen minutes it has no room, and the red test the count
+episode is built around needs the finished filter chain to already exist. Even after the split, episode 34 scripts at about seventeen minutes and
 marks a seam after step 5. Episodes 32, 33 and 34 are the only places in the module where the
 ten-to-fifteen-minute target loses.
 

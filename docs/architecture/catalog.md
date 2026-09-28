@@ -226,6 +226,15 @@ grew to where it was not, the fix is a maintained per-set summary updated on cop
 changes — the events for it already exist. Worth knowing the escape route; not worth building
 before it is needed.
 
+The **theme counts** next to the results (UC-7.2) are the one facet this service computes. A
+second query counts the same filtered listing once per theme, **with every filter applied except the
+theme filter itself**. Otherwise a customer who has chosen one theme would see zero everywhere
+else. Themes with no matches are still listed, with 0. The range filters (piece count, price,
+age) get no counts, because a free range has no options to count. That is one extra statement
+over the rows the page already filters, and it is the kind of faceting Postgres handles without
+help at this size. It is not faceting *over large corpora*, which is the case that would bring
+in a search service.
+
 ### The read-side rules that are easy to get wrong
 
 Three of UC-7's rules are the kind a query written from intuition will break:

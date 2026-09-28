@@ -25,7 +25,9 @@ public static class BrowseEndpoints
             .WithDescription(
                 "Sets by name, filtered by theme, piece count, age, price and availability. "
                 + "startingPrice is the cheapest copy available now, and null when none is. "
-                + "maxPrice therefore returns only sets with a copy available.")
+                + "maxPrice therefore returns only sets with a copy available. "
+                + "themes lists every theme with a set, each with the number of sets choosing it "
+                + "would return under the other filters, including 0.")
             .ProducesValidationProblem();
 
         return group;
@@ -49,13 +51,45 @@ public static class BrowseEndpoints
         CatalogDbContext database,
         CancellationToken cancellationToken)
     {
-        IQueryable<CatalogSetListing> listings = database.Listings;
+        IQueryable<CatalogSetListing> everyFilterButTheme = WhereEveryFilterButTheme(database.Listings, query);
 
-        if (query.ThemeId is { } themeId)
-        {
-            listings = listings.Where(listing => listing.ThemeId == themeId);
-        }
+        IQueryable<CatalogSetListing> listings = query.ThemeId is { } themeId
+            ? everyFilterButTheme.Where(listing => listing.ThemeId == themeId)
+            : everyFilterButTheme;
 
+        List<SetListingResponse> sets = await listings
+            .OrderBy(listing => listing.Name)
+            .ThenBy(listing => listing.Id)
+            .Take(query.Limit ?? BrowseQuery.DefaultLimit)
+            .Select(listing => new SetListingResponse(
+                listing.Id,
+                listing.SetNumber,
+                listing.Name,
+                listing.ThemeName,
+                listing.Year,
+                listing.PieceCount,
+                listing.MinimumAge,
+                listing.MinimumRentalDays,
+                listing.AvailableCount,
+                listing.StartingPrice))
+            .ToListAsync(cancellationToken);
+
+        List<ThemeFacetResponse> themes = await database.Themes
+            .Where(theme => database.Sets.Any(set => set.ThemeId == theme.Id))
+            .OrderBy(theme => theme.Name)
+            .Select(theme => new ThemeFacetResponse(
+                theme.Id,
+                theme.Name,
+                everyFilterButTheme.Count(listing => listing.ThemeId == theme.Id)))
+            .ToListAsync(cancellationToken);
+
+        return TypedResults.Ok(new BrowseSetsResponse(sets, themes));
+    }
+
+    private static IQueryable<CatalogSetListing> WhereEveryFilterButTheme(
+        IQueryable<CatalogSetListing> listings,
+        BrowseQuery query)
+    {
         if (query.MinPieces is { } minPieces)
         {
             listings = listings.Where(listing => listing.PieceCount >= minPieces);
@@ -83,24 +117,7 @@ public static class BrowseEndpoints
             listings = listings.Where(listing => listing.AvailableCount > 0);
         }
 
-        List<SetListingResponse> sets = await listings
-            .OrderBy(listing => listing.Name)
-            .ThenBy(listing => listing.Id)
-            .Take(query.Limit ?? BrowseQuery.DefaultLimit)
-            .Select(listing => new SetListingResponse(
-                listing.Id,
-                listing.SetNumber,
-                listing.Name,
-                listing.ThemeName,
-                listing.Year,
-                listing.PieceCount,
-                listing.MinimumAge,
-                listing.MinimumRentalDays,
-                listing.AvailableCount,
-                listing.StartingPrice))
-            .ToListAsync(cancellationToken);
-
-        return TypedResults.Ok(new BrowseSetsResponse(sets));
+        return listings;
     }
 }
 
@@ -108,7 +125,9 @@ public sealed record ThemesResponse(IReadOnlyList<ThemeResponse> Themes);
 
 public sealed record ThemeResponse(Guid Id, string Name);
 
-public sealed record BrowseSetsResponse(IReadOnlyList<SetListingResponse> Sets);
+public sealed record BrowseSetsResponse(
+    IReadOnlyList<SetListingResponse> Sets,
+    IReadOnlyList<ThemeFacetResponse> Themes);
 
 public sealed record SetListingResponse(
     Guid Id,
@@ -121,3 +140,5 @@ public sealed record SetListingResponse(
     int MinimumRentalDays,
     int AvailableCount,
     decimal? StartingPrice);
+
+public sealed record ThemeFacetResponse(Guid Id, string Name, int SetCount);

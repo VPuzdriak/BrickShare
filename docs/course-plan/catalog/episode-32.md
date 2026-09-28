@@ -502,7 +502,7 @@ meeting. The fix is to write the summary for the audience that actually reads it
 /// <summary>
 /// What staff send to catalogue a set: the id of an earlier lookup, and the commercial terms.
 /// </summary>
-// Every product fact behind that lookup is client-supplied, which is a security problem — episode 39.
+// Every product fact behind that lookup is client-supplied, which is a security problem — episode 40.
 // That note is for us, so it is a // comment. A /// comment is published to every client.
 ```
 
@@ -710,7 +710,7 @@ are what should decide it — not the table above, and not taste.
   is somebody about to write code against us; the shortest path from "reading" to "calling" is worth
   a package.
 - **It is an endpoint, not middleware.** `app.MapScalarApiReference().RequireAuthorization()`
-  compiles; `app.UseSwaggerUI(…)` has nothing to hang that on. **Episode 39 is coming**, and when it
+  compiles; `app.UseSwaggerUI(…)` has nothing to hang that on. **Episode 40 is coming**, and when it
   does, the page is secured with the same one call as every other route in this service instead of a
   bespoke middleware branch. The wiring style is not cosmetic — it decides how much work the security
   episode is.
@@ -725,7 +725,7 @@ episodes' time."**
 Delete the runner-up on camera — both package lines and the `UseSwaggerUI` call — and say why the
 deletion is part of the lesson: **the comparison was worth ten minutes, and carrying both forever
 would not be.** Two ways to render the same document is not redundancy, it is two things to
-maintain, two things to secure in episode 39, and two answers to "which page is the real one?"
+maintain, two things to secure in episode 40, and two answers to "which page is the real one?"
 
 ```csharp
 // src/Catalog/BrickShare.Catalog.Api/Program.cs — what stays
@@ -796,7 +796,7 @@ It is there. On purpose.
 An attacker does not need our JSON — they need one URL and a few minutes. What the guard actually
 achieves is: the people integrating with us, on the environment they integrate against, cannot read
 the contract. It is an obstacle to exactly the audience the document exists for, and to nobody else.
-Security here is **episode 39**, and it is authorization: an endpoint that refuses a request without
+Security here is **episode 40**, and it is authorization: an endpoint that refuses a request without
 a valid token does not care who has read its description.
 
 **The counter-argument, stated honestly, because it is real.** In some organisations publishing a
@@ -858,7 +858,7 @@ Step 6 wired it, read it and deleted it, and the reason it lost is written down 
 disagrees can disagree with an argument rather than with a preference.
 
 **No authentication on the page.** Anyone who reaches the service reaches `/scalar/v1`, exactly as
-anyone who reaches it reaches the four endpoints it describes. That is episode 39's problem for all
+anyone who reaches it reaches the four endpoints it describes. That is episode 40's problem for all
 five of them at once — and step 6 chose the renderer that can be included in that fix with one call.
 
 **No generated clients.** The document is now good enough to generate a typed client from — and
@@ -881,7 +881,7 @@ request — `http://localhost:5080/` on a laptop. That is right for local work a
 somebody saves the file and mails it around. Fixing it properly needs the deployed hostname, which
 is a deployment concern.
 
-**No authentication schemes**, because there is no authentication. When episode 39 adds Entra ID,
+**No authentication schemes**, because there is no authentication. When episode 40 adds Entra ID,
 the document gains a `securitySchemes` section and every operation gains a `security` requirement —
 and that is the episode where it means something rather than decorating an open API.
 

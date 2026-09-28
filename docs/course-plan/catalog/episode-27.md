@@ -87,7 +87,7 @@ episode — the fix landed in 26 in the original plan, then this material split 
 **episode 28**. Fix the number while it is on screen; a comment pointing at the wrong episode is how
 a reader concludes the whole file is untrustworthy. There is a second one of these, and the same
 thirty seconds fixes it: `Program.cs` says "Episode 34 wires the other end of this" about the
-`traceId` extension, and observability is now **episode 40**.
+`traceId` extension, and observability is now **episode 41**.
 
 The second is the actual point. Run this against a running API:
 
@@ -950,7 +950,7 @@ episode. **Say that at the end rather than letting the split hide it.**
 **No image copied into Blob.** `docs/architecture/catalog.md` wants the set image pulled into our
 own storage during the lookup, while staff are waiting on a network call anyway, so that BrickShare
 stops depending on a third party's CDN. Right, and it needs a storage account, a container, a
-client and a failure policy — that is **episode 37**. The snapshot stores the URL until then.
+client and a failure policy — that is **episode 38**. The snapshot stores the URL until then.
 
 **No theme entity.** `theme_name` is text, copied from Rebrickable, and episode 34 will filter the
 public catalog on it. Free text is a bad thing to filter on, and **episode 33** replaces it with a
@@ -962,7 +962,7 @@ a set is a rare, human-paced operation, and a cache here would be a second sourc
 facts this episode exists to make single-sourced.
 
 **No authorization.** "Anyone holding a staff token" is still literally anyone: these endpoints are
-open until **episode 39**. The design work has to happen first regardless — an authenticated caller
+open until **episode 40**. The design work has to happen first regardless — an authenticated caller
 who can still invent a product is an authenticated attacker.
 
 ## Verification

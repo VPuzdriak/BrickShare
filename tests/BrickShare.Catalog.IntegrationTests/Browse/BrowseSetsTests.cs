@@ -122,6 +122,90 @@ public class BrowseSetsTests(CatalogDatabase database) : DatabaseTest(database)
         Assert.Contains(field, problem.Errors.Keys);
     }
 
+    [Fact]
+    public async Task Every_theme_on_the_shelf_says_how_many_sets_it_holds()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        BrowseSetsResponse? page =
+            await client.GetFromJsonAsync<BrowseSetsResponse>("/api/v1/catalog/sets", Database.Api.Json);
+
+        Assert.NotNull(page);
+        Assert.Equal([("Friends", 1), ("Icons", 2)], page.Themes.Select(theme => (theme.Name, theme.SetCount)));
+    }
+
+    [Fact]
+    public async Task A_theme_with_nothing_left_stays_in_the_list_with_zero()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        BrowseSetsResponse? page = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            "/api/v1/catalog/sets?maxPrice=20", Database.Api.Json);
+
+        Assert.NotNull(page);
+        Assert.Equal([("Friends", 0), ("Icons", 1)], page.Themes.Select(theme => (theme.Name, theme.SetCount)));
+    }
+
+    [Fact]
+    public async Task A_theme_count_obeys_every_filter_except_the_theme()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+        Guid icons = await GetThemeIdFromSetsAsync(client, "Icons");
+
+        BrowseSetsResponse? page = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            $"/api/v1/catalog/sets?themeId={icons}&maxPieces=2083", Database.Api.Json);
+
+        Assert.NotNull(page);
+        Assert.Equal(["10318-1"], page.Sets.Select(set => set.SetNumber));
+
+        // Friends has one set under 2,083 pieces. The customer is looking at Icons, and still has
+        // to be told that, or they could never find their way across.
+        Assert.Equal([("Friends", 1), ("Icons", 1)], page.Themes.Select(theme => (theme.Name, theme.SetCount)));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("&maxPrice=20")]
+    [InlineData("&age=8")]
+    [InlineData("&availableNow=true&maxPieces=5000")]
+    public async Task A_theme_count_is_the_number_of_sets_choosing_that_theme_returns(string otherFilters)
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        BrowseSetsResponse? counted = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            $"/api/v1/catalog/sets?limit=50{otherFilters}", Database.Api.Json);
+
+        Assert.NotNull(counted);
+
+        foreach (ThemeFacetResponse theme in counted.Themes)
+        {
+            BrowseSetsResponse? chosen = await client.GetFromJsonAsync<BrowseSetsResponse>(
+                $"/api/v1/catalog/sets?limit=50&themeId={theme.Id}{otherFilters}", Database.Api.Json);
+
+            Assert.NotNull(chosen);
+            Assert.Equal(theme.SetCount, chosen.Sets.Count);
+        }
+    }
+
+    [Fact]
+    public async Task The_counts_are_of_the_catalog_not_of_the_page()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        BrowseSetsResponse? page = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            "/api/v1/catalog/sets?limit=1", Database.Api.Json);
+
+        Assert.NotNull(page);
+        Assert.Single(page.Sets);
+        Assert.Equal([("Friends", 1), ("Icons", 2)], page.Themes.Select(theme => (theme.Name, theme.SetCount)));
+    }
+
+
     private async Task StockTheShelfAsync(HttpClient client)
     {
         Guid titanic = await Database.CatalogueAsync(client, StockedSet.Titanic);
@@ -141,6 +225,17 @@ public class BrowseSetsTests(CatalogDatabase database) : DatabaseTest(database)
 
         return Assert.Single(page.Sets);
     }
+
+    private async Task<Guid> GetThemeIdFromSetsAsync(HttpClient client, string name)
+    {
+        BrowseSetsResponse? page =
+            await client.GetFromJsonAsync<BrowseSetsResponse>("/api/v1/catalog/sets", Database.Api.Json);
+
+        Assert.NotNull(page);
+
+        return page.Themes.Single(theme => theme.Name == name).Id;
+    }
+
 
     /// <summary>
     /// The same helper as RetireCopyTests, for the same reason: the rentals service that makes this

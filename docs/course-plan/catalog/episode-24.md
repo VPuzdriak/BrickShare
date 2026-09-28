@@ -225,7 +225,7 @@ and the two arriving as different status codes is what lets a client tell them a
 **No OpenAPI document.** Three status codes now exist and nothing describes them. Episode 32, once
 there are enough endpoint groups for a document to be worth generating.
 
-**Still no authorization.** Five episodes in, the endpoint is open. Episode 39.
+**Still no authorization.** Five episodes in, the endpoint is open. Episode 40.
 
 ## Verification
 

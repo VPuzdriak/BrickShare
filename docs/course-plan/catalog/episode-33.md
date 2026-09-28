@@ -1405,7 +1405,7 @@ one. If cataloguing ever becomes a bulk import — a hundred sets at a time — 
 and a per-request memo is worth ten lines. It is not a hundred sets at a time.
 
 **No authorization.** These endpoints are still open to anyone who can reach the service, exactly as
-they were in episode 27. **Episode 39.**
+they were in episode 27. **Episode 40.**
 
 ## Verification
 

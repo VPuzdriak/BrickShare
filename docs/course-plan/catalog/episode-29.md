@@ -351,7 +351,7 @@ Fix the number while it is on screen. Episode 27 made this point about a comment
 and it is the same point: **a comment naming the wrong episode is how a reader decides the whole
 file is untrustworthy.** There is one more of these in `Program.cs` right now — it says
 "Episode 34 wires the other end of this" about the `traceId` extension, and observability is
-episode 40.
+episode 41.
 
 Three tests, appended to the existing file:
 
@@ -451,7 +451,7 @@ using System.Security.Cryptography;
 the box; anybody in the shop can read it. The reason is narrower: `Random.Shared` is fine here too,
 and `RandomNumberGenerator.GetString` is the API that cannot be got subtly wrong — no seeding, no
 modulo bias across a 30-character alphabet. A label code that is hard to guess is a small bonus
-that nothing in this system is allowed to depend on. **Episode 39 protects these endpoints with
+that nothing in this system is allowed to depend on. **Episode 40 protects these endpoints with
 Entra ID; an unguessable identifier is not access control.**
 
 **No `ILabelCodeMinter`, no DI, no fake.** An interface here would buy substitutability that
@@ -1244,7 +1244,7 @@ two, seventeen.
 that a copy out on rent cannot be retired, and it still has no HTTP in front of it. Episode 31.
 
 **No `GET`.** There is no way to list the copies of a set, or to look one up by scanning its label,
-which is UC-1.4 and squarely the read API's job — episode 36. `TypedResults.Created` points at
+which is UC-1.4 and squarely the read API's job — episode 37. `TypedResults.Created` points at
 `/api/v1/catalog/copies/{id}`, a route that does not exist yet, for the same reason episode 28 left
 its `Location` header pointing at nothing: inventing an endpoint to make a header true is building
 a feature to satisfy a string.
@@ -1257,7 +1257,7 @@ label is printed and stuck on at registration, so a box with a sticker has been 
 **No `ILabelCodeMinter`, still.** See step 3. Episode 30 is allowed to change its mind if the batch
 makes it necessary; nothing so far has.
 
-**No authorization.** Anybody who can reach the service can register copies, until **episode 39**.
+**No authorization.** Anybody who can reach the service can register copies, until **episode 40**.
 
 ## Verification
 

@@ -18,7 +18,7 @@ write side never needed:
 > price** — the cheapest copy anyone could reserve right now.
 
 This episode builds all of that except the words *by name or set number*. Search is
-[episode 35](catalog-api.md#episode-35--search-and-page-two), because `pg_trgm` and paging are an episode of their own.
+[episode 36](catalog-api.md#episode-36--search-and-page-two), because `pg_trgm` and paging are an episode of their own.
 
 "Starting price" is the phrase that makes this episode more than a `Where` clause. A price is not a
 column. It is `base_rental_price × multiplier[grade]`, and the multipliers have lived in a
@@ -251,7 +251,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BrickShare.Catalog.Api.Endpoints;
 
 /// <summary>
-/// What a customer can read. Kept apart from the staff groups on purpose: episode 39 puts
+/// What a customer can read. Kept apart from the staff groups on purpose: episode 40 puts
 /// RequireAuthorization() on those, and this group is the one it leaves alone.
 /// </summary>
 public static class BrowseEndpoints
@@ -312,7 +312,7 @@ name and id. Empty theme not in list — no point show door with nothing behind.
 **A separate group, although `/catalog/sets` already has one.** Step 2 adds `GET /catalog/sets`,
 the same URL as the staff `POST`, and it would be natural to add it to `CatalogSetEndpoints`. It
 goes here instead, because **the split that matters in this service is not by resource, it is by
-caller.** Episode 39 makes every staff route require a signed-in staff member, and it does that with
+caller.** Episode 40 makes every staff route require a signed-in staff member, and it does that with
 one `RequireAuthorization()` per group. If a public `GET` shares a group with a staff `POST`, that
 one line becomes per-endpoint bookkeeping, and the day somebody forgets it, a staff route is public.
 One group per audience means the security decision is made once, where it is visible.
@@ -324,7 +324,7 @@ away with `DISTINCT` — the same answer, with more work, and a query that says 
 from what it means.
 
 **A wrapper object, not a bare array.** `{ "themes": [...] }` rather than `[...]`. Step 2 returns
-sets the same way, and episode 35 adds a `next` cursor next to them. A bare JSON array has nowhere
+sets the same way, and episode 36 adds a `next` cursor next to them. A bare JSON array has nowhere
 to put a second field. **Adding a field to an object is a compatible change; turning an array into
 an object breaks every client that parses it.**
 
@@ -459,7 +459,7 @@ public sealed class GradeMultiplierConfiguration : IEntityTypeConfiguration<Grad
     public void Configure(EntityTypeBuilder<GradeMultiplier> builder)
     {
         // A zero here would make every copy of that grade free. GradeMultipliers refuses one in C#;
-        // episode 39's admin edit writes to this table, and the database refuses one too.
+        // episode 40's admin edit writes to this table, and the database refuses one too.
         builder.ToTable("grade_multipliers", table =>
             table.HasCheckConstraint("ck_grade_multipliers_positive", "multiplier > 0"));
 
@@ -477,7 +477,7 @@ public sealed class GradeMultiplierConfiguration : IEntityTypeConfiguration<Grad
             .IsRequired();
 
         // The standard table the pricing tests have assumed since episode 12. Placeholders until
-        // an admin edits them in episode 39 — but a shop with no prices cannot open.
+        // an admin edits them in episode 40 — but a shop with no prices cannot open.
         builder.HasData(
             new GradeMultiplier(ConditionGrade.New, 1.00m),
             new GradeMultiplier(ConditionGrade.Excellent, 0.85m),
@@ -518,9 +518,9 @@ Postgres**, one per row because that is how a relational table holds a map. Putt
 not.
 
 **Why `HasData` and not an admin endpoint first.** A shop cannot price anything until the
-multipliers exist, and the endpoint that edits them is episode 39's, Admin-only and two-phase.
-Seeding the standard table makes the service usable today and gives episode 39 something to edit.
-The honest cost: `HasData` values live in a migration forever, so episode 39 has to treat the seed
+multipliers exist, and the endpoint that edits them is episode 40's, Admin-only and two-phase.
+Seeding the standard table makes the service usable today and gives episode 40 something to edit.
+The honest cost: `HasData` values live in a migration forever, so episode 40 has to treat the seed
 as *initial* data and never re-seed it. That is said again there.
 
 ---
@@ -728,7 +728,7 @@ count free box, find cheapest free box price, round like Money round. No free bo
 nothing, not say zero. Zero is lie — zero mean free.
 
 This is the architecture document's rule — *"derived values are computed, never stored"* — at work.
-When episode 39 lets an admin change a multiplier, every starting price in the catalog changes on the
+When episode 40 lets an admin change a multiplier, every starting price in the catalog changes on the
 next query, with no bulk update and no row left behind.
 
 **The cost of a view, said once:** Postgres will now refuse `ALTER COLUMN` on any column the view
@@ -939,7 +939,7 @@ no price, with or without multipliers) and is green for the right one now.
 
 The distinction this red teaches is real in every system with seeded data: **tables a migration
 fills are part of the schema, not part of a test's state.** The rule that follows is a
-consequence of the fix: a test that edits `grade_multipliers` — episode 39 will have them — must
+consequence of the fix: a test that edits `grade_multipliers` — episode 40 will have them — must
 put the table back itself, because nothing else will.
 
 ### What this test pins
@@ -1162,7 +1162,7 @@ whose `false` did something would be the more surprising API.
 **`ThenBy(listing => listing.Id)`.** Two sets can share a name — LEGO has reused plenty. Ordering by
 name alone leaves their relative order to Postgres, which may differ between two identical queries.
 The id tie-break makes the order **total**, which does not matter much today and is load-bearing in
-episode 35: keyset paging needs an order in which every row has exactly one position.
+episode 36: keyset paging needs an order in which every row has exactly one position.
 
 **The composition happens in `IQueryable`, not in a list.** Each `Where` adds a clause to one SQL
 statement; nothing runs until `ToListAsync`. This is exactly what the view bought in step 4 — every
@@ -1285,7 +1285,7 @@ that one request cannot turn into a slow query. **What matters is that there is 
 without one has handed every caller a way to make it do the most expensive thing it can do.
 
 And there is **no page two** yet. `?limit=24` returns the first 24 sets by name, and nothing
-returns the 25th. Episode 35 fixes that with keyset paging, and the argument for keyset over
+returns the 25th. Episode 36 fixes that with keyset paging, and the argument for keyset over
 `?page=2` needs search in the room to be worth having. Say so on camera — a list with no page two
 is an honest gap, not a finished feature.
 
@@ -1404,7 +1404,7 @@ new routes need their summaries, and `/catalog/sets` needs its `400`:
 
 The OpenAPI document's description still says the service is staff-facing, and it no longer is.
 Then there is a comment in `Program.cs` that has promised the wrong episode since it was written.
-Observability is episode 40, not this one:
+Observability is episode 41, not this one:
 
 ```csharp
 // src/Catalog/BrickShare.Catalog.Api/Program.cs — the anchor, already there
@@ -1428,7 +1428,7 @@ Observability is episode 40, not this one:
 ```csharp
 // src/Catalog/BrickShare.Catalog.Api/Program.cs — what it becomes
         // One id that appears in the response and in the logs, so a screenshot from a staff
-        // member is enough to find the request. Episode 40 wires the other end of this.
+        // member is enough to find the request. Episode 41 wires the other end of this.
 ```
 
 **Caveman version:** map of API must say new doors exist, and what bad knock look like. And old
@@ -1467,21 +1467,25 @@ routes are whose.**
 
 ## What this episode is not
 
-**No search.** Not by name, not by set number — *"Titanc"* finds nothing, because nothing looks.
-Episode 35 is `pg_trgm`, and the argument for **not** adding Azure AI Search.
+**No counts next to the themes.** The filter list says *Icons*, not *Icons (12)*, and nothing
+tells the customer that Friends has no set under the price cap they just set. That is
+**episode 35**, and it depends on the filter chain this episode finished.
 
-**No page two.** `limit` caps the list and nothing continues it. Episode 35, with keyset paging —
+**No search.** Not by name, not by set number — *"Titanc"* finds nothing, because nothing looks.
+Episode 36 is `pg_trgm`, and the argument for **not** adding Azure AI Search.
+
+**No page two.** `limit` caps the list and nothing continues it. Episode 36, with keyset paging —
 which is why step 6 made the order total.
 
 **No set detail, no list of copies, no scan by label.** A customer can see that the Titanic has one
 copy available at 51.00, and cannot see which one or why. `GET /catalog/sets/{id}` with every copy,
-its grade, price and deposit is **episode 36**, together with the staff `GET /catalog/copies/by-label/{code}`
+its grade, price and deposit is **episode 37**, together with the staff `GET /catalog/copies/by-label/{code}`
 and the `Location` headers that episodes 28–30 left pointing at routes that do not exist.
-**The view built here is where episode 36 gets its per-set numbers**, so they cannot disagree with
+**The view built here is where episode 37 gets its per-set numbers**, so they cannot disagree with
 this page.
 
 **No multiplier edits.** Four seeded rows and no endpoint. Editing them re-prices the entire catalog,
-which is why it is Admin-only and two-phase — **episode 39**.
+which is why it is Admin-only and two-phase — **episode 40**.
 
 **No caching.** A listing that changes whenever a copy goes out is a listing whose cache is wrong
 exactly when it matters. At this size the query is cheap, so there is nothing to earn.
@@ -1490,7 +1494,7 @@ exactly when it matters. At this size the query is cheap, so there is nothing to
 
 **No authorization — and this one stays.** Browse is anonymous on purpose: UC-7 has no rule that a
 customer must sign in to look, and a rental shop that hides its stock behind a sign-up wall rents
-less. Episode 39 secures the staff groups and leaves `MapBrowse` alone. That is why it is a separate
+less. Episode 40 secures the staff groups and leaves `MapBrowse` alone. That is why it is a separate
 group.
 
 ## Verification
@@ -1518,11 +1522,7 @@ one place where the tooling cannot check the work for you**, and the order of tw
 
 ## Next
 
-[Episode 35 — Search, and page two](catalog-api.md#episode-35--search-and-page-two): the words UC-7.2 starts with — *by name or set
-number*. `pg_trgm` so that *"Titanc"* finds the Titanic, the collation trap episode 17 predicted
-waiting in plain `LIKE`, keyset paging over the order this episode made total, and the argument
-for **not** reaching for a search service when the reflex says to.
-
-The sentence to carry out of this one: **"available" controls what a customer can act on, and the
-price follows it.** The cheapest box the shop owns is not the starting price if it is in someone
-else's living room.
+[Episode 35 — How many sets behind each theme](catalog-api.md#episode-35--how-many-sets-behind-each-theme):
+a count next to every theme, of the sets choosing it would return **given the other filters already
+set**. It is one count per theme over the view this episode built, plus the rule that makes a facet
+count useful: it applies every filter except its own.
