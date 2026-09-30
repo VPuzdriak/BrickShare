@@ -99,6 +99,12 @@ resource "azurerm_postgresql_flexible_server" "catalog" {
   }
 }
 
+resource "azurerm_postgresql_flexible_server_configuration" "extensions" {
+  name      = "azure.extensions"
+  server_id = azurerm_postgresql_flexible_server.catalog.id
+  value     = "PG_TRGM"
+}
+
 resource "azurerm_postgresql_flexible_server_active_directory_administrator" "catalog" {
   server_name         = azurerm_postgresql_flexible_server.catalog.name
   resource_group_name = azurerm_resource_group.main.name
