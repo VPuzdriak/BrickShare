@@ -31,6 +31,11 @@ public sealed class CatalogSetConfiguration : IEntityTypeConfiguration<CatalogSe
             .HasMaxLength(200)
             .IsRequired();
 
+        builder.HasIndex(set => set.Name)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops")
+            .HasDatabaseName("ix_catalog_sets_name_trgm");
+
         builder.Property(set => set.ThemeId).HasColumnName("theme_id").IsRequired();
 
         builder.HasOne<Theme>()

@@ -960,7 +960,17 @@ A single shop's catalog has none of those problems (episode 35 already did its o
 and adding it would mean a second data store
 to keep in sync with nothing paying for the sync.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`
+**And one Azure setting that has to ship first.** Flexible Server installs only the extensions named
+in `azure.extensions`, and the pipeline migrates before it runs `terraform apply`. So the allow-list
+goes out in its own push, ahead of the migration that needs it.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`,
+`infra/`. Notes: [`episode-36.md`](episode-36.md), which **scripts at about 24 minutes and should be
+recorded as two**: 36a is search (steps 1–6), 36b is paging (steps 7–12).
+
+**Done when:** a typo finds the Titanic, a set number finds it by its start, following `next`
+visits every set once even when a set is catalogued mid-scroll, and the theme counts obey the
+search but never the cursor.
 
 ### Episode 37 — Set detail, and the rules that are easy to break
 
@@ -1138,8 +1148,12 @@ minutes it became two, and the numbering after it moved by one. It moved again w
 counts got **episode 35** of their own, so search and paging is now 36 and set detail is 37. The
 counts do not fold back into 34: at seventeen minutes it has no room, and the red test the count
 episode is built around needs the finished filter chain to already exist. Even after the split, episode 34 scripts at about seventeen minutes and
-marks a seam after step 5. Episodes 32, 33 and 34 are the only places in the module where the
-ten-to-fifteen-minute target loses.
+marks a seam after step 5.
+
+Episode 36 splits too. Search and paging share an endpoint and nothing else, and together they
+script at about twenty-four minutes. The cut is marked in [`episode-36.md`](episode-36.md) after
+step 6: **36a** search, **36b** page two. Episodes 32, 33, 34 and 36 are the only places in the module
+where the ten-to-fifteen-minute target loses.
 
 ## What comes after
 

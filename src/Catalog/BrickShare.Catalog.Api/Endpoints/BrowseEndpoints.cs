@@ -23,12 +23,15 @@ public static class BrowseEndpoints
             .AddEndpointFilter<ValidationFilter<BrowseQuery>>()
             .WithSummary("Browse the catalog")
             .WithDescription(
-                "Sets by name, filtered by theme, piece count, age, price and availability. "
+                "Sets by name, found by search and filtered by theme, piece count, age, price and "
+                + "availability. search matches names loosely, tolerating a typo, and set numbers "
+                + "by their start. "
                 + "startingPrice is the cheapest copy available now, and null when none is. "
                 + "maxPrice therefore returns only sets with a copy available. "
                 + "themes lists every theme with a set, each with the number of sets choosing it "
-                + "would return under the other filters, including 0.")
-            .ProducesValidationProblem();
+                + "would return under the other filters and the search, including 0. "
+                + "next is null on the last page. Pass it back as after, with the same filters, "
+                + "for the page that follows.");
 
         return group;
     }
@@ -57,10 +60,20 @@ public static class BrowseEndpoints
             ? everyFilterButTheme.Where(listing => listing.ThemeId == themeId)
             : everyFilterButTheme;
 
+        if (BrowseCursor.TryDecode(query.After, out BrowseCursor? after))
+        {
+            // (name, id) > (@name, @id): the ORDER BY below, written as a comparison.
+            listings = listings.Where(listing => EF.Functions.GreaterThan(
+                ValueTuple.Create(listing.Name, listing.Id),
+                ValueTuple.Create(after.Name, after.Id)));
+        }
+
+        int limit = query.Limit ?? BrowseQuery.DefaultLimit;
+
         List<SetListingResponse> sets = await listings
             .OrderBy(listing => listing.Name)
             .ThenBy(listing => listing.Id)
-            .Take(query.Limit ?? BrowseQuery.DefaultLimit)
+            .Take(limit + 1)
             .Select(listing => new SetListingResponse(
                 listing.Id,
                 listing.SetNumber,
@@ -74,6 +87,16 @@ public static class BrowseEndpoints
                 listing.StartingPrice))
             .ToListAsync(cancellationToken);
 
+        string? next = null;
+
+        // When the next page exists, remove the extra set and return a cursor for the last set on this page.
+        // We don't include the extra set in the response because it would be confusing to have a set on page 1 that is also on page 2.
+        if (sets.Count > limit)
+        {
+            sets.RemoveAt(limit);
+            next = new BrowseCursor(sets[^1].Name, sets[^1].Id).Encode();
+        }
+
         List<ThemeFacetResponse> themes = await database.Themes
             .Where(theme => database.Sets.Any(set => set.ThemeId == theme.Id))
             .OrderBy(theme => theme.Name)
@@ -83,13 +106,23 @@ public static class BrowseEndpoints
                 everyFilterButTheme.Count(listing => listing.ThemeId == theme.Id)))
             .ToListAsync(cancellationToken);
 
-        return TypedResults.Ok(new BrowseSetsResponse(sets, themes));
+        return TypedResults.Ok(new BrowseSetsResponse(sets, themes, next));
     }
 
     private static IQueryable<CatalogSetListing> WhereEveryFilterButTheme(
         IQueryable<CatalogSetListing> listings,
         BrowseQuery query)
     {
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            string search = query.Search.Trim();
+            string numberPrefix = search.ToUpperInvariant();
+
+            listings = listings.Where(listing =>
+                EF.Functions.TrigramsAreWordSimilar(search, listing.Name)
+                || listing.SetNumber.StartsWith(numberPrefix));
+        }
+
         if (query.MinPieces is { } minPieces)
         {
             listings = listings.Where(listing => listing.PieceCount >= minPieces);
@@ -127,7 +160,8 @@ public sealed record ThemeResponse(Guid Id, string Name);
 
 public sealed record BrowseSetsResponse(
     IReadOnlyList<SetListingResponse> Sets,
-    IReadOnlyList<ThemeFacetResponse> Themes);
+    IReadOnlyList<ThemeFacetResponse> Themes,
+    string? Next);
 
 public sealed record SetListingResponse(
     Guid Id,

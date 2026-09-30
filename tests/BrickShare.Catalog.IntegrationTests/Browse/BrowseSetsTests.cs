@@ -107,6 +107,7 @@ public class BrowseSetsTests(CatalogDatabase database) : DatabaseTest(database)
     [InlineData("?limit=51", "limit")]
     [InlineData("?age=19", "age")]
     [InlineData("?maxPrice=-1", "maxPrice")]
+    [InlineData("?after=not-a-cursor", "after")]
     public async Task A_filter_that_cannot_match_anything_is_refused(string query, string field)
     {
         HttpClient client = Database.Api.CreateClient();
@@ -205,6 +206,109 @@ public class BrowseSetsTests(CatalogDatabase database) : DatabaseTest(database)
         Assert.Equal([("Friends", 1), ("Icons", 2)], page.Themes.Select(theme => (theme.Name, theme.SetCount)));
     }
 
+    [Theory]
+    [InlineData("Titanic", new[] { "10294-1" })]
+    [InlineData("titanic", new[] { "10294-1" })]
+    [InlineData("Titanc", new[] { "10294-1" })]
+    [InlineData("10294", new[] { "10294-1" })]
+    [InlineData("10295", new string[] { })]
+    [InlineData(" ", new[] { "10318-1", "41704-1", "10294-1" })]
+    public async Task Search_finds_sets_by_name_or_set_number(string search, string[] expectedSetNumbers)
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        BrowseSetsResponse? page = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            $"/api/v1/catalog/sets?search={Uri.EscapeDataString(search)}", Database.Api.Json);
+
+        Assert.NotNull(page);
+        Assert.Equal(expectedSetNumbers, page.Sets.Select(set => set.SetNumber));
+    }
+
+    [Fact]
+    public async Task A_search_narrows_the_theme_counts_too()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        BrowseSetsResponse? page = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            "/api/v1/catalog/sets?search=Titanic", Database.Api.Json);
+
+        Assert.NotNull(page);
+        Assert.Equal(["10294-1"], page.Sets.Select(set => set.SetNumber));
+        Assert.Equal([("Friends", 0), ("Icons", 1)], page.Themes.Select(theme => (theme.Name, theme.SetCount)));
+    }
+
+    [Fact]
+    public async Task Following_next_visits_every_set_once_and_never_an_empty_page()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        List<string> seen = [];
+        int pagesRead = 0;
+        string? next = null;
+
+        // Capped at five, so a cursor that never runs out fails the test instead of hanging it.
+        do
+        {
+            string after = next is null ? "" : $"&after={next}";
+
+            BrowseSetsResponse? page = await client.GetFromJsonAsync<BrowseSetsResponse>(
+                $"/api/v1/catalog/sets?limit=1{after}", Database.Api.Json);
+
+            Assert.NotNull(page);
+
+            seen.AddRange(page.Sets.Select(set => set.SetNumber));
+            pagesRead++;
+            next = page.Next;
+        }
+        while (next is not null && pagesRead < 5);
+
+        Assert.Equal(["10318-1", "41704-1", "10294-1"], seen);
+        Assert.Equal(3, pagesRead);
+    }
+
+    [Fact]
+    public async Task A_set_catalogued_mid_scroll_does_not_shift_the_next_page()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await Database.CatalogueAsync(client, StockedSet.MainStreetBuilding);
+        await Database.CatalogueAsync(client, StockedSet.Titanic);
+
+        BrowseSetsResponse? first = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            "/api/v1/catalog/sets?limit=1", Database.Api.Json);
+
+        Assert.NotNull(first);
+        Assert.Equal(["41704-1"], first.Sets.Select(set => set.SetNumber));
+
+        await Database.CatalogueAsync(client, StockedSet.Concorde);
+
+        BrowseSetsResponse? second = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            $"/api/v1/catalog/sets?limit=1&after={first.Next}", Database.Api.Json);
+
+        Assert.NotNull(second);
+        Assert.Equal(["10294-1"], second.Sets.Select(set => set.SetNumber));
+        Assert.Null(second.Next);
+    }
+
+    [Fact]
+    public async Task Page_two_counts_the_same_catalog_as_page_one()
+    {
+        HttpClient client = Database.Api.CreateClient();
+        await StockTheShelfAsync(client);
+
+        BrowseSetsResponse? first = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            "/api/v1/catalog/sets?limit=1", Database.Api.Json);
+
+        Assert.NotNull(first);
+
+        BrowseSetsResponse? second = await client.GetFromJsonAsync<BrowseSetsResponse>(
+            $"/api/v1/catalog/sets?limit=1&after={first.Next}", Database.Api.Json);
+
+        Assert.NotNull(second);
+        Assert.Equal(first.Themes, second.Themes);
+    }
 
     private async Task StockTheShelfAsync(HttpClient client)
     {

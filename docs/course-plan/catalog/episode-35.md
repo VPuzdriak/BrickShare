@@ -634,7 +634,7 @@ count that is right for the theme you are looking at and wrong for every other.
 
 ## Next
 
-[Episode 36 — Search, and page two](catalog-api.md#episode-36--search-and-page-two): *by name or
+[Episode 36 — Search, and page two](episode-36.md): *by name or
 set number*. `pg_trgm` so that *"Titanc"* finds the Titanic, keyset paging over the order
 episode 34 made total, and the first two tests of this episode's rules: search narrows the counts,
 the cursor does not.
