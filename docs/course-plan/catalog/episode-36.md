@@ -1145,7 +1145,7 @@ the filter method.
 
 ## Next
 
-[Episode 37 — Set detail, and the rules that are easy to break](catalog-api.md#episode-37--set-detail-and-the-rules-that-are-easy-to-break):
+[Episode 37 — Set detail, and the rules that are easy to break](episode-37.md):
 the set detail endpoint, reading its available count and starting price from episode 34's view
 so the detail page and this listing cannot disagree about a price. And three rules from UC-7 that a
 query written from intuition gets wrong.

@@ -1,4 +1,6 @@
 using BrickShare.Catalog.Api.Persistence;
+using BrickShare.Catalog.Domain;
+using BrickShare.Catalog.Domain.Pricing;
 
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +34,17 @@ public static class BrowseEndpoints
                 + "would return under the other filters and the search, including 0. "
                 + "next is null on the last page. Pass it back as after, with the same filters, "
                 + "for the page that follows.");
+
+        // src/Catalog/BrickShare.Catalog.Api/Endpoints/BrowseEndpoints.cs — paste directly above it
+        group.MapGet("/sets/{setId:guid}", GetSetAsync)
+            .WithSummary("View a set and every copy of it")
+            .WithDescription(
+                "Product facts, with availableCount and startingPrice as the listing shows them. "
+                + "copies lists every copy the shop rents out, available or not, cheapest first, "
+                + "each with its own rentalPrice and deposit. available says whether a copy can be "
+                + "reserved now; every copy listed can be subscribed to. A set with no copies has "
+                + "an empty list and a null startingPrice. Retired copies are not listed.")
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;
     }
@@ -109,6 +122,74 @@ public static class BrowseEndpoints
         return TypedResults.Ok(new BrowseSetsResponse(sets, themes, next));
     }
 
+    // src/Catalog/BrickShare.Catalog.Api/Endpoints/BrowseEndpoints.cs — what it becomes
+    private static async Task<Results<Ok<SetDetailResponse>, ProblemHttpResult>> GetSetAsync(
+        Guid setId,
+        CatalogDbContext database,
+        CancellationToken cancellationToken)
+    {
+        CatalogSetListing? listing = await database.Listings
+            .SingleOrDefaultAsync(candidate => candidate.Id == setId, cancellationToken);
+
+        if (listing is null)
+        {
+            return TypedResults.Problem(
+                title: "No such set",
+                detail: $"Set {setId} is not in the catalog.",
+                statusCode: StatusCodes.Status404NotFound);
+        }
+
+        var prices = await database.Sets
+            .Where(set => set.Id == setId)
+            .Select(set => new { set.BaseRentalPrice, set.RetailPrice })
+            .SingleAsync(cancellationToken);
+
+
+        GradeMultipliers multipliers = await LoadGradeMultipliersAsync(database, cancellationToken);
+
+        var copies = await database.Copies
+            .AsNoTracking()
+            .Where(copy => copy.CatalogSetId == setId && copy.Status != CopyStatus.Retired)
+            .OrderBy(copy => copy.Id)
+            .ToListAsync(cancellationToken);
+
+        var onShow = copies
+            .Select(copy => new SetCopyResponse(
+                copy.Id,
+                copy.Grade,
+                copy.Status == CopyStatus.Available,
+                PriceCalculator.RentalPrice(prices.BaseRentalPrice, copy.Grade, multipliers).Amount,
+                PriceCalculator.Deposit(prices.RetailPrice, copy.Grade, multipliers).Amount))
+            .OrderBy(copy => copy.RentalPrice)
+            .ThenBy(copy => copy.Id)
+            .ToList();
+
+        return TypedResults.Ok(new SetDetailResponse(
+            listing.Id,
+            listing.SetNumber,
+            listing.Name,
+            listing.ThemeName,
+            listing.Year,
+            listing.PieceCount,
+            listing.MinimumAge,
+            listing.MinimumRentalDays,
+            listing.AvailableCount,
+            listing.StartingPrice,
+            onShow));
+    }
+
+    private static async Task<GradeMultipliers> LoadGradeMultipliersAsync(
+        CatalogDbContext database,
+        CancellationToken cancellationToken)
+    {
+        Dictionary<ConditionGrade, decimal> rows = await database.GradeMultipliers
+            .ToDictionaryAsync(row => row.Grade, row => row.Multiplier, cancellationToken);
+
+        return new GradeMultipliers(rows);
+    }
+
+
+
     private static IQueryable<CatalogSetListing> WhereEveryFilterButTheme(
         IQueryable<CatalogSetListing> listings,
         BrowseQuery query)
@@ -176,3 +257,24 @@ public sealed record SetListingResponse(
     decimal? StartingPrice);
 
 public sealed record ThemeFacetResponse(Guid Id, string Name, int SetCount);
+
+public sealed record SetDetailResponse(
+    Guid Id,
+    string SetNumber,
+    string Name,
+    string Theme,
+    int Year,
+    int PieceCount,
+    int MinimumAge,
+    int MinimumRentalDays,
+    int AvailableCount,
+    decimal? StartingPrice,
+    IReadOnlyList<SetCopyResponse> Copies);
+
+// src/Catalog/BrickShare.Catalog.Api/Endpoints/BrowseEndpoints.cs — what it becomes
+public sealed record SetCopyResponse(
+    Guid Id,
+    ConditionGrade Grade,
+    bool Available,
+    decimal RentalPrice,
+    decimal Deposit);

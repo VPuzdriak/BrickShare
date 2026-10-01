@@ -984,19 +984,34 @@ search but never the cursor.
 - **A set with no available copies still shows in full** — and so does a set with **no copies at
   all**, which `docs/IDEA.md` explicitly allows. It simply has no starting price, and the
   response says so rather than inventing a zero.
-- **Only published photographs are returned to customers.** Damage-evidence photographs are
-  reachable through a staff endpoint only — two paths, not one path with a flag on the caller.
+- **A retired copy is not listed.** It is history, not stock, and a set whose every copy is
+  retired reads exactly like a set with none.
 
 **The idea that ties them together:** *available* controls what can be **acted on**, never what
 is **shown**. Writing that sentence down prevents all three bugs.
 
-Also here: the available count and starting price, read from **episode 34's view** rather than
-computed a second time. The detail page and the listing then cannot disagree about a price. And
-the staff scan endpoint, `GET /catalog/copies/by-label/{code}`, belongs here too. It is the other
-read of a copy, and the `Location` headers episodes 28–30 left pointing at nothing become real in
-this episode.
+**The photograph rule moves to episode 39.** *Only published photographs are returned to
+customers* belongs to this page, but there is no photograph in the service until episode 38.
+Testing it here would mean a `copy_photos` table that nothing can fill. That is the same "a feature
+to satisfy a string" that episodes 28–30 refused for `Location` headers. Episode 37 names the rule,
+and episode 39 adds `photos` to this response with its test.
 
-**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`
+Also here: the available count and starting price, read from **episode 34's view** rather than
+computed a second time. The detail page and the listing then cannot disagree about a price. This is
+also the first request that runs `PriceCalculator`, for each copy's price and deposit. And
+the staff scan endpoint, `GET /catalog/copies/by-label/{code}`, belongs here too. It is the other
+read of a copy, and it returns the raw status the customer view deliberately does not. The
+`Location` headers from episodes 21 and 30 become real. The catalogue header turns out to have been
+missing `/catalog` since episode 21. Registration's now points at the set detail rather than at
+the `GET /catalog/sets/{id}/copies` that episode 30 promised, because the detail already lists every copy.
+
+**Lands in:** `src/Catalog/BrickShare.Catalog.Api/`, `tests/BrickShare.Catalog.IntegrationTests/`.
+Notes: [`episode-37.md`](episode-37.md), which **scripts at about 22 minutes and should be recorded
+as two**: 37a is set detail (steps 1–6), 37b is the scan and the `Location` headers (steps 7–11).
+
+**Done when:** a copy on rent is listed as unavailable with its own price and deposit, a set with
+no copies shows with `startingPrice: null`, following either `Location` lands on the detail, and
+scanning a label finds the box in any status.
 
 ---
 
@@ -1019,7 +1034,9 @@ naming it now makes the switch a decision rather than a rewrite.**
 
 ### Episode 39 — SAS, and a privacy rule in code
 
-**Builds:** short-lived user-delegation SAS minting, and the published/evidence split.
+**Builds:** short-lived user-delegation SAS minting, and the published/evidence split. It also
+adds `photos` to episode 37's set detail, with the test episode 37 deferred: an evidence photograph
+is never in a customer response.
 
 **Teaches:** what a SAS is, why a **user-delegation** SAS (signed with the managed identity)
 beats one signed with an account key, and how to hand a client a URL that expires.
@@ -1152,8 +1169,13 @@ marks a seam after step 5.
 
 Episode 36 splits too. Search and paging share an endpoint and nothing else, and together they
 script at about twenty-four minutes. The cut is marked in [`episode-36.md`](episode-36.md) after
-step 6: **36a** search, **36b** page two. Episodes 32, 33, 34 and 36 are the only places in the module
-where the ten-to-fifteen-minute target loses.
+step 6: **36a** search, **36b** page two.
+
+Episode 37 splits for the same reason. The customer's set detail and the staff scan share a response
+type and nothing else, and together they script at about twenty-two minutes. The cut is marked in
+[`episode-37.md`](episode-37.md) after step 6: **37a** set detail, **37b** the scan and the `Location`
+headers. Episodes 32, 33, 34, 36 and 37 are the only places in the module where the
+ten-to-fifteen-minute target loses.
 
 ## What comes after
 
