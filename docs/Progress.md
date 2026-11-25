@@ -15,8 +15,8 @@ Last updated: 2026-11-25
 
 - [x] 1.1 Repository, solution (`BrickShare.slnx`), `global.json`, `.gitignore`
 - [x] 1.2 Central build settings: `Directory.Build.props`, nullable, warnings as errors
-- [ ] 1.3 Central package management: `Directory.Packages.props`
-- [ ] 1.4 Code style: `.editorconfig`, SonarAnalyzer, `dotnet format`
+- [x] 1.3 Central package management: `Directory.Packages.props`
+- [x] 1.4 Code style: `.editorconfig`, SonarAnalyzer, `dotnet format`
 - [ ] 1.5 Test projects with xUnit v3 and Shouldly, the first red-green-refactor cycle
 - [ ] 1.6 Shared kernel: `Entity`, `AggregateRoot`, `ValueObject`, domain events, results
 - [ ] 1.7 `Money` value object, test-first
@@ -179,9 +179,9 @@ Last updated: 2026-11-25
 
 ## Log
 
-| Date | Lesson | Change |
-|------|--------|--------|
-| 2026-11-25 | | Course plan split into lessons. Implementation not started. |
-| 2026-11-25 | 1.1 | Done: `global.json` (10.0.100, latestFeature), `BrickShare.slnx`, `.gitignore`. Solution file written by hand because SDK 10.0.100 `dotnet new sln` has no `--format slnx`. |
-| 2026-11-25 | 1.11 | Added to the course plan: GitHub repository setup lesson (pull requests only, squash merges, branch protection requiring the `ci` check). Lesson script to be written later. |
-| 2026-11-25 | 1.2 | Done: `Directory.Build.props` (net10.0, nullable, warnings as errors). Verified with a probe project that was deleted again. Not committed. |
+| Date       | Lesson | Change                                                                                                                                                                       |
+| ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-25 |        | Course plan split into lessons. Implementation not started.                                                                                                                  |
+| 2026-11-25 | 1.1    | Done: `global.json` (10.0.100, latestFeature), `BrickShare.slnx`, `.gitignore`. Solution file written by hand because SDK 10.0.100 `dotnet new sln` has no `--format slnx`.  |
+| 2026-11-25 | 1.11   | Added to the course plan: GitHub repository setup lesson (pull requests only, squash merges, branch protection requiring the `ci` check). Lesson script to be written later. |
+| 2026-11-25 | 1.2    | Done: `Directory.Build.props` (net10.0, nullable, warnings as errors). Verified with a probe project that was deleted again. Not committed.                                  |
