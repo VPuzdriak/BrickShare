@@ -789,7 +789,7 @@ container_min_replicas = 1
 
 ### 10.1 GitHub setup
 
-- Branch protection on `main`: pull request required, CI must pass, one review.
+- Branch protection on `main`: pull request required, CI must pass, squash merges only. No required review, because the course is solo work. The lesson shows how to add one for a team.
 - GitHub **Environments**: `Development`, `Test`, `Production`. Each has its own variables (resource group, app names) and secrets.
 - Azure login with **OIDC federated credentials** (`azure/login`), no client secrets stored in GitHub.
 - `Production` requires a manual approval from a reviewer. In the course, Production resources do not exist, so the Production deploy stage is defined but disabled (`if: vars.PRODUCTION_ENABLED == 'true'`). Turning it on later needs only the variable and a `terraform apply` for `envs/prod`.

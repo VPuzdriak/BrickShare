@@ -23,6 +23,7 @@ Last updated: 2026-11-25
 - [ ] 1.8 `BrickShare.TestKit`: builders, `FakeTimeProvider`, test tokens
 - [ ] 1.9 Architecture tests: dependency rules for Domain and services
 - [ ] 1.10 CI workflow `ci.yml`: build, test, format check
+- [ ] 1.11 GitHub repository setup: pull requests only, squash merges, branch protection with the `ci` check
 
 ## 2. Catalog Service
 
@@ -182,3 +183,4 @@ Last updated: 2026-11-25
 |------|--------|--------|
 | 2026-11-25 | | Course plan split into lessons. Implementation not started. |
 | 2026-11-25 | 1.1 | Done: `global.json` (10.0.100, latestFeature), `BrickShare.slnx`, `.gitignore`. Solution file written by hand because SDK 10.0.100 `dotnet new sln` has no `--format slnx`. |
+| 2026-11-25 | 1.11 | Added to the course plan: GitHub repository setup lesson (pull requests only, squash merges, branch protection requiring the `ci` check). Lesson script to be written later. |
