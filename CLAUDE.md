@@ -42,7 +42,7 @@ Read the relevant doc before you change code. Do not duplicate doc content in co
 Details: `docs/Architecture.md` sections 7.1 and 7.2.
 
 - **TDD by default.** Start each change with a failing test derived from a rule in `docs/features/`. Then write the simplest code that passes, then refactor. Do not write production code without a test that needs it.
-- Domain rules are covered by fast unit tests in `<Service>.Domain.Tests` (xUnit v3, Shouldly, no mocks). Endpoints, auth, and persistence are covered by integration tests (`WebApplicationFactory` + Testcontainers).
+- Domain rules are covered by fast unit tests in `<Service>.Domain.Tests` (xUnit v3, AwesomeAssertions, no mocks). Endpoints, auth, and persistence are covered by integration tests (`WebApplicationFactory` + Testcontainers).
 - Each service has `<Service>.Domain` (plain C#, no EF Core, ASP.NET Core, Azure, or Stripe references) and `<Service>.Api` (slices, EF Core, adapters).
 - Business rules live in aggregates and value objects, not in endpoints or handlers. Handlers load an aggregate, call a method, and save.
 - No public setters on aggregates. One transaction changes one aggregate.
@@ -50,7 +50,7 @@ Details: `docs/Architecture.md` sections 7.1 and 7.2.
 - External systems sit behind ports (`IPaymentGateway`, `IStaffDirectory`, `ISetSpecificationProvider`). Tests use fakes. Never call Stripe or Rebrickable in automated tests.
 - Use DDD where the domain has rules (Reservation, Payment, Inspection, Customer bans). Keep CRUD parts simple. Do not add patterns that a feature does not need.
 - Test names describe behavior: `Pickup_fails_when_deposit_is_not_secured`. Use TestKit builders and `FakeTimeProvider`.
-- Do not use FluentAssertions (commercial license from v8).
+- Do not use FluentAssertions (commercial license from v8). Use AwesomeAssertions instead.
 
 ## Architecture rules
 
@@ -66,7 +66,10 @@ Details: `docs/Architecture.md` sections 7.1 and 7.2.
 
 Project skills live in `.claude/skills/` and are pinned in `skills-lock.json` (restore with `npx skills experimental_install`). Installed: `stripe-best-practices`, `terraform-style-guide`, `cosmosdb-best-practices`, `azure-functions`, `azure-service-bus`.
 
-Local skill (not in `skills-lock.json`): `lesson-script`. `/lesson-script <id>` writes `docs/lessons/<id>-<slug>.md` on Haiku and changes no other file.
+Local skills (not in `skills-lock.json`):
+
+- `lesson-script`. `/lesson-script <id>` writes `docs/lessons/<id>-<slug>.md` on Haiku and changes no other file.
+- `lesson-script-verify`. `/lesson-script-verify <id>` runs every step of a lesson script in the current repo, except git writes. It fixes the script where the repo differs from it.
 
 **If a skill conflicts with this file or `docs/`, follow this file and `docs/`.** Do not install skills whose rules conflict with the docs. Note: `terraform-style-guide` examples use AWS and `staging`. Our provider is `azurerm`, and environments are `dev`, `test`, `prod`.
 

@@ -19,7 +19,7 @@ Full feature descriptions: [docs/features](docs/features/README.md).
 |------|--------|
 | ASP.NET Core | Minimal APIs, vertical slices, OpenAPI and Scalar, `ProblemDetails`, YARP gateway |
 | Design | DDD (aggregates, value objects, domain events, ports and adapters), microservices, database per service |
-| Testing | TDD, xUnit v3, Shouldly, Testcontainers, architecture and contract tests |
+| Testing | TDD, xUnit v3, AwesomeAssertions, Testcontainers, architecture and contract tests |
 | Data | PostgreSQL with EF Core (`pg_trgm` fuzzy search, partial unique indexes), Cosmos DB for NoSQL, Blob Storage |
 | Messaging | Azure Service Bus, transactional outbox, idempotent consumers |
 | Serverless | Azure Functions (Service Bus and Event Grid triggers), Durable Functions |
