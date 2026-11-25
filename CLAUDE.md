@@ -13,6 +13,7 @@ Read the relevant doc before you change code. Do not duplicate doc content in co
 | `docs/features/*.md` | Business rules, endpoints, events, and flows per feature. The source of truth for behavior |
 | `docs/CoursePlan.md` | Module order. Build in this order |
 | `docs/Progress.md` | One marker per lesson. Keep it current |
+| `docs/lessons/*.md` | Lesson scripts: summary, problem, and code step by step. Written by the `lesson-script` skill |
 
 ## Workflow
 
@@ -64,6 +65,8 @@ Details: `docs/Architecture.md` sections 7.1 and 7.2.
 ## Skills
 
 Project skills live in `.claude/skills/` and are pinned in `skills-lock.json` (restore with `npx skills experimental_install`). Installed: `stripe-best-practices`, `terraform-style-guide`, `cosmosdb-best-practices`, `azure-functions`, `azure-service-bus`.
+
+Local skill (not in `skills-lock.json`): `lesson-script`. `/lesson-script <id>` writes `docs/lessons/<id>-<slug>.md` on Haiku and changes no other file.
 
 **If a skill conflicts with this file or `docs/`, follow this file and `docs/`.** Do not install skills whose rules conflict with the docs. Note: `terraform-style-guide` examples use AWS and `staging`. Our provider is `azurerm`, and environments are `dev`, `test`, `prod`.
 
