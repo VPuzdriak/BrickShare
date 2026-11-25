@@ -7,13 +7,13 @@ One marker per lesson from [CoursePlan.md](CoursePlan.md). Lesson ids match the 
 - Add a line to the log for every status change.
 - If a lesson is added, split, or renamed, change [CoursePlan.md](CoursePlan.md) first, then this file.
 
-**Current lesson:** none (implementation not started)
+**Current lesson:** none (1.1 done; 1.2 not started)
 
 Last updated: 2026-11-25
 
 ## 1. Foundations
 
-- [ ] 1.1 Repository, solution (`BrickShare.slnx`), `global.json`, `.gitignore`
+- [x] 1.1 Repository, solution (`BrickShare.slnx`), `global.json`, `.gitignore`
 - [ ] 1.2 Central build settings: `Directory.Build.props`, nullable, warnings as errors
 - [ ] 1.3 Central package management: `Directory.Packages.props`
 - [ ] 1.4 Code style: `.editorconfig`, SonarAnalyzer, `dotnet format`
@@ -181,3 +181,4 @@ Last updated: 2026-11-25
 | Date | Lesson | Change |
 |------|--------|--------|
 | 2026-11-25 | | Course plan split into lessons. Implementation not started. |
+| 2026-11-25 | 1.1 | Done: `global.json` (10.0.100, latestFeature), `BrickShare.slnx`, `.gitignore`. Solution file written by hand because SDK 10.0.100 `dotnet new sln` has no `--format slnx`. |
