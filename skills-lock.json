@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "skills": {
+    "azure-functions": {
+      "source": "MicrosoftDocs/Agent-Skills",
+      "commit": "9b16b5c7c7716949c83fc4bbdc448e0ada7f93a3",
+      "sourceType": "github",
+      "skillPath": "skills/azure-functions/SKILL.md",
+      "computedHash": "dafcb514a5dd7f1d3756d7e29ad2b59efaebd244238ebdff062fcff45e1f842c"
+    },
+    "azure-service-bus": {
+      "source": "MicrosoftDocs/Agent-Skills",
+      "commit": "9b16b5c7c7716949c83fc4bbdc448e0ada7f93a3",
+      "sourceType": "github",
+      "skillPath": "skills/azure-service-bus/SKILL.md",
+      "computedHash": "74ce170541cf1d352ff7d6125e314d13affdea5e3f4841ae08b0ca86ebe43c38"
+    },
+    "cosmosdb-best-practices": {
+      "source": "AzureCosmosDB/cosmosdb-agent-kit",
+      "commit": "a456e10dc615db3ed47c0b44e3154daf77d4dd7a",
+      "sourceType": "github",
+      "skillPath": "skills/cosmosdb-best-practices/SKILL.md",
+      "computedHash": "0379e89356820c5df06aee1cbc00af389b22ef10d43fe95a64167bdda0f987d0"
+    },
+    "stripe-best-practices": {
+      "source": "stripe/ai",
+      "commit": "d4b19a989bf12bdbd4d42de1f9bfd3aec56fd9da",
+      "sourceType": "github",
+      "skillPath": "skills/stripe-best-practices/SKILL.md",
+      "computedHash": "abf8e949bcbcc38081c03eb66b22e741c3cf1be6bae627546d711e6d32327a09"
+    },
+    "terraform-style-guide": {
+      "source": "hashicorp/agent-skills",
+      "commit": "5e30fa5c867ba6777c37e4206babfd08049c396f",
+      "sourceType": "github",
+      "skillPath": "plugins/terraform/skills/terraform-style-guide/SKILL.md",
+      "computedHash": "39a686ad7d71d99e5fbead0a5cbd666c096af8d38d152f7597eb314e5b2b622c"
+    }
+  }
+}
