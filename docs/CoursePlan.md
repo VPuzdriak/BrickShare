@@ -20,6 +20,7 @@ Repository setup, central build rules, test setup, and the DDD building blocks.
 | 1.8 | `BrickShare.TestKit`: builders, `FakeTimeProvider`, test tokens | |
 | 1.9 | Architecture tests: dependency rules for Domain and services | |
 | 1.10 | CI workflow `ci.yml`: build, test, format check | |
+| 1.11 | GitHub repository setup: pull requests only, squash merges, branch protection with the `ci` check | |
 
 ## 2. Catalog Service
 
