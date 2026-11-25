@@ -518,7 +518,7 @@ Development is test-first wherever practical: write a failing test from a rule i
 
 | Level | Scope | Tools | Notes |
 |-------|-------|-------|-------|
-| Domain unit tests | Aggregates, value objects, policies | xUnit v3, Shouldly | Fast, no mocks, no I/O. Each business rule in a feature doc has at least one test. Main place for TDD |
+| Domain unit tests | Aggregates, value objects, policies | xUnit v3, AwesomeAssertions | Fast, no mocks, no I/O. Each business rule in a feature doc has at least one test. Main place for TDD |
 | Handler tests | One slice with fake ports | xUnit v3, NSubstitute (only for ports), `FakeTimeProvider` | Used where a slice has logic beyond calling the domain |
 | Integration tests | HTTP endpoint to real database | `WebApplicationFactory`, Testcontainers (PostgreSQL, Cosmos emulator, Azurite, Service Bus emulator) | Covers auth policies, EF mappings, unique index, outbox. Test JWTs are issued by the TestKit |
 | Function tests | Orchestrations and activities | xUnit v3, Durable Task test helpers | Timers are tested with a fake orchestration context |
@@ -532,7 +532,7 @@ Rules:
 - Time-dependent rules (holds, overdue days, pick-up deadline) are tested with `FakeTimeProvider`.
 - Stripe is never called in automated tests. `IPaymentGateway` has a fake. The `brickshare-local` sandbox is used only for manual end-to-end checks with the Stripe CLI.
 - Rebrickable is never called in automated tests. `ISetSpecificationProvider` has a fake for domain and handler tests. The adapter is tested against recorded Rebrickable JSON responses served by a stub HTTP handler.
-- FluentAssertions is not used because version 8 and later need a commercial license. Shouldly is used instead.
+- FluentAssertions is not used because version 8 and later need a commercial license. AwesomeAssertions is used instead.
 - CI runs all test levels on every pull request. A failing test blocks the merge.
 
 ### 7.3 Directory.Build.props
@@ -578,7 +578,7 @@ Rules:
     <PackageVersion Include="Yarp.ReverseProxy" Version="x.y.z" />
     <PackageVersion Include="QRCoder" Version="x.y.z" />
     <PackageVersion Include="xunit.v3" Version="x.y.z" />
-    <PackageVersion Include="Shouldly" Version="x.y.z" />
+    <PackageVersion Include="AwesomeAssertions" Version="x.y.z" />
     <PackageVersion Include="NSubstitute" Version="x.y.z" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="x.y.z" />
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="x.y.z" />

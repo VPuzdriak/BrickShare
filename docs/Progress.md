@@ -7,9 +7,9 @@ One marker per lesson from [CoursePlan.md](CoursePlan.md). Lesson ids match the 
 - Add a line to the log for every status change.
 - If a lesson is added, split, or renamed, change [CoursePlan.md](CoursePlan.md) first, then this file.
 
-**Current lesson:** none (1.1 and 1.2 done; 1.3 not started)
+**Current lesson:** none (1.1 to 1.5 done; 1.6 not started)
 
-Last updated: 2026-11-25
+Last updated: 2026-11-26
 
 ## 1. Foundations
 
@@ -17,7 +17,7 @@ Last updated: 2026-11-25
 - [x] 1.2 Central build settings: `Directory.Build.props`, nullable, warnings as errors
 - [x] 1.3 Central package management: `Directory.Packages.props`
 - [x] 1.4 Code style: `.editorconfig`, SonarAnalyzer, `dotnet format`
-- [ ] 1.5 Test projects with xUnit v3 and Shouldly, the first red-green-refactor cycle
+- [x] 1.5 Test projects with xUnit v3 and AwesomeAssertions, the first red-green-refactor cycle
 - [ ] 1.6 Shared kernel: `Entity`, `AggregateRoot`, `ValueObject`, domain events, results
 - [ ] 1.7 `Money` value object, test-first
 - [ ] 1.8 `BrickShare.TestKit`: builders, `FakeTimeProvider`, test tokens
@@ -185,3 +185,4 @@ Last updated: 2026-11-25
 | 2026-11-25 | 1.1    | Done: `global.json` (10.0.100, latestFeature), `BrickShare.slnx`, `.gitignore`. Solution file written by hand because SDK 10.0.100 `dotnet new sln` has no `--format slnx`.  |
 | 2026-11-25 | 1.11   | Added to the course plan: GitHub repository setup lesson (pull requests only, squash merges, branch protection requiring the `ci` check). Lesson script to be written later. |
 | 2026-11-25 | 1.2    | Done: `Directory.Build.props` (net10.0, nullable, warnings as errors). Verified with a probe project that was deleted again. Not committed.                                  |
+| 2026-11-26 | 1.5    | Done: `xunit.v3` and AwesomeAssertions in `Directory.Packages.props`, `global.json` test runner (Microsoft Testing Platform), `.editorconfig` CA1707 off for test projects. Probe with two red-green-refactor tests kept in `probe/`, not committed. Lesson script corrected to match the build. |
