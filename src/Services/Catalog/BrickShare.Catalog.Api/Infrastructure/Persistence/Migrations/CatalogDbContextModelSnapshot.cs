@@ -23,6 +23,8 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.HasSequence("inventory_code_seq");
+
             modelBuilder.Entity("BrickShare.Catalog.Domain.LegoSet", b =>
                 {
                     b.Property<Guid>("Id")
@@ -139,6 +141,44 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("lego_sets", (string)null);
                 });
 
+            modelBuilder.Entity("BrickShare.Catalog.Domain.SetInstance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("condition");
+
+                    b.Property<string>("InventoryCode")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("character varying(7)")
+                        .HasColumnName("inventory_code");
+
+                    b.Property<Guid>("SetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("set_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InventoryCode")
+                        .IsUnique();
+
+                    b.HasIndex("SetId");
+
+                    b.ToTable("set_instances", (string)null);
+                });
+
             modelBuilder.Entity("BrickShare.Catalog.Domain.Theme", b =>
                 {
                     b.Property<Guid>("Id")
@@ -160,6 +200,15 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("themes", (string)null);
+                });
+
+            modelBuilder.Entity("BrickShare.Catalog.Domain.SetInstance", b =>
+                {
+                    b.HasOne("BrickShare.Catalog.Domain.LegoSet", null)
+                        .WithMany()
+                        .HasForeignKey("SetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

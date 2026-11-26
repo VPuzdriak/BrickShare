@@ -24,6 +24,9 @@ public static class SetTestData
             new Money(30000, "EUR"),
             new Money(500, "EUR"));
 
+    public static SetInstance CreateInstance(Guid setId) =>
+        new(Guid.CreateVersion7(), setId, InventoryCode.FromSequence(1), InstanceCondition.New);
+
     public static async Task<LegoSet> SaveAsync(CatalogApiFactory factory, LegoSet legoSet)
     {
         await using var scope = factory.Services.CreateAsyncScope();
@@ -49,5 +52,24 @@ public static class SetTestData
         var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
 
         return await dbContext.Themes.FindAsync([id], TestContext.Current.CancellationToken);
+    }
+
+    public static async Task<SetInstance> SaveInstanceAsync(CatalogApiFactory factory, SetInstance instance)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+
+        dbContext.SetInstances.Add(instance);
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        return instance;
+    }
+
+    public static async Task<SetInstance?> FindInstanceAsync(CatalogApiFactory factory, Guid id)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+
+        return await dbContext.SetInstances.FindAsync([id], TestContext.Current.CancellationToken);
     }
 }
