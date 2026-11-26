@@ -1,0 +1,16 @@
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  azurite:
+    ports:
+      - "127.0.0.1:10000:10000"
+
+  catalog-api:
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      ConnectionStrings__catalog: "Host=postgres;Database=catalog;Username=postgres"
+      Rebrickable__ApiKey: ${REBRICKABLE_API_KEY:?Set REBRICKABLE_API_KEY in the .env file}
+      Storage__BlobServiceUri: "http://azurite:10000/devstoreaccount1"

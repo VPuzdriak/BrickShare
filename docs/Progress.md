@@ -58,8 +58,8 @@ Last updated: 2026-11-26
 ## 3. Docker and docker compose
 
 - [x] 3.1 Multi-stage Dockerfile: chiseled runtime image, non-root user
-- [ ] 3.2 docker compose: PostgreSQL, Azurite, Catalog Service
-- [ ] 3.3 Configuration through environment variables, `docker-compose.override.yml`, init scripts
+- [x] 3.2 docker compose: PostgreSQL, Azurite, Catalog Service
+- [x] 3.3 Configuration through environment variables and `docker-compose.override.yml`
 
 ## 4. Identity
 
@@ -204,3 +204,4 @@ Last updated: 2026-11-26
 | 2026-11-26 | 2.1    | Plan changed: lesson 2.1 is the Catalog Api project with `/health/live`, OpenAPI and Scalar. Architecture tests and the Domain project moved out of it; the Domain project comes with lesson 2.2. Lesson script rewritten.                                                                       |
 | 2026-11-26 | 2.8    | Plan changed: lesson 2.8 split into 2.8a to 2.8j, each at most 10 minutes of typing. Rebrickable down returns `503`, documented in the feature doc. Lesson 2.8 script replaced by ten scripts. Not committed.                                                                                    |
 | 2026-11-26 | 2.6    | Plan changed: lesson 2.6 split into 2.6a (create a set), 2.6b (FluentValidation and ProblemDetails), 2.6c (update), 2.6d (deactivate), 2.6e (Respawn and one shared container). Lesson 2.6 script replaced by five scripts. Not committed.                                                       |
+| 2026-11-26 | 3.3    | Plan changed: lesson 3.3 title drops "init scripts". The init script moves to the lesson that first needs a service database. Lesson script rewritten. Not committed.                                                                                                                            |
