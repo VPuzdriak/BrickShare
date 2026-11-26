@@ -45,6 +45,17 @@ public class AddInstancesTests(CatalogApiFactory factory) : CatalogDatabaseTests
     }
 
     [Fact]
+    public async Task Added_instances_link_to_their_labels()
+    {
+        var legoSet = await SetTestData.SaveAsync(Factory, SetTestData.CreateSet());
+        using var client = Factory.CreateClient();
+
+        var added = await AddAsync(client, legoSet.Id, quantity: 2);
+
+        added.Should().OnlyContain(instance => instance.LabelUrl == $"/catalog/instances/{instance.Id}/label");
+    }
+
+    [Fact]
     public async Task Add_returns_400_problem_details_when_quantity_is_below_one()
     {
         var legoSet = await SetTestData.SaveAsync(Factory, SetTestData.CreateSet());
