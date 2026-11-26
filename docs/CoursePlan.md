@@ -18,7 +18,7 @@ Repository setup, central build rules, test setup, and the DDD building blocks.
 | 1.6 | Shared kernel: `Entity`, `AggregateRoot`, domain events, results | |
 | 1.7 | `Money` value object, test-first | |
 | 1.8 | Removed. No shared TestKit project. Test helpers live in each test project | |
-| 1.9 | Removed. Architecture tests start in lesson 2.1, when the first service projects exist | |
+| 1.9 | Removed. No architecture tests in the course for now | |
 | 1.10 | CI workflow `ci.yml`: build, test, format check | |
 | 1.11 | GitHub repository setup: pull requests only, squash merges, branch protection with the `ci` check | |
 
@@ -28,8 +28,8 @@ Minimal APIs, the Domain/Api split, PostgreSQL with EF Core, authorization from 
 
 | Lesson | Title | Features |
 |--------|-------|----------|
-| 2.1 | Catalog Domain and Api projects, architecture tests for the Domain and Api dependency rules, first Minimal API endpoint, OpenAPI and Scalar | F01 |
-| 2.2 | `LegoSet` aggregate and value objects (`LegoSetNumber`, prices, minimum rental days), test-first | F01 |
+| 2.1 | Catalog Api project, liveness check `/health/live`, OpenAPI and Scalar | |
+| 2.2 | Catalog Domain project, `LegoSet` aggregate and value objects (`LegoSetNumber`, prices, minimum rental days), test-first | F01 |
 | 2.3 | EF Core with PostgreSQL: `DbContext`, mappings, migrations, UUID v7 ids | F01 |
 | 2.4 | Integration tests with `WebApplicationFactory` and Testcontainers | F01 |
 | 2.5 | Authorization policies, development tokens with `dotnet user-jwts`, test tokens in the test project | F01 |

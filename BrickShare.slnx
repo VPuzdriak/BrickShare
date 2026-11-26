@@ -3,6 +3,10 @@
   <Folder Name="/src/BuildingBlocks/">
     <Project Path="src/BuildingBlocks/BrickShare.SharedKernel/BrickShare.SharedKernel.csproj" />
   </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/Catalog/">
+    <Project Path="src/Services/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj" />
+  </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/BuildingBlocks/">
     <Project Path="tests/BuildingBlocks/BrickShare.SharedKernel.Tests/BrickShare.SharedKernel.Tests.csproj" />
