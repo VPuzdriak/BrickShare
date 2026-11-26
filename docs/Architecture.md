@@ -609,7 +609,7 @@ Rules:
 
 | Container | Image / tool | Purpose |
 |-----------|--------------|---------|
-| `postgres` | `postgres:17` | Four databases and extensions (`pg_trgm`, `unaccent`), created by init script |
+| `postgres` | `postgres:18` | Four databases and extensions (`pg_trgm`, `unaccent`), created by init script |
 | `cosmos` | Cosmos DB Linux emulator (vNext) | Inspection |
 | `azurite` | `mcr.microsoft.com/azure-storage/azurite` | Blob Storage |
 | `servicebus` | Azure Service Bus emulator (+ its SQL Edge dependency) | Topics and subscriptions from `servicebus-config.json` |

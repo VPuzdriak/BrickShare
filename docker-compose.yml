@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: catalog
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d catalog"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite-blob --blobHost 0.0.0.0 --location /data
+    ports:
+      - "127.0.0.1:10000:10000"
+    volumes:
+      - azurite-data:/data
+
+  catalog-api:
+    build:
+      context: .
+      dockerfile: src/Services/Catalog/BrickShare.Catalog.Api/Dockerfile
+    image: brickshare-catalog-api:local
+    environment:
+      ConnectionStrings__catalog: "Host=postgres;Database=catalog;Username=postgres"
+      Rebrickable__ApiKey: placeholder-for-lesson-3-2
+      Storage__BlobServiceUri: "http://azurite:10000/devstoreaccount1"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  azurite-data:
