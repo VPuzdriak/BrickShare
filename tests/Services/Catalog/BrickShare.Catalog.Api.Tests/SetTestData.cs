@@ -24,6 +24,34 @@ public static class SetTestData
             new Money(30000, "EUR"),
             new Money(500, "EUR"));
 
+    public static LegoSet CreateSpecifiedSet(
+        string legoSetNumber, string name, int pieces, long dailyPrice, Guid themeId)
+    {
+        var legoSet = new LegoSet(
+            Guid.CreateVersion7(),
+            new LegoSetNumber(legoSetNumber),
+            name,
+            new MinRentalDays(3),
+            new Money(dailyPrice, "EUR"),
+            new Money(15000, "EUR"),
+            new Money(30000, "EUR"),
+            new Money(500, "EUR"));
+
+        var specification = new SetSpecification(
+            RebrickableSetNumber.Parse($"{legoSetNumber}-1").Value,
+            name,
+            2021,
+            pieces,
+            0,
+            new RebrickableTheme(1, "Top Theme", null),
+            null,
+            new Uri($"https://rebrickable.com/sets/{legoSetNumber}-1/"));
+
+        legoSet.LinkToRebrickable(specification, themeId, new DateTimeOffset(2026, 11, 26, 12, 0, 0, TimeSpan.Zero));
+
+        return legoSet;
+    }
+
     public static SetInstance CreateInstance(Guid setId, long sequence = 1) =>
         new(Guid.CreateVersion7(), setId, InventoryCode.FromSequence(sequence), InstanceCondition.New);
 
@@ -44,6 +72,17 @@ public static class SetTestData
         var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
 
         return await dbContext.LegoSets.FindAsync([id], TestContext.Current.CancellationToken);
+    }
+
+    public static async Task<Theme> SaveThemeAsync(CatalogApiFactory factory, Theme theme)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+
+        dbContext.Themes.Add(theme);
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        return theme;
     }
 
     public static async Task<Theme?> FindThemeAsync(CatalogApiFactory factory, Guid id)

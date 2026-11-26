@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 using FluentValidation;
@@ -28,12 +27,6 @@ public sealed class ValidationFilter<T> : IEndpointFilter
             return await next(context);
         }
 
-        var errors = result.Errors
-            .GroupBy(
-                failure => JsonNamingPolicy.CamelCase.ConvertName(failure.PropertyName ?? string.Empty),
-                failure => failure.ErrorMessage)
-            .ToDictionary(group => group.Key, group => group.ToArray());
-
-        return TypedResults.ValidationProblem(errors);
+        return ValidationProblems.From(result);
     }
 }
