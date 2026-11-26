@@ -25,8 +25,8 @@ Last updated: 2026-11-26
 
 ## 2. Catalog Service
 
-- [ ] 2.1 Catalog Domain and Api projects, architecture tests for the Domain and Api dependency rules, first Minimal API endpoint, OpenAPI and Scalar (F01)
-- [ ] 2.2 `LegoSet` aggregate and value objects (`LegoSetNumber`, prices, minimum rental days), test-first (F01)
+- [x] 2.1 Catalog Api project, liveness check `/health/live`, OpenAPI and Scalar
+- [ ] 2.2 Catalog Domain project, `LegoSet` aggregate and value objects (`LegoSetNumber`, prices, minimum rental days), test-first (F01)
 - [ ] 2.3 EF Core with PostgreSQL: `DbContext`, mappings, migrations, UUID v7 ids (F01)
 - [ ] 2.4 Integration tests with `WebApplicationFactory` and Testcontainers (F01)
 - [ ] 2.5 Authorization policies, development tokens with `dotnet user-jwts`, test tokens in the test project (F01)
@@ -188,3 +188,4 @@ Last updated: 2026-11-26
 | 2026-11-26 | 1.6    | Done: `BrickShare.SharedKernel` with `Entity`, `AggregateRoot`, domain events and results, 9 tests green. Lesson script fixed for the real CS0103/CS0246 errors in step 13. Not committed.                                                                                                       |
 | 2026-11-26 | 1.5    | Done: `xunit.v3` and AwesomeAssertions in `Directory.Packages.props`, `global.json` test runner (Microsoft Testing Platform), `.editorconfig` CA1707 off for test projects. Probe with two red-green-refactor tests kept in `probe/`, not committed. Lesson script corrected to match the build. |
 | 2026-11-26 | 1.9    | Removed from the plan: architecture tests start in lesson 2.1, when the Catalog Domain and Api projects exist. Cross-service rule added to lesson 6.1, when Reservation exists. No lesson script existed.                                                                                        |
+| 2026-11-26 | 2.1    | Plan changed: lesson 2.1 is the Catalog Api project with `/health/live`, OpenAPI and Scalar. Architecture tests and the Domain project moved out of it; the Domain project comes with lesson 2.2. Lesson script rewritten.                                                                       |
