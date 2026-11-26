@@ -35,8 +35,17 @@ Last updated: 2026-11-26
 - [x] 2.6c Update a set: `Update`, `PUT /catalog/sets/{id}`, `404` as `ProblemDetails` (F01)
 - [x] 2.6d Deactivate a set: `Deactivate`, `DELETE /catalog/sets/{id}`, shared `ProblemDetails` (F01)
 - [x] 2.6e Test isolation: Respawn resets, one shared PostgreSQL container for the Catalog tests
-- [ ] 2.7 Themes and theme mapping (F01)
-- [ ] 2.8 Rebrickable lookup: `ISetSpecificationProvider`, typed `HttpClient`, resilience, caching, stub-based tests (F01)
+- [x] 2.7 Themes and theme mapping (F01)
+- [x] 2.8a Rebrickable set number: default `-1` variant and explicit variants, test-first (F01)
+- [x] 2.8b Rebrickable set number: LEGO set number and input validation (F01)
+- [x] 2.8c `ISetSpecificationProvider` port and Rebrickable adapter: set, minifigures and theme tree, stub-based tests (F01)
+- [x] 2.8d Adapter: unknown set returns `null` (F01)
+- [x] 2.8e Adapter: 24-hour in-memory cache (F01)
+- [x] 2.8f Adapter: Rebrickable failure raises `SetSpecificationUnavailableException` (F01)
+- [x] 2.8g Wire the adapter: typed `HttpClient`, standard resilience handler, API key in user secrets (F01)
+- [x] 2.8h Lookup endpoint: set draft for an admin, fake port in tests (F01)
+- [x] 2.8i Lookup endpoint: `404` and `400` as `ProblemDetails`, admin only (F01)
+- [x] 2.8j Lookup endpoint: `503` when Rebrickable is unavailable (F01)
 - [ ] 2.9 Submit a set from a Rebrickable draft, refresh specs (F01)
 - [ ] 2.10 `InventoryCode` value object: alphabet, scramble, check character, parsing, test-first (F01)
 - [ ] 2.11 Add instances: sequence, quantity, condition and physical status changes (F01)
@@ -193,4 +202,5 @@ Last updated: 2026-11-26
 | 2026-11-26 | 1.5    | Done: `xunit.v3` and AwesomeAssertions in `Directory.Packages.props`, `global.json` test runner (Microsoft Testing Platform), `.editorconfig` CA1707 off for test projects. Probe with two red-green-refactor tests kept in `probe/`, not committed. Lesson script corrected to match the build. |
 | 2026-11-26 | 1.9    | Removed from the plan: architecture tests start in lesson 2.1, when the Catalog Domain and Api projects exist. Cross-service rule added to lesson 6.1, when Reservation exists. No lesson script existed.                                                                                        |
 | 2026-11-26 | 2.1    | Plan changed: lesson 2.1 is the Catalog Api project with `/health/live`, OpenAPI and Scalar. Architecture tests and the Domain project moved out of it; the Domain project comes with lesson 2.2. Lesson script rewritten.                                                                       |
+| 2026-11-26 | 2.8    | Plan changed: lesson 2.8 split into 2.8a to 2.8j, each at most 10 minutes of typing. Rebrickable down returns `503`, documented in the feature doc. Lesson 2.8 script replaced by ten scripts. Not committed.                                                                                    |
 | 2026-11-26 | 2.6    | Plan changed: lesson 2.6 split into 2.6a (create a set), 2.6b (FluentValidation and ProblemDetails), 2.6c (update), 2.6d (deactivate), 2.6e (Respawn and one shared container). Lesson 2.6 script replaced by five scripts. Not committed.                                                       |

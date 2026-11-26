@@ -4,6 +4,7 @@ using BrickShare.Auth;
 using BrickShare.Catalog.Api.Features.Access.Probe;
 using BrickShare.Catalog.Api.Features.Sets;
 using BrickShare.Catalog.Api.Infrastructure.Persistence;
+using BrickShare.Catalog.Api.Infrastructure.Rebrickable;
 
 using FluentValidation;
 
@@ -25,6 +26,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddValidatorsFromAssemblyContaining<SetRequestValidator>();
 builder.Services.AddHealthChecks();
 builder.Services.AddDbContext<CatalogDbContext>(options => options.UseNpgsql(catalogConnection));
+builder.Services.AddMemoryCache();
+builder.Services.AddRebrickableLookup(builder.Configuration);
 builder.Services.AddBrickShareAuthentication(builder.Configuration, builder.Environment);
 builder.Services.AddBrickShareAuthorization();
 
