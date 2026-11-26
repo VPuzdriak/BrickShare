@@ -57,7 +57,7 @@ Last updated: 2026-11-26
 
 ## 3. Docker and docker compose
 
-- [ ] 3.1 Multi-stage Dockerfile: chiseled runtime image, non-root user
+- [x] 3.1 Multi-stage Dockerfile: chiseled runtime image, non-root user
 - [ ] 3.2 docker compose: PostgreSQL, Azurite, Catalog Service
 - [ ] 3.3 Configuration through environment variables, `docker-compose.override.yml`, init scripts
 
