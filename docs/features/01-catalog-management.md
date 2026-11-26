@@ -30,7 +30,7 @@ Adding a set is a two-step process: look up, then submit.
 | Field | Source |
 |-------|--------|
 | LEGO set number, Rebrickable reference, name, release year, piece count | Rebrickable set |
-| Theme | Rebrickable theme. Catalog maps it to a local theme by Rebrickable theme id. The top-level parent theme becomes the catalog theme, and the sub-theme is stored in attributes. A missing local theme is created on submit |
+| Theme | Rebrickable theme. Catalog maps it to a local theme by Rebrickable theme id. The top-level parent theme becomes the catalog theme. Sub-themes are not stored. A missing local theme is created on submit |
 | Minifigure count | Rebrickable set minifigures |
 | Reference image URL, Rebrickable page URL | Rebrickable set |
 | Minimum age, description, minimum rental days, daily price, deposit, replacement value, late fee | Admin. Rebrickable has no ages or prices |
