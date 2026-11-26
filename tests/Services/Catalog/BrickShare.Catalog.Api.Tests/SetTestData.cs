@@ -24,8 +24,8 @@ public static class SetTestData
             new Money(30000, "EUR"),
             new Money(500, "EUR"));
 
-    public static SetInstance CreateInstance(Guid setId) =>
-        new(Guid.CreateVersion7(), setId, InventoryCode.FromSequence(1), InstanceCondition.New);
+    public static SetInstance CreateInstance(Guid setId, long sequence = 1) =>
+        new(Guid.CreateVersion7(), setId, InventoryCode.FromSequence(sequence), InstanceCondition.New);
 
     public static async Task<LegoSet> SaveAsync(CatalogApiFactory factory, LegoSet legoSet)
     {
