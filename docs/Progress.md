@@ -20,13 +20,12 @@ Last updated: 2026-11-26
 - [x] 1.5 Test projects with xUnit v3 and AwesomeAssertions, the first red-green-refactor cycle
 - [x] 1.6 Shared kernel: `Entity`, `AggregateRoot`, domain events, results
 - [x] 1.7 `Money` value object, test-first
-- [ ] 1.9 Architecture tests: dependency rules for Domain and services
 - [ ] 1.10 CI workflow `ci.yml`: build, test, format check
 - [ ] 1.11 GitHub repository setup: pull requests only, squash merges, branch protection with the `ci` check
 
 ## 2. Catalog Service
 
-- [ ] 2.1 Catalog Domain and Api projects, first Minimal API endpoint, OpenAPI and Scalar (F01)
+- [ ] 2.1 Catalog Domain and Api projects, architecture tests for the Domain and Api dependency rules, first Minimal API endpoint, OpenAPI and Scalar (F01)
 - [ ] 2.2 `LegoSet` aggregate and value objects (`LegoSetNumber`, prices, minimum rental days), test-first (F01)
 - [ ] 2.3 EF Core with PostgreSQL: `DbContext`, mappings, migrations, UUID v7 ids (F01)
 - [ ] 2.4 Integration tests with `WebApplicationFactory` and Testcontainers (F01)
@@ -67,7 +66,7 @@ Last updated: 2026-11-26
 
 ## 6. Reservation Service
 
-- [ ] 6.1 Reservation projects, `Reservation` aggregate and state machine, test-first (F06)
+- [ ] 6.1 Reservation projects, architecture test: no references to other services' projects, `Reservation` aggregate and state machine, test-first (F06)
 - [ ] 6.2 Booking rules: minimum rental days, price snapshot, `RentalDays` (F06)
 - [ ] 6.3 Persistence and the partial unique index, concurrency test with Testcontainers (F06)
 - [ ] 6.4 Instance availability, availability endpoint, Catalog proxy endpoint (F02, F06)
@@ -188,3 +187,4 @@ Last updated: 2026-11-26
 | 2026-11-26 | 1.7    | Done: `Money` record in `BrickShare.SharedKernel` (amount in minor units, currency code, EUR only, non-negative), 14 tests green. Lesson script corrected: test count and summary. Not committed. |
 | 2026-11-26 | 1.6    | Done: `BrickShare.SharedKernel` with `Entity`, `AggregateRoot`, domain events and results, 9 tests green. Lesson script fixed for the real CS0103/CS0246 errors in step 13. Not committed. |
 | 2026-11-26 | 1.5    | Done: `xunit.v3` and AwesomeAssertions in `Directory.Packages.props`, `global.json` test runner (Microsoft Testing Platform), `.editorconfig` CA1707 off for test projects. Probe with two red-green-refactor tests kept in `probe/`, not committed. Lesson script corrected to match the build. |
+| 2026-11-26 | 1.9    | Removed from the plan: architecture tests start in lesson 2.1, when the Catalog Domain and Api projects exist. Cross-service rule added to lesson 6.1, when Reservation exists. No lesson script existed. |
