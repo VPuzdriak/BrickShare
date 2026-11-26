@@ -19,7 +19,7 @@ public class DeactivateSetTests(CatalogApiFactory factory) : CatalogDatabaseTest
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Delete, $"/catalog/sets/{legoSet.Id}", TestTokens.Create("Admin"));
+            HttpMethod.Delete, $"/catalog/sets/{legoSet.Id}", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
@@ -33,7 +33,7 @@ public class DeactivateSetTests(CatalogApiFactory factory) : CatalogDatabaseTest
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Delete, $"/catalog/sets/{Guid.CreateVersion7()}", TestTokens.Create("Employee"));
+            HttpMethod.Delete, $"/catalog/sets/{Guid.CreateVersion7()}", EntraTestTokens.Staff("Employee"));
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
@@ -44,7 +44,7 @@ public class DeactivateSetTests(CatalogApiFactory factory) : CatalogDatabaseTest
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Delete, $"/catalog/sets/{Guid.CreateVersion7()}", TestTokens.Create("Admin"));
+            HttpMethod.Delete, $"/catalog/sets/{Guid.CreateVersion7()}", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");

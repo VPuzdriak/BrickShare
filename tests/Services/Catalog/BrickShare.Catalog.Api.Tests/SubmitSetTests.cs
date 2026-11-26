@@ -24,7 +24,7 @@ public class SubmitSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody(rebrickableSetNumber: "10294-1"));
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -50,7 +50,7 @@ public class SubmitSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody(rebrickableSetNumber: "99999-1"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -67,7 +67,7 @@ public class SubmitSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
             using var client = Factory.CreateClient();
 
             using var response = await client.SendWithTokenAsync(
-                HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"),
+                HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"),
                 SetRequests.ValidBody(rebrickableSetNumber: "10294-1"));
 
             response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
@@ -86,12 +86,12 @@ public class SubmitSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var first = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody(rebrickableSetNumber: "10294-1"));
         var existingId = (await first.Content.ReadFromJsonAsync<SetResponse>(TestContext.Current.CancellationToken))!.Id;
 
         using var second = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody(rebrickableSetNumber: "10294-1"));
 
         second.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -106,7 +106,7 @@ public class SubmitSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody(rebrickableSetNumber: "10294-x"));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

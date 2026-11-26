@@ -20,7 +20,7 @@ public class LookupSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, "/catalog/sets/lookup/10294", TestTokens.Create("Admin"));
+            HttpMethod.Get, "/catalog/sets/lookup/10294", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -40,7 +40,7 @@ public class LookupSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, "/catalog/sets/lookup/99999", TestTokens.Create("Admin"));
+            HttpMethod.Get, "/catalog/sets/lookup/99999", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");
@@ -52,7 +52,7 @@ public class LookupSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, "/catalog/sets/lookup/abc", TestTokens.Create("Admin"));
+            HttpMethod.Get, "/catalog/sets/lookup/abc", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");
@@ -64,7 +64,7 @@ public class LookupSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, "/catalog/sets/lookup/10294", TestTokens.Create("Employee"));
+            HttpMethod.Get, "/catalog/sets/lookup/10294", EntraTestTokens.Staff("Employee"));
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
@@ -79,7 +79,7 @@ public class LookupSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
             using var client = Factory.CreateClient();
 
             using var response = await client.SendWithTokenAsync(
-                HttpMethod.Get, "/catalog/sets/lookup/10294", TestTokens.Create("Admin"));
+                HttpMethod.Get, "/catalog/sets/lookup/10294", EntraTestTokens.Staff("Admin"));
 
             response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
             response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");

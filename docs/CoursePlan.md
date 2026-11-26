@@ -75,7 +75,7 @@ Replace the development issuer with Entra ID and External ID. Endpoints and poli
 | 4.1 | Workforce tenant: BrickShare API app registration, scope, app roles `Admin` and `Employee` | F04 |
 | 4.2 | External ID tenant: customer user flow with e-mail OTP, Google, and Facebook | F03 |
 | 4.3 | `BrickShare.Auth`: `Staff` and `Customer` schemes, policy scheme by issuer, role claim mapping | F03, F04 |
-| 4.4 | Scalar with real sign-in, keeping the development issuer for local work | |
+| 4.4 | Scalar with real sign-in | |
 
 ## 5. Customer Service
 

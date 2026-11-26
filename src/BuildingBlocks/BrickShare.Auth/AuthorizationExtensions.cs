@@ -8,7 +8,8 @@ public static class AuthorizationExtensions
     {
         services.AddAuthorizationBuilder()
             .AddPolicy(Policies.AdminOnly, policy => policy.RequireRole("Admin"))
-            .AddPolicy(Policies.EmployeeOrAdmin, policy => policy.RequireRole("Employee", "Admin"));
+            .AddPolicy(Policies.EmployeeOrAdmin, policy => policy.RequireRole("Employee", "Admin"))
+            .AddPolicy(Policies.CustomerOnly, policy => policy.RequireRole("Customer"));
 
         return services;
     }

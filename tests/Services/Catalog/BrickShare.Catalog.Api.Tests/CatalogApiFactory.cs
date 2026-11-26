@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
+using BrickShare.Auth;
 using BrickShare.Catalog.Api.Infrastructure.Persistence;
 using BrickShare.Catalog.Domain;
 
@@ -75,7 +76,10 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
         builder.UseEnvironment(Environments.Development);
         builder.UseSetting("ConnectionStrings:catalog", _postgres.GetConnectionString());
         builder.UseSetting("Rebrickable:ApiKey", "test-key");
-        builder.UseSetting("Authentication:UseDevelopmentIssuer", "true");
+        builder.UseSetting("Authentication:Staff:Authority", EntraTestTokens.StaffIssuer);
+        builder.UseSetting("Authentication:Staff:Audience", EntraTestTokens.ClientId);
+        builder.UseSetting("Authentication:Customer:Authority", EntraTestTokens.CustomerIssuer);
+        builder.UseSetting("Authentication:Customer:Audience", EntraTestTokens.ClientId);
 
         builder.ConfigureTestServices(services =>
         {
@@ -83,12 +87,19 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
             services.AddSingleton<ISetImageStorage>(SetImageStorage);
             services.AddSingleton<TimeProvider>(Time);
 
-            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
-            {
-                options.TokenValidationParameters.ValidIssuer = TestTokens.Issuer;
-                options.TokenValidationParameters.ValidAudience = TestTokens.Audience;
-                options.TokenValidationParameters.IssuerSigningKey = TestTokens.SigningKey;
-            });
+            services.PostConfigure<JwtBearerOptions>(Schemes.Staff, options =>
+                UseEntraTestKey(options, EntraTestTokens.StaffIssuer));
+
+            services.PostConfigure<JwtBearerOptions>(Schemes.Customer, options =>
+                UseEntraTestKey(options, EntraTestTokens.CustomerIssuer));
         });
+    }
+
+    private static void UseEntraTestKey(JwtBearerOptions options, string issuer)
+    {
+        options.ConfigurationManager = null;
+        options.TokenValidationParameters.ValidIssuer = issuer;
+        options.TokenValidationParameters.ValidAudience = EntraTestTokens.ClientId;
+        options.TokenValidationParameters.IssuerSigningKey = EntraTestTokens.SigningKey;
     }
 }

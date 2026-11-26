@@ -19,5 +19,9 @@ public static class AccessProbe
         probe.MapGroup("/staff")
             .RequireAuthorization(Policies.EmployeeOrAdmin)
             .MapGet("/", () => TypedResults.Ok());
+
+        probe.MapGroup("/customer")
+            .RequireAuthorization(Policies.CustomerOnly)
+            .MapGet("/", () => TypedResults.Ok());
     }
 }

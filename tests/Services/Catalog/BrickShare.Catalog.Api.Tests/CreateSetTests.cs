@@ -21,7 +21,7 @@ public class CreateSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"), SetRequests.ValidBody());
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"), SetRequests.ValidBody());
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         response.Headers.Location!.OriginalString.Should().StartWith("/catalog/sets/");
@@ -37,7 +37,7 @@ public class CreateSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Employee"), SetRequests.ValidBody());
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Employee"), SetRequests.ValidBody());
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
@@ -48,7 +48,7 @@ public class CreateSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"), SetRequests.ValidBody(name: ""));
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"), SetRequests.ValidBody(name: ""));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");
@@ -63,7 +63,7 @@ public class CreateSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"), SetRequests.ValidBody(legoSetNumber: "10294-1"));
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"), SetRequests.ValidBody(legoSetNumber: "10294-1"));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
