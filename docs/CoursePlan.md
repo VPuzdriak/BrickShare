@@ -39,7 +39,16 @@ Minimal APIs, the Domain/Api split, PostgreSQL with EF Core, authorization from 
 | 2.6d | Deactivate a set: `Deactivate`, `DELETE /catalog/sets/{id}`, shared `ProblemDetails` | F01 |
 | 2.6e | Test isolation: Respawn resets, one shared PostgreSQL container for the Catalog tests | |
 | 2.7 | Themes and theme mapping | F01 |
-| 2.8 | Rebrickable lookup: `ISetSpecificationProvider`, typed `HttpClient`, resilience, caching, stub-based tests | F01 |
+| 2.8a | Rebrickable set number: default `-1` variant and explicit variants, test-first | F01 |
+| 2.8b | Rebrickable set number: LEGO set number and input validation | F01 |
+| 2.8c | `ISetSpecificationProvider` port and Rebrickable adapter: set, minifigures and theme tree, stub-based tests | F01 |
+| 2.8d | Adapter: unknown set returns `null` | F01 |
+| 2.8e | Adapter: 24-hour in-memory cache | F01 |
+| 2.8f | Adapter: Rebrickable failure raises `SetSpecificationUnavailableException` | F01 |
+| 2.8g | Wire the adapter: typed `HttpClient`, standard resilience handler, API key in user secrets | F01 |
+| 2.8h | Lookup endpoint: set draft for an admin, fake port in tests | F01 |
+| 2.8i | Lookup endpoint: `404` and `400` as `ProblemDetails`, admin only | F01 |
+| 2.8j | Lookup endpoint: `503` when Rebrickable is unavailable | F01 |
 | 2.9 | Submit a set from a Rebrickable draft, refresh specs | F01 |
 | 2.10 | `InventoryCode` value object: alphabet, scramble, check character, parsing, test-first | F01 |
 | 2.11 | Add instances: sequence, quantity, condition and physical status changes | F01 |

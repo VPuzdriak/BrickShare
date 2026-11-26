@@ -37,6 +37,7 @@ Adding a set is a two-step process: look up, then submit.
 
 - The admin can change every draft field before submitting.
 - A set number unknown to Rebrickable returns `404`. The admin can still create the set manually without a lookup.
+- If Rebrickable is down, slow, or still failing after the retries, the lookup returns `503` with `ProblemDetails`. Nothing is saved, and the admin can try again later.
 - If a set with the same Rebrickable reference already exists in the catalog, the lookup returns `409` with the id of the existing set. Different variants (`10294-1`, `10294-2`) are different sets.
 - On submit, Catalog generates the set id and stores the Rebrickable reference, the Rebrickable theme id, and the time of the lookup, so the data can be refreshed later.
 - **Refresh:** the admin can re-fetch Rebrickable data for an existing set. Only Rebrickable fields are updated. Shop data (prices, deposit, age) stays unchanged.

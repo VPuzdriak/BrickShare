@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 
 using BrickShare.Catalog.Api.Infrastructure.Persistence;
+using BrickShare.Catalog.Domain;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +25,8 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:18").Build();
     private Respawner _respawner = null!;
+
+    public FakeSetSpecificationProvider SetSpecifications { get; } = new();
 
     public async ValueTask InitializeAsync()
     {
@@ -62,14 +65,19 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
     {
         builder.UseEnvironment(Environments.Development);
         builder.UseSetting("ConnectionStrings:catalog", _postgres.GetConnectionString());
+        builder.UseSetting("Rebrickable:ApiKey", "test-key");
         builder.UseSetting("Authentication:UseDevelopmentIssuer", "true");
 
         builder.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<ISetSpecificationProvider>(SetSpecifications);
+
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.TokenValidationParameters.ValidIssuer = TestTokens.Issuer;
                 options.TokenValidationParameters.ValidAudience = TestTokens.Audience;
                 options.TokenValidationParameters.IssuerSigningKey = TestTokens.SigningKey;
-            }));
+            });
+        });
     }
 }
