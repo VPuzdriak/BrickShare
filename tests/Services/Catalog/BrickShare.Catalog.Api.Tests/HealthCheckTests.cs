@@ -7,7 +7,8 @@ using Xunit;
 
 namespace BrickShare.Catalog.Api.Tests;
 
-public class HealthCheckTests(CatalogApiFactory factory) : IClassFixture<CatalogApiFactory>
+[Collection(CatalogCollectionDefinition.Name)]
+public class HealthCheckTests(CatalogApiFactory factory)
 {
     [Fact]
     public async Task Liveness_check_returns_ok()

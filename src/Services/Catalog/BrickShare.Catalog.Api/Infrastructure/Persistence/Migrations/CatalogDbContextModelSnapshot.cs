@@ -29,6 +29,10 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
                     b.Property<string>("LegoSetNumber")
                         .IsRequired()
                         .HasColumnType("text")
@@ -37,6 +41,11 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
                     b.Property<int>("MinRentalDays")
                         .HasColumnType("integer")
                         .HasColumnName("min_rental_days");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "DailyPrice", "BrickShare.Catalog.Domain.LegoSet.DailyPrice#Money", b1 =>
                         {
