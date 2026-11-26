@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Time.Testing;
@@ -59,6 +60,8 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
         await connection.OpenAsync();
 
         await _respawner.ResetAsync(connection);
+
+        ((MemoryCache)Services.GetRequiredService<IMemoryCache>()).Compact(1.0);
     }
 
     public override async ValueTask DisposeAsync()
