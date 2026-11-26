@@ -4,6 +4,7 @@ using BrickShare.Auth;
 using BrickShare.Catalog.Api.Features.Access.Probe;
 using BrickShare.Catalog.Api.Features.Instances;
 using BrickShare.Catalog.Api.Features.Sets;
+using BrickShare.Catalog.Api.Features.Themes;
 using BrickShare.Catalog.Api.Infrastructure.Persistence;
 using BrickShare.Catalog.Api.Infrastructure.Rebrickable;
 using BrickShare.Catalog.Api.Infrastructure.Storage;
@@ -46,6 +47,7 @@ app.MapOpenApi();
 app.MapScalarApiReference();
 app.MapAccessProbe();
 app.MapSetEndpoints();
+app.MapThemeEndpoints();
 app.MapInstanceEndpoints();
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false })
