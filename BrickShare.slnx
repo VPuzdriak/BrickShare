@@ -1,1 +1,10 @@
-<Solution />
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/BrickShare.SharedKernel/BrickShare.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/BuildingBlocks/">
+    <Project Path="tests/BuildingBlocks/BrickShare.SharedKernel.Tests/BrickShare.SharedKernel.Tests.csproj" />
+  </Folder>
+</Solution>

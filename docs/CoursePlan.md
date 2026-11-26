@@ -15,7 +15,7 @@ Repository setup, central build rules, test setup, and the DDD building blocks.
 | 1.3 | Central package management: `Directory.Packages.props` | |
 | 1.4 | Code style: `.editorconfig`, SonarAnalyzer, `dotnet format` | |
 | 1.5 | Test projects with xUnit v3 and AwesomeAssertions, the first red-green-refactor cycle | |
-| 1.6 | Shared kernel: `Entity`, `AggregateRoot`, `ValueObject`, domain events, results | |
+| 1.6 | Shared kernel: `Entity`, `AggregateRoot`, domain events, results | |
 | 1.7 | `Money` value object, test-first | |
 | 1.8 | `BrickShare.TestKit`: builders, `FakeTimeProvider`, test tokens | |
 | 1.9 | Architecture tests: dependency rules for Domain and services | |

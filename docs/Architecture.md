@@ -442,7 +442,7 @@ BrickShare/
 ├── docker-compose.override.yml       # local ports, emulator settings
 ├── src/
 │   ├── BuildingBlocks/
-│   │   ├── BrickShare.SharedKernel/       # Entity, AggregateRoot, ValueObject, IDomainEvent, Money
+│   │   ├── BrickShare.SharedKernel/       # Entity, AggregateRoot, IDomainEvent, Money
 │   │   ├── BrickShare.Contracts/          # integration event records
 │   │   ├── BrickShare.Auth/               # JWT schemes, policies
 │   │   ├── BrickShare.Messaging/          # Service Bus publisher/consumer, outbox, inbox

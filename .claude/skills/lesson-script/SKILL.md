@@ -98,11 +98,14 @@ When a step creates a file the dotnet CLI can generate, the step uses the CLI. K
 | `.gitignore` (new) | `dotnet new gitignore` | |
 | Solution file | `dotnet new sln` | SDK 10.0.100 writes `.sln`, not `.slnx` (see lesson 1.1). |
 | Class library | `dotnet new classlib -n <Name> -o <folder>` | Writes `TargetFramework` net11.0 and `Class1.cs`. See the template checks below. |
-| xUnit test project | `dotnet new xunit --xunit-version v3 -n <Name> -o <folder>` | Writes `Version` attributes and nested `global.json` and `xunit.runner.json` files. See the template checks below. |
+| xUnit test project | `dotnet new xunit -n <Name> -o <folder>` | Writes xUnit v2 with the VSTest packages (`Microsoft.NET.Test.Sdk`, `xunit`, `xunit.runner.visualstudio`, `coverlet.collector`), a `net11.0` target, a `Using Include="Xunit"` item, and a sample `UnitTest1.cs`. The SDK 10.0.100 has no `--xunit-version` option. Adjust by hand. See the template checks below. |
 | C# class, interface, record | `dotnet new class -n <Name> -o <folder>` (and `interface`, `record`) | |
 | Package reference | `dotnet add <project> package <id>` | No version: central package management. |
+| Remove package | `dotnet remove <project> package <id>` | Removes a package the template added. |
 
-The table shows the SDK's own short names. Do not invent a short name. The SDK has `xunit`, not `xunit3`.
+The table shows the SDK's own short names. Do not invent a short name. The SDK has `xunit`, not `xunit3`. The xUnit v3 packages are added with `dotnet add ... package xunit.v3`.
+
+For the xUnit test project, the step runs the command, then removes the VSTest and coverlet packages, adds `xunit.v3` and `AwesomeAssertions`, deletes `UnitTest1.cs`, and shows the full project file as it should read. The full file is shown because the hand edits change several lines, as lesson 1.6 does.
 
 Rules for a generated file:
 
