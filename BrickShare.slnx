@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/BrickShare.Auth/BrickShare.Auth.csproj" />
     <Project Path="src/BuildingBlocks/BrickShare.SharedKernel/BrickShare.SharedKernel.csproj" />
   </Folder>
   <Folder Name="/src/Services/" />

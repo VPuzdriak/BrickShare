@@ -2,10 +2,13 @@ using System.Threading.Tasks;
 
 using BrickShare.Catalog.Api.Infrastructure.Persistence;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using Testcontainers.PostgreSql;
 
@@ -34,6 +37,16 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment(Environments.Development);
         builder.UseSetting("ConnectionStrings:catalog", _postgres.GetConnectionString());
+        builder.UseSetting("Authentication:UseDevelopmentIssuer", "true");
+
+        builder.ConfigureTestServices(services =>
+            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters.ValidIssuer = TestTokens.Issuer;
+                options.TokenValidationParameters.ValidAudience = TestTokens.Audience;
+                options.TokenValidationParameters.IssuerSigningKey = TestTokens.SigningKey;
+            }));
     }
 }
