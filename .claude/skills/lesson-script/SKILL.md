@@ -114,6 +114,7 @@ Rules for a generated file:
 - If the template output conflicts with [CLAUDE.md](../../../CLAUDE.md) or the repository's `Directory.Build.props`, `Directory.Packages.props`, or `global.json`, still run the template, then adjust the conflicting lines by hand. Show each adjustment as before and after, and say why in one sentence in the step. Examples of a conflict: a `Version` on a `PackageReference`, a `TargetFramework` that differs from `Directory.Build.props`, or a second `global.json` inside a project folder.
 - A file that the CLI does not generate, such as `docs/Progress.md`, Markdown, or a test body, is written by hand.
 - Do not add explanations as code comments. Explain in the prose around the block.
+- Source samples never mention the course. No "course", "lesson", "tutorial", or "student" in code, comments, exception messages, test names, or identifiers. Prose around the block may mention the course.
 - Plain technical English: short sentences, active voice, one term per concept.
 
 ## Step 3. Check and report
