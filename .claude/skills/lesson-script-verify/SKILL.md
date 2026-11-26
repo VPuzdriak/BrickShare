@@ -3,8 +3,6 @@ name: lesson-script-verify
 description: Verify one BrickShare lesson script by running every step (all steps except git add, commit, and push) in the current repository. Where reality differs from the script, fix the script in docs/lessons/. Use when the user asks to verify, check, or dry-run a lesson, e.g. "/lesson-script-verify 1.5".
 argument-hint: <lesson id, e.g. 1.5>
 model: sonnet
-context: fork
-agent: general-purpose
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Edit, Write, Bash(git:*), Bash(dotnet:*), Bash(pwsh:*), Bash(ls:*), Bash(cat:*), Bash(mkdir:*), Bash(test:*)
 ---

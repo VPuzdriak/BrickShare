@@ -14,6 +14,8 @@ Admins manage Lego sets, set images, and the physical instances the shop owns. S
 
 - Catalog gives every set and instance its own id. APIs, events, and other services use only these ids. Rebrickable identifiers are external references and never leave Catalog.
 - A set has: LEGO set number from the box (for example `10294`, searchable, not unique), optional Rebrickable reference (for example `10294-1`), name, theme, release year, pieces, minimum age, description, minimum rental days, daily price, deposit, replacement value, late fee per day, and attributes that vary between sets (minifigures, dimensions, tags).
+- The LEGO set number is digits only. `10294-1` is not a LEGO set number: the `-1` suffix is part of the Rebrickable reference.
+- Minimum rental days is set per set, not for the whole shop. It is any whole number greater than 0. The code sets no upper limit.
 - `ReplacementValue` is the cost to buy the set again. The admin sets `Deposit` per set. A guideline is 30–50% of `ReplacementValue`, so expensive sets have a bigger deposit.
 - Deleting a set is a soft delete (deactivate).
 
