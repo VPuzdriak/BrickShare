@@ -11,7 +11,8 @@ public sealed record SetRequest(
     long DailyPrice,
     long Deposit,
     long ReplacementValue,
-    long LateFeePerDay);
+    long LateFeePerDay,
+    string? RebrickableSetNumber = null);
 
 public sealed record SetResponse(Guid Id, string LegoSetNumber, string Name, bool IsActive)
 {

@@ -9,16 +9,18 @@ namespace BrickShare.Catalog.Api.Tests;
 
 public static class SetRequests
 {
-    public static object ValidBody(string legoSetNumber = "10294", string name = "Millennium Falcon") => new
-    {
-        legoSetNumber,
-        name,
-        minRentalDays = 3,
-        dailyPrice = 1500,
-        deposit = 15000,
-        replacementValue = 30000,
-        lateFeePerDay = 500
-    };
+    public static object ValidBody(
+        string legoSetNumber = "10294", string name = "Millennium Falcon", string? rebrickableSetNumber = null) => new
+        {
+            legoSetNumber,
+            rebrickableSetNumber,
+            name,
+            minRentalDays = 3,
+            dailyPrice = 1500,
+            deposit = 15000,
+            replacementValue = 30000,
+            lateFeePerDay = 500
+        };
 
     public static async Task<HttpResponseMessage> SendWithTokenAsync(
         this HttpClient client, HttpMethod method, string path, string token, object? body = null)

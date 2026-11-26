@@ -42,4 +42,12 @@ public static class SetTestData
 
         return await dbContext.LegoSets.FindAsync([id], TestContext.Current.CancellationToken);
     }
+
+    public static async Task<Theme?> FindThemeAsync(CatalogApiFactory factory, Guid id)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+
+        return await dbContext.Themes.FindAsync([id], TestContext.Current.CancellationToken);
+    }
 }

@@ -2,6 +2,7 @@ using BrickShare.Auth;
 using BrickShare.Catalog.Api.Features.Sets.Create;
 using BrickShare.Catalog.Api.Features.Sets.Deactivate;
 using BrickShare.Catalog.Api.Features.Sets.Lookup;
+using BrickShare.Catalog.Api.Features.Sets.RefreshSpecs;
 using BrickShare.Catalog.Api.Features.Sets.Update;
 
 using Microsoft.AspNetCore.Builder;
@@ -20,5 +21,6 @@ public static class SetEndpoints
         sets.MapUpdateSet();
         sets.MapDeactivateSet();
         sets.MapLookupSet();
+        sets.MapRefreshSetSpecs();
     }
 }
