@@ -33,7 +33,11 @@ Minimal APIs, the Domain/Api split, PostgreSQL with EF Core, authorization from 
 | 2.3 | EF Core with PostgreSQL: `DbContext`, mappings, migrations, UUID v7 ids | F01 |
 | 2.4 | Integration tests with `WebApplicationFactory` and Testcontainers | F01 |
 | 2.5 | Authorization policies, development tokens with `dotnet user-jwts`, test tokens in the test project | F01 |
-| 2.6 | Create, update, and deactivate sets: validation filters, `ProblemDetails` | F01 |
+| 2.6a | Create a set: `LegoSet` name and active flag, persistence and migration, `POST /catalog/sets` | F01 |
+| 2.6b | Validation with FluentValidation and `ProblemDetails` for create | F01 |
+| 2.6c | Update a set: `Update`, `PUT /catalog/sets/{id}`, `404` as `ProblemDetails` | F01 |
+| 2.6d | Deactivate a set: `Deactivate`, `DELETE /catalog/sets/{id}`, shared `ProblemDetails` | F01 |
+| 2.6e | Test isolation: Respawn resets, one shared PostgreSQL container for the Catalog tests | |
 | 2.7 | Themes and theme mapping | F01 |
 | 2.8 | Rebrickable lookup: `ISetSpecificationProvider`, typed `HttpClient`, resilience, caching, stub-based tests | F01 |
 | 2.9 | Submit a set from a Rebrickable draft, refresh specs | F01 |

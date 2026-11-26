@@ -26,6 +26,12 @@ public sealed class LegoSetConfiguration : IEntityTypeConfiguration<LegoSet>
             .HasConversion(days => days.Days, value => new MinRentalDays(value))
             .HasColumnName("min_rental_days");
 
+        builder.Property(legoSet => legoSet.Name)
+            .HasColumnName("name");
+
+        builder.Property(legoSet => legoSet.IsActive)
+            .HasColumnName("is_active");
+
         builder.ComplexProperty(legoSet => legoSet.DailyPrice, money => ConfigureMoney(money, "daily_price"));
         builder.ComplexProperty(legoSet => legoSet.Deposit, money => ConfigureMoney(money, "deposit"));
         builder.ComplexProperty(legoSet => legoSet.ReplacementValue, money => ConfigureMoney(money, "replacement_value"));

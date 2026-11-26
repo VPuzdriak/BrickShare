@@ -9,7 +9,8 @@ using Xunit;
 
 namespace BrickShare.Catalog.Api.Tests;
 
-public class AccessProbeTests(CatalogApiFactory factory) : IClassFixture<CatalogApiFactory>
+[Collection(CatalogCollectionDefinition.Name)]
+public class AccessProbeTests(CatalogApiFactory factory)
 {
     [Fact]
     public async Task Admin_token_is_allowed_on_admin_probe()

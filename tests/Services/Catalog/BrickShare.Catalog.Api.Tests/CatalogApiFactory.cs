@@ -10,6 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using Npgsql;
+
+using Respawn;
+
 using Testcontainers.PostgreSql;
 
 using Xunit;
@@ -19,6 +23,7 @@ namespace BrickShare.Catalog.Api.Tests;
 public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:18").Build();
+    private Respawner _respawner = null!;
 
     public async ValueTask InitializeAsync()
     {
@@ -27,6 +32,24 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
         await using var scope = Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
         await dbContext.Database.MigrateAsync();
+
+        await using var connection = new NpgsqlConnection(_postgres.GetConnectionString());
+        await connection.OpenAsync();
+
+        _respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
+        {
+            DbAdapter = DbAdapter.Postgres,
+            SchemasToInclude = ["public"],
+            TablesToIgnore = ["__EFMigrationsHistory"]
+        });
+    }
+
+    public async Task ResetDatabaseAsync()
+    {
+        await using var connection = new NpgsqlConnection(_postgres.GetConnectionString());
+        await connection.OpenAsync();
+
+        await _respawner.ResetAsync(connection);
     }
 
     public override async ValueTask DisposeAsync()
