@@ -16,6 +16,7 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresExtension("pg_trgm");
         modelBuilder.HasSequence<long>("inventory_code_seq");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CatalogDbContext).Assembly);
     }

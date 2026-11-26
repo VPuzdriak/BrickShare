@@ -134,6 +134,39 @@ public class BrowseSetsTests(CatalogApiFactory factory) : CatalogDatabaseTests(f
         problem.GetProperty("errors").TryGetProperty("sort", out _).Should().BeTrue();
     }
 
+    [Fact]
+    public async Task Search_finds_a_set_by_a_part_of_its_name()
+    {
+        await SaveAsync("10001", "Millennium Falcon");
+        await SaveAsync("10002", "Star Destroyer");
+
+        var page = await GetPageAsync("?q=falcon");
+
+        page.Items.Select(item => item.LegoSetNumber).Should().Equal("10001");
+    }
+
+    [Fact]
+    public async Task Search_tolerates_a_typo_in_the_name()
+    {
+        await SaveAsync("10001", "Millennium Falcon");
+        await SaveAsync("10002", "Star Destroyer");
+
+        var page = await GetPageAsync("?q=milenium%20falcon");
+
+        page.Items.Select(item => item.LegoSetNumber).Should().Equal("10001");
+    }
+
+    [Fact]
+    public async Task Search_puts_the_closest_name_first()
+    {
+        await SaveAsync("10001", "Millenium Falcon");
+        await SaveAsync("10002", "Millennium Falcon");
+
+        var page = await GetPageAsync("?q=Millennium%20Falcon");
+
+        page.Items.Select(item => item.LegoSetNumber).Should().Equal("10002", "10001");
+    }
+
     private Task<LegoSet> SaveAsync(
         string legoSetNumber, string name, int pieces = 1000, long dailyPrice = 1500, Guid? themeId = null) =>
         SetTestData.SaveAsync(

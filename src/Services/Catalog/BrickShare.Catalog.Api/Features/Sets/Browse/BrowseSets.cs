@@ -37,6 +37,13 @@ public static class BrowseSets
 
         var matches = dbContext.LegoSets.Where(legoSet => legoSet.IsActive);
 
+        var search = request.Search;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            matches = matches.Where(legoSet => EF.Functions.TrigramsAreWordSimilar(search, legoSet.Name));
+        }
+
         if (request.ThemeId is not null)
         {
             matches = matches.Where(legoSet => legoSet.ThemeId == request.ThemeId);
@@ -64,7 +71,11 @@ public static class BrowseSets
 
         var totalCount = await matches.CountAsync(cancellationToken);
 
-        var rows = await Sort(matches, request.Sort)
+        var ordered = string.IsNullOrWhiteSpace(search)
+            ? Sort(matches, request.Sort)
+            : Rank(matches, search);
+
+        var rows = await ordered
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(legoSet => new SetRow(
@@ -90,6 +101,11 @@ public static class BrowseSets
         "price" => sets.OrderBy(legoSet => legoSet.DailyPrice.Amount).ThenBy(legoSet => legoSet.Id),
         _ => sets.OrderBy(legoSet => legoSet.Name).ThenBy(legoSet => legoSet.Id),
     };
+
+    private static IOrderedQueryable<LegoSet> Rank(IQueryable<LegoSet> sets, string search) =>
+        sets.OrderByDescending(legoSet => EF.Functions.TrigramsWordSimilarity(search, legoSet.Name))
+            .ThenBy(legoSet => legoSet.Name)
+            .ThenBy(legoSet => legoSet.Id);
 
     private sealed record SetRow(
         Guid Id, LegoSetNumber LegoSetNumber, string Name, int? PieceCount, long DailyPrice, string Currency);

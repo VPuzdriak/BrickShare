@@ -38,6 +38,10 @@ public sealed class LegoSetConfiguration : IEntityTypeConfiguration<LegoSet>
         builder.HasIndex(legoSet => legoSet.RebrickableSetNum)
             .IsUnique();
 
+        builder.HasIndex(legoSet => legoSet.Name)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops");
+
         builder.Property(legoSet => legoSet.Year)
             .HasColumnName("year");
 
