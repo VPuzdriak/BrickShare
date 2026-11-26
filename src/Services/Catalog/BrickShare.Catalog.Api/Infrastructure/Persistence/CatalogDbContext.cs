@@ -12,6 +12,8 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
 
     public DbSet<SetInstance> SetInstances => Set<SetInstance>();
 
+    public DbSet<SetImage> SetImages => Set<SetImage>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasSequence<long>("inventory_code_seq");

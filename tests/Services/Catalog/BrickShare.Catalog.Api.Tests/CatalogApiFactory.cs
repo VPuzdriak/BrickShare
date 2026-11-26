@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 using BrickShare.Catalog.Api.Infrastructure.Persistence;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Time.Testing;
 
 using Npgsql;
 
@@ -27,6 +29,10 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
     private Respawner _respawner = null!;
 
     public FakeSetSpecificationProvider SetSpecifications { get; } = new();
+
+    public FakeSetImageStorage SetImageStorage { get; } = new();
+
+    public FakeTimeProvider Time { get; } = new(new DateTimeOffset(2026, 11, 26, 12, 0, 0, TimeSpan.Zero));
 
     public async ValueTask InitializeAsync()
     {
@@ -71,6 +77,8 @@ public sealed class CatalogApiFactory : WebApplicationFactory<CatalogApi>, IAsyn
         builder.ConfigureTestServices(services =>
         {
             services.AddSingleton<ISetSpecificationProvider>(SetSpecifications);
+            services.AddSingleton<ISetImageStorage>(SetImageStorage);
+            services.AddSingleton<TimeProvider>(Time);
 
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {

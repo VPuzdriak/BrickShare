@@ -72,4 +72,23 @@ public static class SetTestData
 
         return await dbContext.SetInstances.FindAsync([id], TestContext.Current.CancellationToken);
     }
+
+    public static async Task<SetImage> SaveImageAsync(CatalogApiFactory factory, SetImage image)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+
+        dbContext.SetImages.Add(image);
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        return image;
+    }
+
+    public static async Task<SetImage?> FindImageAsync(CatalogApiFactory factory, Guid id)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
+
+        return await dbContext.SetImages.FindAsync([id], TestContext.Current.CancellationToken);
+    }
 }
