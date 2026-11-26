@@ -6,9 +6,14 @@
   <Folder Name="/src/Services/" />
   <Folder Name="/src/Services/Catalog/">
     <Project Path="src/Services/Catalog/BrickShare.Catalog.Api/BrickShare.Catalog.Api.csproj" />
+    <Project Path="src/Services/Catalog/BrickShare.Catalog.Domain/BrickShare.Catalog.Domain.csproj" />
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/BuildingBlocks/">
     <Project Path="tests/BuildingBlocks/BrickShare.SharedKernel.Tests/BrickShare.SharedKernel.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Services/" />
+  <Folder Name="/tests/Services/Catalog/">
+    <Project Path="tests/Services/Catalog/BrickShare.Catalog.Domain.Tests/BrickShare.Catalog.Domain.Tests.csproj" />
   </Folder>
 </Solution>

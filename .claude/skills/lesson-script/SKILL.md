@@ -3,8 +3,6 @@ name: lesson-script
 description: Write the script for one BrickShare course lesson as a single Markdown file in docs/lessons/. The script has a short summary, the problem the lesson solves, and the source code step by step. Use when the user asks for a lesson script, e.g. "/lesson-script 2.10".
 argument-hint: <lesson id, e.g. 2.10>
 model: haiku
-context: fork
-agent: general-purpose
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Write, Bash(ls:*), Bash(git log:*), Bash(git ls-files:*)
 ---
@@ -91,17 +89,19 @@ A short list of files added or changed.
 
 When a step creates a file the dotnet CLI can generate, the step uses the CLI. Known commands (verified with the SDK 10.0.100 templates):
 
-| File | Command | Note |
-|------|---------|------|
-| `global.json` (new) | `dotnet new globaljson --sdk-version <version>` | Does not edit an existing file. Edit by hand. |
-| `.editorconfig` (new) | `dotnet new editorconfig` | Appending a section to an existing file is a hand edit. |
-| `.gitignore` (new) | `dotnet new gitignore` | |
-| Solution file | `dotnet new sln` | SDK 10.0.100 writes `.sln`, not `.slnx` (see lesson 1.1). |
-| Class library | `dotnet new classlib -n <Name> -o <folder>` | Writes `TargetFramework` net11.0 and `Class1.cs`. See the template checks below. |
-| xUnit test project | `dotnet new xunit -n <Name> -o <folder>` | Writes xUnit v2 with the VSTest packages (`Microsoft.NET.Test.Sdk`, `xunit`, `xunit.runner.visualstudio`, `coverlet.collector`), a `net11.0` target, a `Using Include="Xunit"` item, and a sample `UnitTest1.cs`. The SDK 10.0.100 has no `--xunit-version` option. Adjust by hand. See the template checks below. |
-| C# class, interface, record | `dotnet new class -n <Name> -o <folder>` (and `interface`, `record`) | |
-| Package reference | `dotnet add <project> package <id>` | No version: central package management. |
-| Remove package | `dotnet remove <project> package <id>` | Removes a package the template added. |
+| File                        | Command                                                              | Note                                                                                                                                                                                                                                                                                                               |
+| --------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `global.json` (new)         | `dotnet new globaljson --sdk-version <version>`                      | Does not edit an existing file. Edit by hand.                                                                                                                                                                                                                                                                      |
+| `.editorconfig` (new)       | `dotnet new editorconfig`                                            | Appending a section to an existing file is a hand edit.                                                                                                                                                                                                                                                            |
+| `.gitignore` (new)          | `dotnet new gitignore`                                               |                                                                                                                                                                                                                                                                                                                    |
+| Solution file               | `dotnet new sln`                                                     | SDK 10.0.100 writes `.sln`, not `.slnx` (see lesson 1.1).                                                                                                                                                                                                                                                          |
+| Class library               | `dotnet new classlib -n <Name> -o <folder> -f net10.0`               | Writes `TargetFramework` net10.0 and `Class1.cs`. See the template checks below.                                                                                                                                                                                                                                   |
+| xUnit test project          | `dotnet new xunit -n <Name> -o <folder> -f net10.0`                  | Writes xUnit v2 with the VSTest packages (`Microsoft.NET.Test.Sdk`, `xunit`, `xunit.runner.visualstudio`, `coverlet.collector`), a `net10.0` target, a `Using Include="Xunit"` item, and a sample `UnitTest1.cs`. The SDK 10.0.100 has no `--xunit-version` option. Adjust by hand. See the template checks below. |
+| C# class, interface, record | `dotnet new class -n <Name> -o <folder>` (and `interface`, `record`) |                                                                                                                                                                                                                                                                                                                    |
+| Package reference           | `dotnet add <project> package <id>`                                  | No version: central package management.                                                                                                                                                                                                                                                                            |
+| Remove package              | `dotnet remove <project> package <id>`                               | Removes a package the template added.                                                                                                                                                                                                                                                                              |
+
+Always pass `-f net10.0` to `classlib` and `xunit`. Without it, both templates write net11.0, and the repository targets net10.0 in `Directory.Build.props`.
 
 The table shows the SDK's own short names. Do not invent a short name. The SDK has `xunit`, not `xunit3`. The xUnit v3 packages are added with `dotnet add ... package xunit.v3`.
 

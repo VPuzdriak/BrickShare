@@ -461,11 +461,19 @@ BrickShare/
 │       ├── BrickShare.Functions.Notifications/
 │       ├── BrickShare.Functions.Media/
 │       └── BrickShare.Functions.RentalTimers/
-├── tests/
-│   ├── BrickShare.Reservation.Domain.Tests/       # unit tests of aggregates and value objects
-│   ├── BrickShare.Reservation.Api.Tests/          # integration tests: WebApplicationFactory + Testcontainers
-│   ├── ...                                        # same pair per service
-│   ├── BrickShare.Functions.RentalTimers.Tests/   # orchestration and activity tests
+├── tests/                                 # mirrors src/: one test project per project
+│   ├── BuildingBlocks/
+│   │   └── BrickShare.SharedKernel.Tests/
+│   ├── Services/
+│   │   ├── Catalog/
+│   │   │   ├── BrickShare.Catalog.Domain.Tests/   # unit tests of aggregates and value objects
+│   │   │   └── BrickShare.Catalog.Api.Tests/      # integration tests: WebApplicationFactory + Testcontainers
+│   │   ├── Reservation/                           # same two test projects per service
+│   │   ├── Payment/
+│   │   ├── Inspection/
+│   │   └── Customer/
+│   ├── Functions/
+│   │   └── BrickShare.Functions.RentalTimers.Tests/   # orchestration and activity tests
 │   └── BrickShare.Architecture.Tests/             # dependency rules (see 7.2)
 ├── deploy/
 │   └── terraform/
