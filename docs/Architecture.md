@@ -366,7 +366,7 @@ One set of tenants per environment is ideal. To keep the course simple, Developm
 
 Each service registers two JWT bearer schemes with `Microsoft.Identity.Web`:
 
-- `Staff` scheme: authority of the workforce tenant, role claims from `roles`.
+- `Staff` scheme: authority of the workforce tenant, role claims from `roles`. The valid issuer is `https://login.microsoftonline.com/<tenant id>/v2.0`, and the valid audience is the BrickShare API app id (the client id GUID). The API requests version 2 tokens, and version 2 tokens carry the client id as `aud`. The `api://` URI is not a valid audience.
 - `Customer` scheme: authority of the External ID tenant (`https://<tenant>.ciamlogin.com/`).
 
 A policy scheme selects the right handler from the token `iss` claim. The `Customer` scheme adds the role `Customer` to the principal when a token is validated (`OnTokenValidated`). Each scheme sets its `RoleClaimType` (`roles` for Entra tokens), so all policies are expressed as roles and do not depend on the issuer:
@@ -698,7 +698,7 @@ The App Service uses VNet integration to reach the Container Apps environment. A
 
 ### 9.1 Infrastructure as code with Terraform
 
-All Azure resources are defined in Terraform. Nobody creates resources by hand in the portal, except the one-time bootstrap below.
+All Azure resources are defined in Terraform. Nobody creates resources by hand in the portal, except the one-time bootstrap below and the workforce app registration from lesson 4.1. Lesson 13.7 imports that registration into Terraform, so the app keeps its object id and client id.
 
 **Providers**
 
