@@ -48,7 +48,7 @@ Last updated: 2026-11-26
 - [x] 2.8j Lookup endpoint: `503` when Rebrickable is unavailable (F01)
 - [x] 2.9 Submit a set from a Rebrickable draft, refresh specs (F01)
 - [x] 2.10 `InventoryCode` value object: alphabet, scramble, check character, parsing, test-first (F01)
-- [ ] 2.11 Add instances: sequence, quantity, condition and physical status changes (F01)
+- [x] 2.11 Add instances: sequence, quantity, condition and physical status changes (F01)
 - [ ] 2.12 QR labels with QRCoder (SVG, label sheet), lookup by scanned code (F01)
 - [ ] 2.13 Set images: SAS upload URLs with Azurite (F01)
 - [ ] 2.14 Browse sets: filters, sorting, paging, set details (F02)

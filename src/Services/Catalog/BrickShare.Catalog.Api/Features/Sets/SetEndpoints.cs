@@ -1,4 +1,5 @@
 using BrickShare.Auth;
+using BrickShare.Catalog.Api.Features.Instances.Add;
 using BrickShare.Catalog.Api.Features.Sets.Create;
 using BrickShare.Catalog.Api.Features.Sets.Deactivate;
 using BrickShare.Catalog.Api.Features.Sets.Lookup;
@@ -22,5 +23,6 @@ public static class SetEndpoints
         sets.MapDeactivateSet();
         sets.MapLookupSet();
         sets.MapRefreshSetSpecs();
+        sets.MapAddInstances();
     }
 }
