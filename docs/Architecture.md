@@ -399,7 +399,7 @@ dotnet user-jwts create --project src/Services/Reservation/BrickShare.Reservatio
 - `BrickShare.Auth` registers the development scheme **only when the environment is `Development`** and `Authentication:UseDevelopmentIssuer = true`. In any other environment the scheme is never registered, even if the setting is present.
 - The development scheme uses `RoleClaimType = role`, so the same policies (`AdminOnly`, `EmployeeOrAdmin`, `CustomerOnly`) work unchanged.
 - Development tokens must include an `oid` claim, because endpoints read the user id from `oid`.
-- Integration tests do not use `dotnet user-jwts`. They use tokens issued by `BrickShare.TestKit` (section 7.2), which work the same before and after module 4.
+- Integration tests do not use `dotnet user-jwts`. Each test project has a small helper that issues tokens with the same `oid` and `role` claims (section 7.2), so the tests work the same before and after module 4.
 - Module 4 adds the `Staff` and `Customer` Entra schemes to `BrickShare.Auth`. Endpoints, policies, and tests do not change.
 
 ### 5.4 Service identities
@@ -466,7 +466,6 @@ BrickShare/
 │   ├── BrickShare.Reservation.Api.Tests/          # integration tests: WebApplicationFactory + Testcontainers
 │   ├── ...                                        # same pair per service
 │   ├── BrickShare.Functions.RentalTimers.Tests/   # orchestration and activity tests
-│   ├── BrickShare.TestKit/                        # shared fixtures, builders, fake clock, auth helpers
 │   └── BrickShare.Architecture.Tests/             # dependency rules (see 7.2)
 ├── deploy/
 │   └── terraform/
@@ -520,7 +519,7 @@ Development is test-first wherever practical: write a failing test from a rule i
 |-------|-------|-------|-------|
 | Domain unit tests | Aggregates, value objects, policies | xUnit v3, AwesomeAssertions | Fast, no mocks, no I/O. Each business rule in a feature doc has at least one test. Main place for TDD |
 | Handler tests | One slice with fake ports | xUnit v3, NSubstitute (only for ports), `FakeTimeProvider` | Used where a slice has logic beyond calling the domain |
-| Integration tests | HTTP endpoint to real database | `WebApplicationFactory`, Testcontainers (PostgreSQL, Cosmos emulator, Azurite, Service Bus emulator) | Covers auth policies, EF mappings, unique index, outbox. Test JWTs are issued by the TestKit |
+| Integration tests | HTTP endpoint to real database | `WebApplicationFactory`, Testcontainers (PostgreSQL, Cosmos emulator, Azurite, Service Bus emulator) | Covers auth policies, EF mappings, unique index, outbox. Test JWTs come from a helper in the test project |
 | Function tests | Orchestrations and activities | xUnit v3, Durable Task test helpers | Timers are tested with a fake orchestration context |
 | Architecture tests | Dependency rules | ArchUnitNET or NetArchTest | `Domain` has no reference to EF Core, ASP.NET Core, or Azure SDKs. No service references another service's projects |
 | Contract tests | Integration events | xUnit v3 | Serialize every event in `BrickShare.Contracts` and compare it with a stored sample, so breaking changes fail the build |
@@ -528,7 +527,7 @@ Development is test-first wherever practical: write a failing test from a rule i
 Rules:
 
 - Test names describe behavior: `Pickup_fails_when_deposit_is_not_secured`.
-- Tests use builders from `BrickShare.TestKit` (`AReservation().PickedUp().DueIn(days: 3)`) to keep them short.
+- Tests that need many objects use a builder private to their test project (`AReservation().PickedUp().DueIn(days: 3)`). No shared test library exists, and no test helper has its own tests.
 - Time-dependent rules (holds, overdue days, pick-up deadline) are tested with `FakeTimeProvider`.
 - Stripe is never called in automated tests. `IPaymentGateway` has a fake. The `brickshare-local` sandbox is used only for manual end-to-end checks with the Stripe CLI.
 - Rebrickable is never called in automated tests. `ISetSpecificationProvider` has a fake for domain and handler tests. The adapter is tested against recorded Rebrickable JSON responses served by a stub HTTP handler.

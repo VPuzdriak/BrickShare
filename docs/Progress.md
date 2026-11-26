@@ -20,7 +20,6 @@ Last updated: 2026-11-26
 - [x] 1.5 Test projects with xUnit v3 and AwesomeAssertions, the first red-green-refactor cycle
 - [x] 1.6 Shared kernel: `Entity`, `AggregateRoot`, domain events, results
 - [x] 1.7 `Money` value object, test-first
-- [ ] 1.8 `BrickShare.TestKit`: builders, `FakeTimeProvider`, test tokens
 - [ ] 1.9 Architecture tests: dependency rules for Domain and services
 - [ ] 1.10 CI workflow `ci.yml`: build, test, format check
 - [ ] 1.11 GitHub repository setup: pull requests only, squash merges, branch protection with the `ci` check
@@ -31,7 +30,7 @@ Last updated: 2026-11-26
 - [ ] 2.2 `LegoSet` aggregate and value objects (`LegoSetNumber`, prices, minimum rental days), test-first (F01)
 - [ ] 2.3 EF Core with PostgreSQL: `DbContext`, mappings, migrations, UUID v7 ids (F01)
 - [ ] 2.4 Integration tests with `WebApplicationFactory` and Testcontainers (F01)
-- [ ] 2.5 Authorization policies, development tokens with `dotnet user-jwts`, TestKit tokens in tests (F01)
+- [ ] 2.5 Authorization policies, development tokens with `dotnet user-jwts`, test tokens in the test project (F01)
 - [ ] 2.6 Create, update, and deactivate sets: validation filters, `ProblemDetails` (F01)
 - [ ] 2.7 Themes and theme mapping (F01)
 - [ ] 2.8 Rebrickable lookup: `ISetSpecificationProvider`, typed `HttpClient`, resilience, caching, stub-based tests (F01)
@@ -185,6 +184,7 @@ Last updated: 2026-11-26
 | 2026-11-25 | 1.1    | Done: `global.json` (10.0.100, latestFeature), `BrickShare.slnx`, `.gitignore`. Solution file written by hand because SDK 10.0.100 `dotnet new sln` has no `--format slnx`.  |
 | 2026-11-25 | 1.11   | Added to the course plan: GitHub repository setup lesson (pull requests only, squash merges, branch protection requiring the `ci` check). Lesson script to be written later. |
 | 2026-11-25 | 1.2    | Done: `Directory.Build.props` (net10.0, nullable, warnings as errors). Verified with a probe project that was deleted again. Not committed.                                  |
+| 2026-11-26 | 1.8    | Removed from the plan: no `BrickShare.TestKit`. Money needs no builder, and a token helper that issues fake tokens would only test itself. Test helpers live in each test project. Lesson script deleted. |
 | 2026-11-26 | 1.7    | Done: `Money` record in `BrickShare.SharedKernel` (amount in minor units, currency code, EUR only, non-negative), 14 tests green. Lesson script corrected: test count and summary. Not committed. |
 | 2026-11-26 | 1.6    | Done: `BrickShare.SharedKernel` with `Entity`, `AggregateRoot`, domain events and results, 9 tests green. Lesson script fixed for the real CS0103/CS0246 errors in step 13. Not committed. |
 | 2026-11-26 | 1.5    | Done: `xunit.v3` and AwesomeAssertions in `Directory.Packages.props`, `global.json` test runner (Microsoft Testing Platform), `.editorconfig` CA1707 off for test projects. Probe with two red-green-refactor tests kept in `probe/`, not committed. Lesson script corrected to match the build. |
