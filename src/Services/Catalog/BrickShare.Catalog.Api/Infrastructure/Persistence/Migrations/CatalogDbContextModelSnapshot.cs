@@ -42,10 +42,34 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("min_rental_days");
 
+                    b.Property<int?>("MinifigureCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("minifigure_count");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<int?>("PieceCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("piece_count");
+
+                    b.Property<string>("RebrickableSetNum")
+                        .HasColumnType("text")
+                        .HasColumnName("rebrickable_set_num");
+
+                    b.Property<DateTimeOffset?>("SpecsFetchedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("specs_fetched_at");
+
+                    b.Property<Guid?>("ThemeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("theme_id");
+
+                    b.Property<int?>("Year")
+                        .HasColumnType("integer")
+                        .HasColumnName("year");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "DailyPrice", "BrickShare.Catalog.Domain.LegoSet.DailyPrice#Money", b1 =>
                         {
@@ -109,7 +133,33 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RebrickableSetNum")
+                        .IsUnique();
+
                     b.ToTable("lego_sets", (string)null);
+                });
+
+            modelBuilder.Entity("BrickShare.Catalog.Domain.Theme", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int>("RebrickableThemeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("rebrickable_theme_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RebrickableThemeId")
+                        .IsUnique();
+
+                    b.ToTable("themes", (string)null);
                 });
 #pragma warning restore 612, 618
         }

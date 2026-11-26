@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -18,6 +19,19 @@ public static class SetProblems
             title: "Set not found",
             detail: $"Rebrickable has no set with number {setNumber}.",
             statusCode: StatusCodes.Status404NotFound);
+
+    public static ProblemHttpResult RebrickableSetAlreadyExists(Guid existingSetId) =>
+        TypedResults.Problem(
+            title: "Set already exists",
+            detail: "A set with this Rebrickable reference is already in the catalog.",
+            statusCode: StatusCodes.Status409Conflict,
+            extensions: new Dictionary<string, object?> { ["existingSetId"] = existingSetId });
+
+    public static ProblemHttpResult NoRebrickableReference(Guid id) =>
+        TypedResults.Problem(
+            title: "No Rebrickable reference",
+            detail: $"Set {id} was not created from a Rebrickable draft, so its specifications cannot be refreshed.",
+            statusCode: StatusCodes.Status409Conflict);
 
     public static ProblemHttpResult InvalidSetNumber(string setNumber) =>
         TypedResults.Problem(

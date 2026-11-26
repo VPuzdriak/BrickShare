@@ -32,6 +32,27 @@ public sealed class LegoSetConfiguration : IEntityTypeConfiguration<LegoSet>
         builder.Property(legoSet => legoSet.IsActive)
             .HasColumnName("is_active");
 
+        builder.Property(legoSet => legoSet.RebrickableSetNum)
+            .HasColumnName("rebrickable_set_num");
+
+        builder.HasIndex(legoSet => legoSet.RebrickableSetNum)
+            .IsUnique();
+
+        builder.Property(legoSet => legoSet.Year)
+            .HasColumnName("year");
+
+        builder.Property(legoSet => legoSet.PieceCount)
+            .HasColumnName("piece_count");
+
+        builder.Property(legoSet => legoSet.MinifigureCount)
+            .HasColumnName("minifigure_count");
+
+        builder.Property(legoSet => legoSet.ThemeId)
+            .HasColumnName("theme_id");
+
+        builder.Property(legoSet => legoSet.SpecsFetchedAt)
+            .HasColumnName("specs_fetched_at");
+
         builder.ComplexProperty(legoSet => legoSet.DailyPrice, money => ConfigureMoney(money, "daily_price"));
         builder.ComplexProperty(legoSet => legoSet.Deposit, money => ConfigureMoney(money, "deposit"));
         builder.ComplexProperty(legoSet => legoSet.ReplacementValue, money => ConfigureMoney(money, "replacement_value"));

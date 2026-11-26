@@ -49,6 +49,45 @@ public class LegoSetPersistenceTests(CatalogApiFactory factory) : CatalogDatabas
         stored.Should().HaveCount(2);
     }
 
+    [Fact]
+    public async Task Linked_set_is_read_back_with_its_rebrickable_reference_and_theme()
+    {
+        var themeId = Guid.CreateVersion7();
+        var legoSet = CreateLinkedSet(themeId);
+        await SaveAsync(legoSet);
+
+        var stored = (await LoadAsync(legoSet.Id)).Single();
+
+        stored.RebrickableSetNum.Should().Be("10294-1");
+        stored.Year.Should().Be(2021);
+        stored.PieceCount.Should().Be(9092);
+        stored.MinifigureCount.Should().Be(3);
+        stored.ThemeId.Should().Be(themeId);
+        stored.SpecsFetchedAt.Should().Be(new DateTimeOffset(2026, 11, 26, 10, 0, 0, TimeSpan.Zero));
+    }
+
+    [Fact]
+    public async Task Two_sets_cannot_share_one_rebrickable_reference()
+    {
+        var first = CreateLinkedSet(Guid.CreateVersion7());
+        var second = CreateLinkedSet(Guid.CreateVersion7());
+
+        Func<Task> save = () => SaveAsync(first, second);
+
+        await save.Should().ThrowAsync<DbUpdateException>();
+    }
+
+    private static LegoSet CreateLinkedSet(Guid themeId)
+    {
+        var legoSet = SetTestData.CreateSet("10294");
+        legoSet.LinkToRebrickable(
+            SetSpecificationData.Titanic(),
+            themeId,
+            new DateTimeOffset(2026, 11, 26, 10, 0, 0, TimeSpan.Zero));
+
+        return legoSet;
+    }
+
     private async Task SaveAsync(params LegoSet[] legoSets)
     {
         await using var scope = Factory.Services.CreateAsyncScope();

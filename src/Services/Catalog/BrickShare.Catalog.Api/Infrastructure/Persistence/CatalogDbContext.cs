@@ -8,6 +8,8 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
 {
     public DbSet<LegoSet> LegoSets => Set<LegoSet>();
 
+    public DbSet<Theme> Themes => Set<Theme>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CatalogDbContext).Assembly);

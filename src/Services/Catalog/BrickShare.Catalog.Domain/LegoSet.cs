@@ -49,6 +49,18 @@ public sealed class LegoSet : AggregateRoot<Guid>
 
     public bool IsActive { get; private set; }
 
+    public string? RebrickableSetNum { get; private set; }
+
+    public int? Year { get; private set; }
+
+    public int? PieceCount { get; private set; }
+
+    public int? MinifigureCount { get; private set; }
+
+    public Guid? ThemeId { get; private set; }
+
+    public DateTimeOffset? SpecsFetchedAt { get; private set; }
+
     public void Update(
         LegoSetNumber legoSetNumber,
         string name,
@@ -68,4 +80,25 @@ public sealed class LegoSet : AggregateRoot<Guid>
     }
 
     public void Deactivate() => IsActive = false;
+
+    public void LinkToRebrickable(SetSpecification specification, Guid themeId, DateTimeOffset fetchedAt)
+    {
+        RebrickableSetNum = specification.RebrickableSetNumber.Value;
+        ApplyRebrickableFacts(specification, themeId, fetchedAt);
+    }
+
+    public void RefreshSpecification(SetSpecification specification, Guid themeId, DateTimeOffset fetchedAt)
+    {
+        Name = specification.Name;
+        ApplyRebrickableFacts(specification, themeId, fetchedAt);
+    }
+
+    private void ApplyRebrickableFacts(SetSpecification specification, Guid themeId, DateTimeOffset fetchedAt)
+    {
+        Year = specification.Year;
+        PieceCount = specification.PieceCount;
+        MinifigureCount = specification.MinifigureCount;
+        ThemeId = themeId;
+        SpecsFetchedAt = fetchedAt;
+    }
 }
