@@ -27,7 +27,7 @@ Last updated: 2026-11-26
 
 - [x] 2.1 Catalog Api project, liveness check `/health/live`, OpenAPI and Scalar
 - [x] 2.2 Catalog Domain project, `LegoSet` aggregate and value objects (`LegoSetNumber`, prices, minimum rental days), test-first (F01)
-- [ ] 2.3 EF Core with PostgreSQL: `DbContext`, mappings, migrations, UUID v7 ids (F01)
+- [x] 2.3 EF Core with PostgreSQL: `DbContext`, mappings, migrations, UUID v7 ids (F01)
 - [ ] 2.4 Integration tests with `WebApplicationFactory` and Testcontainers (F01)
 - [ ] 2.5 Authorization policies, development tokens with `dotnet user-jwts`, test tokens in the test project (F01)
 - [ ] 2.6 Create, update, and deactivate sets: validation filters, `ProblemDetails` (F01)

@@ -4,24 +4,41 @@ using BrickShare.SharedKernel;
 
 namespace BrickShare.Catalog.Domain;
 
-public sealed class LegoSet(
-    Guid id,
-    LegoSetNumber legoSetNumber,
-    MinRentalDays minRentalDays,
-    Money dailyPrice,
-    Money deposit,
-    Money replacementValue,
-    Money lateFeePerDay) : AggregateRoot<Guid>(id)
+public sealed class LegoSet : AggregateRoot<Guid>
 {
-    public LegoSetNumber LegoSetNumber { get; } = legoSetNumber;
+    // Used by EF Core to materialize a stored set. EF Core cannot bind the Money parameters to the public constructor.
+    private LegoSet()
+        : this(Guid.Empty, null!, null!, null!, null!, null!, null!)
+    {
+    }
 
-    public MinRentalDays MinRentalDays { get; } = minRentalDays;
+    public LegoSet(
+        Guid id,
+        LegoSetNumber legoSetNumber,
+        MinRentalDays minRentalDays,
+        Money dailyPrice,
+        Money deposit,
+        Money replacementValue,
+        Money lateFeePerDay)
+        : base(id)
+    {
+        LegoSetNumber = legoSetNumber;
+        MinRentalDays = minRentalDays;
+        DailyPrice = dailyPrice;
+        Deposit = deposit;
+        ReplacementValue = replacementValue;
+        LateFeePerDay = lateFeePerDay;
+    }
 
-    public Money DailyPrice { get; } = dailyPrice;
+    public LegoSetNumber LegoSetNumber { get; }
 
-    public Money Deposit { get; } = deposit;
+    public MinRentalDays MinRentalDays { get; }
 
-    public Money ReplacementValue { get; } = replacementValue;
+    public Money DailyPrice { get; }
 
-    public Money LateFeePerDay { get; } = lateFeePerDay;
+    public Money Deposit { get; }
+
+    public Money ReplacementValue { get; }
+
+    public Money LateFeePerDay { get; }
 }
