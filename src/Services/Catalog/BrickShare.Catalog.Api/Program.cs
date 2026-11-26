@@ -6,6 +6,7 @@ using BrickShare.Catalog.Api.Features.Instances;
 using BrickShare.Catalog.Api.Features.Sets;
 using BrickShare.Catalog.Api.Infrastructure.Persistence;
 using BrickShare.Catalog.Api.Infrastructure.Rebrickable;
+using BrickShare.Catalog.Api.Infrastructure.Storage;
 using BrickShare.Catalog.Domain;
 
 using FluentValidation;
@@ -31,6 +32,7 @@ builder.Services.AddDbContext<CatalogDbContext>(options => options.UseNpgsql(cat
 builder.Services.AddScoped<IInventoryCodeSequence, PostgresInventoryCodeSequence>();
 builder.Services.AddMemoryCache();
 builder.Services.AddRebrickableLookup(builder.Configuration);
+builder.Services.AddSetImageStorage(builder.Configuration);
 builder.Services.AddBrickShareAuthentication(builder.Configuration, builder.Environment);
 builder.Services.AddBrickShareAuthorization();
 

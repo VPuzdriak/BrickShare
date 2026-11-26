@@ -141,6 +141,35 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("lego_sets", (string)null);
                 });
 
+            modelBuilder.Entity("BrickShare.Catalog.Domain.SetImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("OriginalBlobName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("original_blob_name");
+
+                    b.Property<Guid>("SetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("set_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SetId");
+
+                    b.ToTable("set_images", (string)null);
+                });
+
             modelBuilder.Entity("BrickShare.Catalog.Domain.SetInstance", b =>
                 {
                     b.Property<Guid>("Id")
@@ -200,6 +229,15 @@ namespace BrickShare.Catalog.Api.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("themes", (string)null);
+                });
+
+            modelBuilder.Entity("BrickShare.Catalog.Domain.SetImage", b =>
+                {
+                    b.HasOne("BrickShare.Catalog.Domain.LegoSet", null)
+                        .WithMany()
+                        .HasForeignKey("SetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BrickShare.Catalog.Domain.SetInstance", b =>

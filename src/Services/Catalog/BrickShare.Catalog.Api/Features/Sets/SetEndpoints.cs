@@ -2,6 +2,7 @@ using BrickShare.Auth;
 using BrickShare.Catalog.Api.Features.Instances.Add;
 using BrickShare.Catalog.Api.Features.Sets.Create;
 using BrickShare.Catalog.Api.Features.Sets.Deactivate;
+using BrickShare.Catalog.Api.Features.Sets.ImageUpload;
 using BrickShare.Catalog.Api.Features.Sets.Lookup;
 using BrickShare.Catalog.Api.Features.Sets.RefreshSpecs;
 using BrickShare.Catalog.Api.Features.Sets.Update;
@@ -24,5 +25,6 @@ public static class SetEndpoints
         sets.MapLookupSet();
         sets.MapRefreshSetSpecs();
         sets.MapAddInstances();
+        sets.MapCreateImageUploadUrl();
     }
 }
