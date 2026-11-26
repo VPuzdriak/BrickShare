@@ -52,7 +52,7 @@ Last updated: 2026-11-26
 - [x] 2.12 QR labels with QRCoder (SVG, label sheet), lookup by scanned code (F01)
 - [x] 2.13 Set images: SAS upload URLs with Azurite (F01)
 - [x] 2.14 Browse sets: filters, sorting, paging, set details (F02)
-- [ ] 2.15 Fuzzy search with `pg_trgm` (F02)
+- [x] 2.15 Fuzzy search with `pg_trgm` (F02)
 - [ ] 2.16 Theme facets with in-memory caching (F02)
 
 ## 3. Docker and docker compose

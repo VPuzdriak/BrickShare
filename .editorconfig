@@ -384,3 +384,7 @@ dotnet_naming_style.s_camelcase.capitalization = camel_case
 # Test projects: test names use underscores to describe behavior, such as Pickup_fails_when_deposit_is_not_secured
 [**/*.Tests/**.cs]
 dotnet_diagnostic.CA1707.severity = none
+
+# EF Core migrations are generated: the tool writes a constant array argument for index operator classes
+[**/Migrations/*.cs]
+dotnet_diagnostic.CA1861.severity = none
