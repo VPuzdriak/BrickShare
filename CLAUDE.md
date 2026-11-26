@@ -49,7 +49,7 @@ Details: `docs/Architecture.md` sections 7.1 and 7.2.
 - Domain events stay internal. Handlers translate them into integration events (`BrickShare.Contracts`) through the outbox.
 - External systems sit behind ports (`IPaymentGateway`, `IStaffDirectory`, `ISetSpecificationProvider`). Tests use fakes. Never call Stripe or Rebrickable in automated tests.
 - Use DDD where the domain has rules (Reservation, Payment, Inspection, Customer bans). Keep CRUD parts simple. Do not add patterns that a feature does not need.
-- Test names describe behavior: `Pickup_fails_when_deposit_is_not_secured`. Use TestKit builders and `FakeTimeProvider`.
+- Test names describe behavior: `Pickup_fails_when_deposit_is_not_secured`. Use `FakeTimeProvider` for time-dependent tests.
 - Do not use FluentAssertions (commercial license from v8). Use AwesomeAssertions instead.
 
 ## Architecture rules

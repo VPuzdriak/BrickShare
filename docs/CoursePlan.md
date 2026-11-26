@@ -17,7 +17,7 @@ Repository setup, central build rules, test setup, and the DDD building blocks.
 | 1.5 | Test projects with xUnit v3 and AwesomeAssertions, the first red-green-refactor cycle | |
 | 1.6 | Shared kernel: `Entity`, `AggregateRoot`, domain events, results | |
 | 1.7 | `Money` value object, test-first | |
-| 1.8 | `BrickShare.TestKit`: builders, `FakeTimeProvider`, test tokens | |
+| 1.8 | Removed. No shared TestKit project. Test helpers live in each test project | |
 | 1.9 | Architecture tests: dependency rules for Domain and services | |
 | 1.10 | CI workflow `ci.yml`: build, test, format check | |
 | 1.11 | GitHub repository setup: pull requests only, squash merges, branch protection with the `ci` check | |
@@ -32,7 +32,7 @@ Minimal APIs, the Domain/Api split, PostgreSQL with EF Core, authorization from 
 | 2.2 | `LegoSet` aggregate and value objects (`LegoSetNumber`, prices, minimum rental days), test-first | F01 |
 | 2.3 | EF Core with PostgreSQL: `DbContext`, mappings, migrations, UUID v7 ids | F01 |
 | 2.4 | Integration tests with `WebApplicationFactory` and Testcontainers | F01 |
-| 2.5 | Authorization policies, development tokens with `dotnet user-jwts`, TestKit tokens in tests | F01 |
+| 2.5 | Authorization policies, development tokens with `dotnet user-jwts`, test tokens in the test project | F01 |
 | 2.6 | Create, update, and deactivate sets: validation filters, `ProblemDetails` | F01 |
 | 2.7 | Themes and theme mapping | F01 |
 | 2.8 | Rebrickable lookup: `ISetSpecificationProvider`, typed `HttpClient`, resilience, caching, stub-based tests | F01 |
