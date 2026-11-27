@@ -27,7 +27,7 @@ public class RefreshSetSpecsTests(CatalogApiFactory factory) : CatalogDatabaseTe
             SetSpecificationData.Titanic() with { Name = "Titanic (2nd edition)", PieceCount = 9100 });
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{id}/refresh-specs", TestTokens.Create("Admin"));
+            HttpMethod.Post, $"/catalog/sets/{id}/refresh-specs", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -44,11 +44,11 @@ public class RefreshSetSpecsTests(CatalogApiFactory factory) : CatalogDatabaseTe
         using var client = Factory.CreateClient();
 
         using var created = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"), SetRequests.ValidBody());
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"), SetRequests.ValidBody());
         var id = (await created.Content.ReadFromJsonAsync<SetResponse>(TestContext.Current.CancellationToken))!.Id;
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{id}/refresh-specs", TestTokens.Create("Admin"));
+            HttpMethod.Post, $"/catalog/sets/{id}/refresh-specs", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
@@ -60,7 +60,7 @@ public class RefreshSetSpecsTests(CatalogApiFactory factory) : CatalogDatabaseTe
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{Guid.CreateVersion7()}/refresh-specs", TestTokens.Create("Admin"));
+            HttpMethod.Post, $"/catalog/sets/{Guid.CreateVersion7()}/refresh-specs", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
@@ -78,7 +78,7 @@ public class RefreshSetSpecsTests(CatalogApiFactory factory) : CatalogDatabaseTe
         try
         {
             using var response = await client.SendWithTokenAsync(
-                HttpMethod.Post, $"/catalog/sets/{id}/refresh-specs", TestTokens.Create("Admin"));
+                HttpMethod.Post, $"/catalog/sets/{id}/refresh-specs", EntraTestTokens.Staff("Admin"));
 
             response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
             response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
@@ -92,7 +92,7 @@ public class RefreshSetSpecsTests(CatalogApiFactory factory) : CatalogDatabaseTe
     private static async Task<Guid> SubmitTitanicAsync(HttpClient client)
     {
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/sets", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/sets", EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody(rebrickableSetNumber: "10294-1"));
 
         var created = await response.Content.ReadFromJsonAsync<SetResponse>(TestContext.Current.CancellationToken);

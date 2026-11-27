@@ -62,7 +62,7 @@ public class AddInstancesTests(CatalogApiFactory factory) : CatalogDatabaseTests
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/instances", TestTokens.Create("Admin"),
+            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/instances", EntraTestTokens.Staff("Admin"),
             new { quantity = 0, condition = InstanceCondition.New });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -75,7 +75,7 @@ public class AddInstancesTests(CatalogApiFactory factory) : CatalogDatabaseTests
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{Guid.CreateVersion7()}/instances", TestTokens.Create("Admin"),
+            HttpMethod.Post, $"/catalog/sets/{Guid.CreateVersion7()}/instances", EntraTestTokens.Staff("Admin"),
             new { quantity = 1, condition = InstanceCondition.New });
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -89,7 +89,7 @@ public class AddInstancesTests(CatalogApiFactory factory) : CatalogDatabaseTests
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/instances", TestTokens.Create("Employee"),
+            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/instances", EntraTestTokens.Staff("Employee"),
             new { quantity = 1, condition = InstanceCondition.New });
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -98,7 +98,7 @@ public class AddInstancesTests(CatalogApiFactory factory) : CatalogDatabaseTests
     private static async Task<List<InstanceResponse>> AddAsync(HttpClient client, Guid setId, int quantity)
     {
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{setId}/instances", TestTokens.Create("Admin"),
+            HttpMethod.Post, $"/catalog/sets/{setId}/instances", EntraTestTokens.Staff("Admin"),
             new { quantity, condition = InstanceCondition.New });
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);

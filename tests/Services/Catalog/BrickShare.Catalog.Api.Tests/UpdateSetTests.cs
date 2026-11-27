@@ -25,7 +25,7 @@ public class UpdateSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var response = await client.SendWithTokenAsync(
             HttpMethod.Put,
             $"/catalog/sets/{legoSet.Id}",
-            TestTokens.Create("Admin"),
+            EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody(legoSetNumber: "75192", name: "Millennium Falcon UCS"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -46,7 +46,7 @@ public class UpdateSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var response = await client.SendWithTokenAsync(
             HttpMethod.Put,
             $"/catalog/sets/{Guid.CreateVersion7()}",
-            TestTokens.Create("Employee"),
+            EntraTestTokens.Staff("Employee"),
             SetRequests.ValidBody());
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -61,7 +61,7 @@ public class UpdateSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var response = await client.SendWithTokenAsync(
             HttpMethod.Put,
             $"/catalog/sets/{legoSet.Id}",
-            TestTokens.Create("Admin"),
+            EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody(name: ""));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -79,7 +79,7 @@ public class UpdateSetTests(CatalogApiFactory factory) : CatalogDatabaseTests(fa
         using var response = await client.SendWithTokenAsync(
             HttpMethod.Put,
             $"/catalog/sets/{Guid.CreateVersion7()}",
-            TestTokens.Create("Admin"),
+            EntraTestTokens.Staff("Admin"),
             SetRequests.ValidBody());
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

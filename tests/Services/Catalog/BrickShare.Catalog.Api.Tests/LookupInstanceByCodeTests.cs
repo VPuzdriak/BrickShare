@@ -23,7 +23,7 @@ public class LookupInstanceByCodeTests(CatalogApiFactory factory) : CatalogDatab
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, $"/catalog/instances/by-code/{instance.InventoryCode.ToString()}", TestTokens.Create("Employee"));
+            HttpMethod.Get, $"/catalog/instances/by-code/{instance.InventoryCode.ToString()}", EntraTestTokens.Staff("Employee"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -46,7 +46,7 @@ public class LookupInstanceByCodeTests(CatalogApiFactory factory) : CatalogDatab
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, $"/catalog/instances/by-code/{typed}", TestTokens.Create("Employee"));
+            HttpMethod.Get, $"/catalog/instances/by-code/{typed}", EntraTestTokens.Staff("Employee"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -59,7 +59,7 @@ public class LookupInstanceByCodeTests(CatalogApiFactory factory) : CatalogDatab
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, $"/catalog/instances/by-code/{wrongCheck}", TestTokens.Create("Employee"));
+            HttpMethod.Get, $"/catalog/instances/by-code/{wrongCheck}", EntraTestTokens.Staff("Employee"));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");
@@ -72,7 +72,7 @@ public class LookupInstanceByCodeTests(CatalogApiFactory factory) : CatalogDatab
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, $"/catalog/instances/by-code/{unused}", TestTokens.Create("Employee"));
+            HttpMethod.Get, $"/catalog/instances/by-code/{unused}", EntraTestTokens.Staff("Employee"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");
@@ -85,7 +85,7 @@ public class LookupInstanceByCodeTests(CatalogApiFactory factory) : CatalogDatab
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, $"/catalog/instances/by-code/{code}", TestTokens.Create("Customer"));
+            HttpMethod.Get, $"/catalog/instances/by-code/{code}", EntraTestTokens.Customer());
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }

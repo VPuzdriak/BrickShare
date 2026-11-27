@@ -22,7 +22,7 @@ public class UpdateInstanceTests(CatalogApiFactory factory) : CatalogDatabaseTes
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Put, $"/catalog/instances/{instance.Id}", TestTokens.Create("Admin"),
+            HttpMethod.Put, $"/catalog/instances/{instance.Id}", EntraTestTokens.Staff("Admin"),
             new { condition = InstanceCondition.Worn, status = InstanceStatus.InMaintenance });
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -38,7 +38,7 @@ public class UpdateInstanceTests(CatalogApiFactory factory) : CatalogDatabaseTes
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Put, $"/catalog/instances/{Guid.CreateVersion7()}", TestTokens.Create("Admin"),
+            HttpMethod.Put, $"/catalog/instances/{Guid.CreateVersion7()}", EntraTestTokens.Staff("Admin"),
             new { condition = InstanceCondition.Good, status = InstanceStatus.Available });
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -51,7 +51,7 @@ public class UpdateInstanceTests(CatalogApiFactory factory) : CatalogDatabaseTes
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Put, $"/catalog/instances/{Guid.CreateVersion7()}", TestTokens.Create("Employee"),
+            HttpMethod.Put, $"/catalog/instances/{Guid.CreateVersion7()}", EntraTestTokens.Staff("Employee"),
             new { condition = InstanceCondition.Good, status = InstanceStatus.Available });
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);

@@ -21,7 +21,7 @@ public class ImageUploadUrlTests(CatalogApiFactory factory) : CatalogDatabaseTes
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/images/upload-url", TestTokens.Create("Admin"));
+            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/images/upload-url", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -38,7 +38,7 @@ public class ImageUploadUrlTests(CatalogApiFactory factory) : CatalogDatabaseTes
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{unknownSetId}/images/upload-url", TestTokens.Create("Admin"));
+            HttpMethod.Post, $"/catalog/sets/{unknownSetId}/images/upload-url", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");
@@ -52,7 +52,7 @@ public class ImageUploadUrlTests(CatalogApiFactory factory) : CatalogDatabaseTes
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/images/upload-url", TestTokens.Create("Employee"));
+            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/images/upload-url", EntraTestTokens.Staff("Employee"));
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
@@ -64,7 +64,7 @@ public class ImageUploadUrlTests(CatalogApiFactory factory) : CatalogDatabaseTes
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/images/upload-url", TestTokens.Create("Admin"));
+            HttpMethod.Post, $"/catalog/sets/{legoSet.Id}/images/upload-url", EntraTestTokens.Staff("Admin"));
 
         var body = await response.Content.ReadFromJsonAsync<JsonElement>(TestContext.Current.CancellationToken);
         body.GetProperty("expiresAt").GetDateTimeOffset().Should().Be(Factory.Time.GetUtcNow().AddMinutes(15));

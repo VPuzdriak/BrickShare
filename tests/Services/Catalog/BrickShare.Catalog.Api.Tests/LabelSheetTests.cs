@@ -21,7 +21,7 @@ public class LabelSheetTests(CatalogApiFactory factory) : CatalogDatabaseTests(f
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/instances/labels", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/instances/labels", EntraTestTokens.Staff("Admin"),
             new { instanceIds = new[] { first.Id, second.Id } });
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -38,7 +38,7 @@ public class LabelSheetTests(CatalogApiFactory factory) : CatalogDatabaseTests(f
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/instances/labels", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/instances/labels", EntraTestTokens.Staff("Admin"),
             new { instanceIds = new[] { Guid.CreateVersion7() } });
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -51,7 +51,7 @@ public class LabelSheetTests(CatalogApiFactory factory) : CatalogDatabaseTests(f
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Post, "/catalog/instances/labels", TestTokens.Create("Admin"),
+            HttpMethod.Post, "/catalog/instances/labels", EntraTestTokens.Staff("Admin"),
             new { instanceIds = Array.Empty<Guid>() });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

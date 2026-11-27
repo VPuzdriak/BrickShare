@@ -20,7 +20,7 @@ public class InstanceLabelTests(CatalogApiFactory factory) : CatalogDatabaseTest
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, $"/catalog/instances/{instance.Id}/label", TestTokens.Create("Admin"));
+            HttpMethod.Get, $"/catalog/instances/{instance.Id}/label", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType!.MediaType.Should().Be("image/svg+xml");
@@ -38,7 +38,7 @@ public class InstanceLabelTests(CatalogApiFactory factory) : CatalogDatabaseTest
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, $"/catalog/instances/{Guid.CreateVersion7()}/label", TestTokens.Create("Admin"));
+            HttpMethod.Get, $"/catalog/instances/{Guid.CreateVersion7()}/label", EntraTestTokens.Staff("Admin"));
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");
@@ -52,7 +52,7 @@ public class InstanceLabelTests(CatalogApiFactory factory) : CatalogDatabaseTest
         using var client = Factory.CreateClient();
 
         using var response = await client.SendWithTokenAsync(
-            HttpMethod.Get, $"/catalog/instances/{instance.Id}/label", TestTokens.Create("Employee"));
+            HttpMethod.Get, $"/catalog/instances/{instance.Id}/label", EntraTestTokens.Staff("Employee"));
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }

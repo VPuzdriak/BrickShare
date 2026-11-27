@@ -34,7 +34,7 @@ builder.Services.AddScoped<IInventoryCodeSequence, PostgresInventoryCodeSequence
 builder.Services.AddMemoryCache();
 builder.Services.AddRebrickableLookup(builder.Configuration);
 builder.Services.AddSetImageStorage(builder.Configuration);
-builder.Services.AddBrickShareAuthentication(builder.Configuration, builder.Environment);
+builder.Services.AddBrickShareAuthentication(builder.Configuration);
 builder.Services.AddBrickShareAuthorization();
 
 var app = builder.Build();
