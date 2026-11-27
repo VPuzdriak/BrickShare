@@ -42,6 +42,10 @@ namespace BrickShare.Customers.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("email");
 
+                    b.Property<string>("Phone")
+                        .HasColumnType("text")
+                        .HasColumnName("phone");
+
                     b.HasKey("Id");
 
                     b.ToTable("customers", (string)null);
