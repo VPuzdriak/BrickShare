@@ -31,11 +31,11 @@ public sealed class Customer : AggregateRoot<Guid>
         "customer.ban_until_not_in_future",
         "A temporary ban must end after the current time.");
 
-    private static readonly DomainError BanNotFound = new(
+    public static readonly DomainError BanNotFound = new(
         "customer.ban_not_found",
         "The ban does not exist.");
 
-    private static readonly DomainError BanAlreadyLifted = new(
+    public static readonly DomainError BanAlreadyLifted = new(
         "customer.ban_already_lifted",
         "The ban is already lifted.");
 
@@ -92,24 +92,25 @@ public sealed class Customer : AggregateRoot<Guid>
         return Result.Success();
     }
 
-    public Result AddBan(BanReason reason, string? comment, string bannedBy, DateTimeOffset? until, DateTimeOffset now)
+    public Result<Ban> AddBan(BanReason reason, string? comment, string bannedBy, DateTimeOffset? until, DateTimeOffset now)
     {
         var text = comment?.Trim() ?? string.Empty;
 
         if (text.Length == 0)
         {
-            return Result.Failure(BanCommentRequired);
+            return Result.Failure<Ban>(BanCommentRequired);
         }
 
         if (until is { } end && end <= now)
         {
-            return Result.Failure(BanUntilNotInFuture);
+            return Result.Failure<Ban>(BanUntilNotInFuture);
         }
 
-        _bans.Add(new Ban(Guid.CreateVersion7(), reason, text, bannedBy, now, until));
+        var ban = new Ban(Guid.CreateVersion7(), reason, text, bannedBy, now, until);
+        _bans.Add(ban);
         RefreshStatus();
 
-        return Result.Success();
+        return Result.Success(ban);
     }
 
     public Result LiftBan(Guid banId, DateTimeOffset now)
@@ -135,6 +136,6 @@ public sealed class Customer : AggregateRoot<Guid>
     private void RefreshStatus() =>
         Status = _bans.Exists(candidate => candidate.IsActive) ? CustomerStatus.Banned : CustomerStatus.Active;
 
-    public Result BanForLostSet(DateTimeOffset now) =>
+    public Result<Ban> BanForLostSet(DateTimeOffset now) =>
         AddBan(BanReason.NonReturn, LostSetComment, Ban.SystemActor, until: null, now: now);
 }

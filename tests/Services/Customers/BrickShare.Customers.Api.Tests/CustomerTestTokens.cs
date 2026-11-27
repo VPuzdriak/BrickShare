@@ -20,7 +20,10 @@ public static class CustomerTestTokens
         Create(CustomerIssuer, new Claim("oid", oid.ToString()), new Claim("email", email), new Claim("name", name));
 
     public static string Staff(string role) =>
-        Create(StaffIssuer, new Claim("oid", Guid.CreateVersion7().ToString()), new Claim("roles", role));
+        Staff(Guid.CreateVersion7(), role);
+
+    public static string Staff(Guid oid, string role) =>
+        Create(StaffIssuer, new Claim("oid", oid.ToString()), new Claim("roles", role));
 
     private static string Create(string issuer, params Claim[] claims)
     {

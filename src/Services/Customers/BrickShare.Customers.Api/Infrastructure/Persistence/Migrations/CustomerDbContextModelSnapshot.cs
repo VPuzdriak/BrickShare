@@ -46,9 +46,67 @@ namespace BrickShare.Customers.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("phone");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasColumnName("status")
+                        .HasDefaultValueSql("'Active'");
+
                     b.HasKey("Id");
 
                     b.ToTable("customers", (string)null);
+                });
+
+            modelBuilder.Entity("BrickShare.Customers.Domain.Customer", b =>
+                {
+                    b.OwnsMany("BrickShare.Customers.Domain.Ban", "Bans", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<string>("BannedBy")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("banned_by");
+
+                            b1.Property<string>("Comment")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("comment");
+
+                            b1.Property<DateTimeOffset>("From")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("banned_from");
+
+                            b1.Property<DateTimeOffset?>("LiftedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("lifted_at");
+
+                            b1.Property<string>("Reason")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("reason");
+
+                            b1.Property<DateTimeOffset?>("Until")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("banned_until");
+
+                            b1.Property<Guid>("customer_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("customer_id");
+
+                            b1.ToTable("customer_bans", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("customer_id");
+                        });
+
+                    b.Navigation("Bans");
                 });
 #pragma warning restore 612, 618
         }

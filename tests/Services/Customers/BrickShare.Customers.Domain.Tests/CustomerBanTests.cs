@@ -34,6 +34,17 @@ public class CustomerBanTests
     }
 
     [Fact]
+    public void Ban_returns_the_new_ban()
+    {
+        var clock = new FakeTimeProvider(Now);
+        var customer = CreateCustomer();
+
+        var result = customer.AddBan(BanReason.Other, "Staff note.", "staff-1", null, clock.GetUtcNow());
+
+        result.Value.Should().BeSameAs(customer.Bans[0]);
+    }
+
+    [Fact]
     public void Ban_fails_when_the_comment_is_blank()
     {
         var clock = new FakeTimeProvider(Now);

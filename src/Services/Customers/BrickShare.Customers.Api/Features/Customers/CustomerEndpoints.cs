@@ -1,5 +1,7 @@
 using BrickShare.Auth;
+using BrickShare.Customers.Api.Features.Customers.BanCustomer;
 using BrickShare.Customers.Api.Features.Customers.GetProfile;
+using BrickShare.Customers.Api.Features.Customers.LiftBan;
 using BrickShare.Customers.Api.Features.Customers.SearchCustomers;
 using BrickShare.Customers.Api.Features.Customers.UpdateProfile;
 
@@ -22,5 +24,11 @@ public static class CustomerEndpoints
             .RequireAuthorization(Policies.EmployeeOrAdmin);
 
         staffCustomers.MapSearchCustomers();
+
+        var adminCustomers = app.MapGroup("/customers")
+            .RequireAuthorization(Policies.AdminOnly);
+
+        adminCustomers.MapBanCustomer();
+        adminCustomers.MapLiftBan();
     }
 }
