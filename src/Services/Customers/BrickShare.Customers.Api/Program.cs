@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 using BrickShare.Auth;
 using BrickShare.Customers.Api.Features.Customers;
@@ -19,6 +20,8 @@ var customersConnection = builder.Configuration.GetConnectionString("customers")
     ?? throw new InvalidOperationException("The connection string 'customers' is missing.");
 
 builder.Services.AddOpenApi();
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddHealthChecks();
 builder.Services.AddDbContext<CustomerDbContext>(options => options.UseNpgsql(customersConnection));
 builder.Services.AddSingleton(TimeProvider.System);

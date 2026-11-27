@@ -29,8 +29,43 @@ public sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(customer => customer.CreatedAt)
             .HasColumnName("created_at");
 
+        builder.Property(customer => customer.Status)
+            .HasColumnName("status")
+            .HasConversion<string>()
+            .HasDefaultValueSql("'Active'");
+
+        builder.OwnsMany(customer => customer.Bans, ban =>
+        {
+            ban.ToTable("customer_bans");
+            ban.WithOwner().HasForeignKey("customer_id");
+            ban.HasKey(item => item.Id);
+
+            ban.Property(item => item.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+
+            ban.Property(item => item.Reason)
+                .HasConversion<string>()
+                .HasColumnName("reason");
+
+            ban.Property(item => item.Comment)
+                .HasColumnName("comment");
+
+            ban.Property(item => item.BannedBy)
+                .HasColumnName("banned_by");
+
+            ban.Property(item => item.From)
+                .HasColumnName("banned_from");
+
+            ban.Property(item => item.Until)
+                .HasColumnName("banned_until");
+
+            ban.Property(item => item.LiftedAt)
+                .HasColumnName("lifted_at");
+
+            ban.Ignore(item => item.IsActive);
+        });
+
         builder.Ignore(customer => customer.DomainEvents);
-        builder.Ignore(customer => customer.Status);
-        builder.Ignore(customer => customer.Bans);
     }
 }
