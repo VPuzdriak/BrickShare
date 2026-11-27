@@ -26,7 +26,7 @@ public sealed class GetProfileTests(CustomerApiFactory factory) : IClassFixture<
         var profile = await ReadProfile(client, token);
 
         profile.Should().BeEquivalentTo(
-            new CustomerProfileResponse(customerId, "ada@example.test", "Ada Lovelace", createdAt));
+            new CustomerProfileResponse(customerId, "ada@example.test", "Ada Lovelace", null, createdAt));
     }
 
     [Fact]

@@ -1,5 +1,7 @@
 using BrickShare.Auth;
 using BrickShare.Customers.Api.Features.Customers.GetProfile;
+using BrickShare.Customers.Api.Features.Customers.SearchCustomers;
+using BrickShare.Customers.Api.Features.Customers.UpdateProfile;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -14,5 +16,11 @@ public static class CustomerEndpoints
             .RequireAuthorization(Policies.CustomerOnly);
 
         customers.MapGetProfile();
+        customers.MapUpdateProfile();
+
+        var staffCustomers = app.MapGroup("/customers")
+            .RequireAuthorization(Policies.EmployeeOrAdmin);
+
+        staffCustomers.MapSearchCustomers();
     }
 }

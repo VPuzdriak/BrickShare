@@ -23,6 +23,9 @@ public sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(customer => customer.DisplayName)
             .HasColumnName("display_name");
 
+        builder.Property(customer => customer.Phone)
+            .HasColumnName("phone");
+
         builder.Property(customer => customer.CreatedAt)
             .HasColumnName("created_at");
 
