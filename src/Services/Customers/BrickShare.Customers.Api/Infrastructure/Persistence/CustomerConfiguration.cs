@@ -30,5 +30,7 @@ public sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasColumnName("created_at");
 
         builder.Ignore(customer => customer.DomainEvents);
+        builder.Ignore(customer => customer.Status);
+        builder.Ignore(customer => customer.Bans);
     }
 }
