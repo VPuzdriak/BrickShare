@@ -70,7 +70,7 @@ Last updated: 2026-11-26
 
 ## 5. Customer Service
 
-- [ ] 5.1 Customer Service projects, `Customer` aggregate, just-in-time provisioning (`/customers/me`) (F03)
+- [x] 5.1 Customer Service projects, `Customer` aggregate, just-in-time provisioning (`/customers/me`) (F03)
 - [ ] 5.2 Profile update, staff customer search (F03)
 - [ ] 5.3 Bans in the `Customer` aggregate: ban, lift, automatic ban, test-first (F05)
 - [ ] 5.4 Ban endpoints (F05)
