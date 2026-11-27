@@ -5,6 +5,7 @@ using BrickShare.Catalog.Api.Features.Access.Probe;
 using BrickShare.Catalog.Api.Features.Instances;
 using BrickShare.Catalog.Api.Features.Sets;
 using BrickShare.Catalog.Api.Features.Themes;
+using BrickShare.Catalog.Api.Infrastructure.Docs;
 using BrickShare.Catalog.Api.Infrastructure.Persistence;
 using BrickShare.Catalog.Api.Infrastructure.Rebrickable;
 using BrickShare.Catalog.Api.Infrastructure.Storage;
@@ -18,14 +19,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using Scalar.AspNetCore;
-
 var builder = WebApplication.CreateBuilder(args);
 
 var catalogConnection = builder.Configuration.GetConnectionString("catalog")
     ?? throw new InvalidOperationException("The connection string 'catalog' is missing.");
 
-builder.Services.AddOpenApi();
+builder.Services.AddApiDocs(builder.Configuration);
 builder.Services.AddProblemDetails();
 builder.Services.AddValidatorsFromAssemblyContaining<SetRequestValidator>();
 builder.Services.AddHealthChecks();
@@ -43,8 +42,7 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapOpenApi();
-app.MapScalarApiReference();
+app.MapApiDocs();
 app.MapAccessProbe();
 app.MapSetEndpoints();
 app.MapThemeEndpoints();
